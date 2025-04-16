@@ -1,6 +1,6 @@
 # Oh-Wow-wow-pair
 
-## How to deplay?
+## How to deploy?
 
 ### Step 1  
 Enter virtual environment
