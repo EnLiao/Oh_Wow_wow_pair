@@ -14,21 +14,32 @@ export default function DollPage() {
       <div 
         style={{ 
           display: 'flex', 
-          justifyContent: 'space-between', 
           alignItems: 'flex-start', 
-          paddingLeft:'5%',
+          paddingLeft:'8%',
+          paddingTop:'6%',
         }}
       >
         <div>
           <h2>{doll.name}</h2>
-          <img src={doll.photo} alt={doll.name} style={{width:200, height:200, objectFit:'cover', borderRadius: 30}}/>
-          <h2>user: {doll.user_name}</h2>
-          <h2>BirthDay: {doll.birthday}</h2>
-          <h2>Bio: {doll.bio}</h2>
-          <h2>Tag: {doll.tag}</h2>
+          <img 
+            src={doll.photo} 
+            alt={doll.name} 
+            style={{
+              width:300, 
+              height:300, 
+              objectFit:'cover', 
+              borderRadius: 10,
+              marginBottom: '5%',
+              marginTop: '5%',
+            }}
+          />
+          <p>user: {doll.user_id}</p>
+          <p>BirthDay: {doll.birthday}</p>
+          <p>Bio: {doll.bio}</p>
+          <p>Tag: {doll.tag}</p>
         </div>
-        <div style={{ width: '60%'}}>
-          <h2 style={{textAlign:'center'}}>recently post</h2>
+        <div style={{ width: '100%', paddingTop:'3%'}}>
+          <p style={{textAlign:'center', fontSize:18}}>recently post</p>
         </div>
       </div>
     )

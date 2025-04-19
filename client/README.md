@@ -1,16 +1,7 @@
-# Oh-Wow-wow-pair
-
-## How to deploy?
-
-### Step 1  
-Enter virtual environment
-
-### Step 2
+how to run
 ```
-pip install -r requirements.txt
+npm install
 ```
-### Step 3
 ```
-cd server
-python manage.py runserver
+npm run dev
 ```
