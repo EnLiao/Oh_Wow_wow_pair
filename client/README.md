@@ -1,9 +1,16 @@
-# Oh-Wow-Wow-Pair 前端 API 串接說明文件
+# Oh-Wow-wow-pair
 
-how to run server
+## How to deploy?
+
+### Step 1  
+Enter virtual environment
+
+### Step 2
 ```
-npm install
+pip install -r requirements.txt
 ```
+### Step 3
 ```
-npm run dev
+cd server
+python manage.py runserver
 ```
