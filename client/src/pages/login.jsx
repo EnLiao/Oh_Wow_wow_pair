@@ -19,49 +19,35 @@ export default function Login() {
         nickname,
         avatar_url,
         bio
-      }
+      };
   
       try {
-        const res = await register({ username, password, email, nickname, bio, avatar_url })
-  
-        if (res.ok) {
-          const result = await res.json()
-          console.log('✅ 註冊成功！', result)
-          alert('註冊成功，請重新登入')
-          setIsSignUp(false)
-        } else {
-          const error = await res.json()
-          console.error('❌ 註冊失敗', error)
-          alert(`註冊失敗：${error.detail || '請檢查欄位'}`)
-        }
+        const res = await register(data); // axios 呼叫 register
+        console.log('sign up success', res.data);
+        alert('sign up success');
+        setIsSignUp(false);
       } catch (err) {
-        console.error('❌ 網路錯誤', err)
-        alert('無法連線到伺服器')
+        const errorData = err.response?.data;
+        console.error('sign up failed', errorData);
+        alert(`sign up failed：${errorData?.detail || 'Please check your input'}`);
       }
   
     } else {
-      const data = { username, password }
-  
       try {
-        const res = await login({ username, password })
+        const res = await login({ username, password }); // axios 呼叫 login
+        const { access, refresh } = res.data;
   
-        if (res.ok) {
-          const result = await res.json()
-          console.log('✅ 登入成功！', result)
-          localStorage.setItem('access_token', result.access)
-          localStorage.setItem('refresh_token', result.refresh)
-          alert('登入成功')
-        } else {
-          const error = await res.json()
-          console.error('❌ 登入失敗', error)
-          alert(`登入失敗：${error.detail || '帳號或密碼錯誤'}`)
-        }
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
+        console.log('log in success', res.data);
+        alert('log in success');
       } catch (err) {
-        console.error('❌ 網路錯誤', err)
-        alert('無法連線到伺服器')
+        const errorData = err.response?.data;
+        console.error('log in failed', errorData);
+        alert(`log in failed：${errorData?.detail || 'Account or password is incorrect'}`);
       }
     }
-  }
+  };
 
   return (
     <div style={{

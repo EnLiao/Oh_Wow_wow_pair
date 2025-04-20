@@ -1,28 +1,11 @@
 import axios from 'axios';
+import { data } from 'react-router-dom';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/',
+  baseURL: 'http://localhost:8000',
 });
 
-// services/api.js
-export async function login({ username, password }) {
-  return await fetch('/core/login/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-  })
-}
-
-export async function register(userInfo) {
-  return await fetch('/core/register/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userInfo)
-  })
-}
-
-export const fetchPosts = () => api.get('posts/');
-export const fetchPost = (id) => api.get(`posts/${id}/`);
-export const createComment = (data) => api.post('comments/', data);
+export const login = (data) => api.post('/core/login/', data);
+export const register = (data) => api.post('/core/register/', data);
 
 export default api;
