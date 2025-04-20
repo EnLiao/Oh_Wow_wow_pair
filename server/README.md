@@ -33,14 +33,23 @@
 }
 ```
 
+- **未填寫必要欄位時的錯誤範例（JSON）**：
+
+```json
+{
+  "username": ["This field is required."],
+  "password": ["This field is required."]
+}
+```
+
 ---
 
 ### 使用者登入 API
 
-> 假設前端有確實讓使用者輸入完整的 username 跟 password，不會只填一個
-
 - **路徑**：`POST /core/login/`
 - **說明**：使用者登入
+
+> ⚠️ 如果前端未提供完整的 `username` 或 `password`，後端會回傳錯誤，請確保兩者都提供
 
 - **成功請求格式範例（JSON）**：
 
@@ -60,7 +69,7 @@
 }
 ```
 
-- **失敗請求格式範例（JSON）**：
+- **失敗請求範例（密碼錯誤）**：
 
 ```json
 {
@@ -74,6 +83,14 @@
 ```json
 {
   "detail": "No active account found with the given credentials"
+}
+```
+
+- **缺少欄位時的錯誤回應（JSON）**：
+
+```json
+{
+  "username": ["This field is required."]
 }
 ```
 
@@ -142,6 +159,15 @@
 }
 ```
 
+- **缺少欄位時回應（JSON）**：
+
+```json
+{
+  "name": ["This field is required."],
+  "birthday": ["This field is required."]
+}
+```
+
 ---
 
 ### 建立新 Tag
@@ -204,8 +230,6 @@ curl -X POST http://127.0.0.1:8000/core/tags/ \
         "name": "可愛",
         "category": "風格"
       }'
-#{"refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ...",
-  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ...WN3_byQUEaejDFIopEpsQy0"}
 
 # 正確使用 access token 建立 tag
 curl -X POST http://127.0.0.1:8000/core/tags/ \
