@@ -5,3 +5,4 @@ typing_extensions==4.13.2
 # Core dependencies
 djangorestframework>=3.14.0
 djangorestframework-simplejwt>=5.3.0
+django-cors-headers
