@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # CORS middleware
+    'django.middleware.locale.LocaleMiddleware', # 啟用語言判斷
 ]
 
 ROOT_URLCONF = 'wowpair.urls'

@@ -211,8 +211,20 @@ curl -X POST http://127.0.0.1:8000/core/register/ \
         "bio": "我愛娃娃",
         "avatar_url": "https://example.com/momo.jpg"
       }'
+# → {"username":["一個相同名稱的使用者已經存在。"]}
+# 註冊（若已存在使用者）指定語言為英文 -> 要在header加上Accept-Language
+curl -X POST http://127.0.0.1:8000/core/register/ \
+  -H "Content-Type: application/json" \
+  -H "Accept-Language: en" \
+  -d '{
+        "username": "momo",
+        "password": "abc12345",
+        "email": "momo@example.com",
+        "nickname": "小桃",
+        "bio": "我愛娃娃",
+        "avatar_url": "https://example.com/momo.jpg"
+      }'
 # → {"username":["A user with that username already exists."]}
-
 # 登入，取得 token
 curl -X POST http://127.0.0.1:8000/core/login/ \
   -H "Content-Type: application/json" \
