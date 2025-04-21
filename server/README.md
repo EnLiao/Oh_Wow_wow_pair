@@ -196,6 +196,8 @@ Authorization: Bearer <access_token>
 ```
 
 ---
+### 建立新貼文
+
 
 ## 用curl測試指令紀錄（終端機）
 
