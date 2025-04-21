@@ -200,7 +200,7 @@ Authorization: Bearer <access_token>
 ## 用curl測試指令紀錄（終端機）
 
 ```bash
-# 註冊（若已存在使用者）
+# 註冊（若已存在使用者）預設中文
 curl -X POST http://127.0.0.1:8000/core/register/ \
   -H "Content-Type: application/json" \
   -d '{
