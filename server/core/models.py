@@ -1,13 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+import uuid
 class User(AbstractUser):
     nickname = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
     avatar_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 class Doll(models.Model):
-    doll_id = models.AutoField(primary_key=True)  #PK：自動遞增
+    doll_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
