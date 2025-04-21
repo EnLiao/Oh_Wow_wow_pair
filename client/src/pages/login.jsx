@@ -28,7 +28,7 @@ export default function Login() {
         setIsSignUp(false);
       } catch (err) {
         if (err.response){
-          alert(`sign up failed：${err.response.data?.detail || 'Account or password is incorrect'}`);
+          alert(`sign up failed：${err.response.data?.detail || 'Please check your input'}`);
         }
         else if (err.request){
           alert('sign up failed：No response from server');
