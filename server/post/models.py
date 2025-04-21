@@ -18,3 +18,17 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Likes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    like_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('user', 'post')
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
+    favorite_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('user', 'doll')
