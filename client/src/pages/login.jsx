@@ -27,9 +27,15 @@ export default function Login() {
         alert('sign up success');
         setIsSignUp(false);
       } catch (err) {
-        const errorData = err.response?.data;
-        console.error('sign up failed', errorData);
-        alert(`sign up failed：${errorData?.detail || 'Please check your input'}`);
+        if (err.response){
+          alert(`sign up failed：${err.response.data?.detail || 'Account or password is incorrect'}`);
+        }
+        else if (err.request){
+          alert('sign up failed：No response from server');
+        }
+        else{
+          alert(`sign up failed：${err.message}`);
+        }
       }
   
     } else {
@@ -42,9 +48,15 @@ export default function Login() {
         console.log('log in success', res.data);
         alert('log in success');
       } catch (err) {
-        const errorData = err.response?.data;
-        console.error('log in failed', errorData);
-        alert(`log in failed：${errorData?.detail || 'Account or password is incorrect'}`);
+        if (err.response){
+          alert(`log in failed：${err.response.data?.detail || 'Account or password is incorrect'}`);
+        }
+        else if (err.request){
+          alert('log in failed：No response from server');
+        }
+        else{
+          alert(`log in failed：${err.message}`);
+        }
       }
     }
   };

@@ -1,9 +1,17 @@
 import log_out_icon from '../assets/log_out.png';
 import search_icon from '../assets/search.png';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 
 export default function NavBar() {
     const navigate = useNavigate()
+
+    const handleLogOut = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        console.log(localStorage.getItem('access_token'))
+        console.log(localStorage.getItem('refresh_token'))
+        navigate('/login')
+    }
     return (
         <div 
           style={{
@@ -58,7 +66,8 @@ export default function NavBar() {
             <img 
               src={log_out_icon} 
               alt="log out_icon" 
-              onClick={() => {console.log('log out')}}
+              onClick={handleLogOut}
+              onMouseOver={(e) => {e.currentTarget.style.opacity = 0.5}}
               style={{
                 width: 25,
                 height: 25,
