@@ -90,7 +90,8 @@ export default function MainPage() {
             width: 70,
             height: 70,
             borderRadius: '50%',
-            objectFit: 'cover'
+            objectFit: 'cover',
+            cursor: 'pointer',
           }}
         />
         <p style={{ textAlign: 'center', fontSize: 12 }}>Good Morning, {doll.name}!</p>
