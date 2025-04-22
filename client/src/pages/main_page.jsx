@@ -40,7 +40,7 @@ export default function MainPage() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',                     // ✅ 間距回來了
+              gap: '10px',
               paddingLeft: '7%',
             }}
           >
@@ -50,8 +50,8 @@ export default function MainPage() {
                 width: 40,
                 height: 40,
                 borderRadius: '50%',
-                overflow: 'hidden',            // ✅ 裁掉多餘圖片
-                flexShrink: 0,                 // ✅ 圖片不會被壓縮
+                overflow: 'hidden',
+                flexShrink: 0,
               }}
             >
               <img
@@ -68,7 +68,7 @@ export default function MainPage() {
             <p
               style={{
                 cursor: 'pointer',
-                whiteSpace: 'nowrap',          // ✅ 文字不換行
+                whiteSpace: 'nowrap',
                 fontSize: 14,
               }}
             >
