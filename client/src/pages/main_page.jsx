@@ -46,7 +46,7 @@ export default function MainPage() {
       <div style={{ width: '60%'}}>
       </div>
       {/* right my area */}
-      <div style={{ width: '20%'}}>
+      <div style={{ width: '20%', textAlign:'center'}}>
         <img
           src={doll.photo}
           alt={doll.name}
@@ -54,8 +54,7 @@ export default function MainPage() {
             width: 70,
             height: 70,
             borderRadius: '50%',
-            objectFit: 'cover',
-            marginLeft: '30%',
+            objectFit: 'cover'
           }}
         />
         <p style={{ textAlign: 'center', fontSize: 12 }}>Good Morning, {doll.name}!</p>

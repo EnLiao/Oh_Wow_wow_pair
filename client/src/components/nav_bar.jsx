@@ -37,7 +37,7 @@ export default function NavBar() {
               }}
               onClick={() => {navigate('/main_page')}}
             >Oh-Wow-wow-pair</h3>
-            <div style={{position: 'relative', width: '40%', height: '60%', display: 'flex', right:'5%'}}>
+            <div style={{position: 'relative', width: '40%', height: '60%', display: 'flex', left:'5%'}}>
               <input
                 type='text'
                 placeholder="Oh-Wow-wow-pair"
@@ -63,6 +63,16 @@ export default function NavBar() {
                 }}
               ></img>
             </div>
+            <p
+              style={{
+                fontSize: 30,
+                float: 'right',
+                marginRight: 60, 
+                marginBottom: 5, 
+                cursor: 'pointer'
+              }}
+              // onClick={() => create_post}
+            >+</p>
             <img 
               src={log_out_icon} 
               alt="log out_icon" 
