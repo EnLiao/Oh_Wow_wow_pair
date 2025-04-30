@@ -10,7 +10,8 @@ class UserPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'nickname', 'avatar_url']
 
 class PostSerializer(serializers.ModelSerializer):
-    doll = DollSerializer(read_only=True)
+    #doll = DollSerializer(read_only=True)
+    doll = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
     user = UserPublicSerializer(read_only=True)
 
     class Meta:
