@@ -198,6 +198,30 @@ Authorization: Bearer <access_token>
 ---
 ### 建立新貼文
 
+- **路徑**：`POST /post/posts/`
+- **說明**：建立新貼文
+- **請求格式範例（JSON）**：
+
+```json
+{
+  "doll": "1",
+  "content": "這是我的第一篇文",
+  "image_url": "https://example.com/momo.jpg"
+}
+```
+- **回應格式範例（JSON）**：
+
+```json
+{
+  "post_id":"73cffbd0-b1d6-4690-aae1-a4a4dbb2f210",
+  "doll":1,
+  "user":{"id":1,"username":"momo","nickname":"小桃","avatar_url":"https://example.com/momo.jpg"},
+  "content":"這是我的第一篇發文！",
+  "image_url":"https://example.com/image.jpg",
+  "visibility":"public",
+  "created_at":"2025-04-30T19:56:50.121718+08:00"
+}
+```
 
 ## 用curl測試指令紀錄（終端機）
 
@@ -255,5 +279,16 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
         "tag_ids": [1]
       }'
 # → {"doll_id":1,"user":1,"name":"小白","birthday":"2023-10-01","description":"超可愛娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-04-20T01:36:59.484864Z","tags":[{"tag_id":1,"name":"可愛","category":"風格"}]}
+
+# 建立貼文
+curl -X POST http://127.0.0.1:8000/post/posts/ \ 
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ey...2M9uw" \
+  -d '{
+    "doll": 1,
+    "content": "這是我的第一篇發文！",
+    "image_url": "https://example.com/image.jpg"
+  }'
+# → {"post_id":"73cffbd0-b1d6-4690-aae1-a4a4dbb2f210","doll":1,"user":{"id":1,"username":"momo","nickname":"小桃","avatar_url":"https://example.com/momo.jpg"},"content":"這是我的第一篇發文！","image_url":"https://example.com/image.jpg","visibility":"public","created_at":"2025-04-30T19:56:50.121718+08:00"}
 ```
 
