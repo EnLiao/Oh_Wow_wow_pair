@@ -11,6 +11,11 @@ class Post(models.Model):
     image_url = models.URLField(blank=True)
     visibility = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')], default='public')
     created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, # 或其他刪除策略，如 models.SET_NULL
+        related_name='posts' # 方便從 User 反查 Post
+    )
 
 class Comment(models.Model):
     comment_id = models.AutoField(primary_key=True)
