@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { login, register } from '../services/api'
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -9,6 +10,7 @@ export default function Login() {
   const [nickname, setNickname] = useState('')
   const [avatar_url, setAvatar_url] = useState('')
   const [bio, setBio] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = async () => {
     if (isSignUp) {
@@ -47,6 +49,7 @@ export default function Login() {
         localStorage.setItem('refresh_token', refresh);
         console.log('log in success', res.data);
         alert('log in success');
+        navigate('/main_page');
       } catch (err) {
         if (err.response){
           alert(`log in failed：${err.response.data?.detail || 'Account or password is incorrect'}`);
