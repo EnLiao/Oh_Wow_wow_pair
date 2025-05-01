@@ -25,7 +25,7 @@ export default function NavBar() {
         left: 0,
         right: 0,
         zIndex: 100,
-        padding: '0 5%',                   // ✅ 取代你的 right: 5% 與 marginRight
+        padding: '0 5%',
       }}
     >
       {/* 左邊：logo/title */}
@@ -107,7 +107,7 @@ export default function NavBar() {
           onMouseOver={(e) => { e.currentTarget.style.opacity = 0.5; }}
           onMouseOut={(e) => { e.currentTarget.style.opacity = 1; }}
           style={{
-            width: 'clamp(15px, 2vw, 25px)',    // ✅ 自動根據視窗調整大小
+            width: 'clamp(15px, 2vw, 25px)',
             height: 'clamp(15px, 2vw, 25px)',
             cursor: 'pointer',
           }}
