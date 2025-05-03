@@ -2,6 +2,6 @@
 __pycache__/
 *.py[cod]
 .env
+*.sqlite3
 node_modules/
 .DS_Store 
-db.sqlite3

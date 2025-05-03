@@ -1,13 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+import uuid
 class User(AbstractUser):
     nickname = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
     avatar_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 class Doll(models.Model):
-    doll_id = models.AutoField(primary_key=True)  #PK：自動遞增
+    doll_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -18,7 +23,7 @@ class Doll(models.Model):
     description = models.TextField(blank=True)
     avatar_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    tags = models.ManyToManyField('Tag', through='DollTag', related_name='dolls')
+    tags = models.ManyToManyField('Tag', through='DollTag', through_fields=('doll', 'tag'))
     def __str__(self):
         return self.name
 class Tag(models.Model):
@@ -27,8 +32,10 @@ class Tag(models.Model):
     category = models.CharField(max_length=100)
     def __str__(self):
         return f"{self.name} ({self.category})"
+
 class DollTag(models.Model):
     doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, blank=True, null=True)
     class Meta:
         unique_together = ('doll', 'tag') #複合主鍵
+
