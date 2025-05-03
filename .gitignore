@@ -3,4 +3,5 @@ __pycache__/
 *.py[cod]
 .env
 node_modules/
+.DS_Store 
 db.sqlite3

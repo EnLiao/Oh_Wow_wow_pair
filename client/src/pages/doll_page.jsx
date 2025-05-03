@@ -16,7 +16,7 @@ export default function DollPage() {
           display: 'flex', 
           alignItems: 'flex-start', 
           paddingLeft:'8%',
-          paddingTop:'6%',
+          paddingTop:50,
         }}
       >
         <div>
@@ -25,12 +25,13 @@ export default function DollPage() {
             src={doll.photo} 
             alt={doll.name} 
             style={{
-              width:300, 
-              height:300, 
-              objectFit:'cover', 
+              width: '100%',
+              maxWidth: '300px',
+              aspectRatio: '1 / 1',
+              overflow: 'hidden',
               borderRadius: 10,
-              marginBottom: '5%',
-              marginTop: '5%',
+              objectFit: 'cover',
+              margin: '5% auto',
             }}
           />
           <p>user: {doll.user_id}</p>
