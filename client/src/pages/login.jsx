@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { login, register } from '../services/api'
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -9,6 +10,7 @@ export default function Login() {
   const [nickname, setNickname] = useState('')
   const [avatar_url, setAvatar_url] = useState('')
   const [bio, setBio] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = async () => {
     if (isSignUp) {
@@ -27,17 +29,34 @@ export default function Login() {
         alert('sign up success');
         setIsSignUp(false);
       } catch (err) {
-        if (err.response){
-          alert(`sign up failed：${err.response.data?.detail || 'Account or password is incorrect'}`);
-        }
-        else if (err.request){
-          alert('sign up failed：No response from server');
-        }
-        else{
-          alert(`sign up failed：${err.message}`);
+        if (err.response) {
+          const data = err.response.data;
+          let message = '';
+      
+          if (typeof data === 'object' && data !== null) {
+            if (data.detail) {
+              // case 1: 有 detail
+              message = data.detail;
+            } else if (data.non_field_errors) {
+              // case 2: 有 non_field_errors
+              message = data.non_field_errors.join(', ');
+            } else {
+              // case 3: 欄位對應 array
+              message = Object.entries(data)
+                .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+                .join('\n');
+            }
+          } else {
+            message = 'Please check your input';
+          }
+      
+          alert(`sign up failed:\n${message}`);
+        } else if (err.request) {
+          alert('sign up failed: No response from server');
+        } else {
+          alert(`sign up failed: ${err.message}`);
         }
       }
-  
     } else {
       try {
         const res = await login({ username, password }); // axios 呼叫 login
@@ -47,17 +66,33 @@ export default function Login() {
         localStorage.setItem('refresh_token', refresh);
         console.log('log in success', res.data);
         alert('log in success');
+        navigate('/main_page');
       } catch (err) {
-        if (err.response){
-          alert(`log in failed：${err.response.data?.detail || 'Account or password is incorrect'}`);
+        if (err.response) {
+          const data = err.response.data;
+          let message = '';
+      
+          if (typeof data === 'object' && data !== null) {
+            if (data.detail) {
+              // case 1: 有 detail
+              message = data.detail;
+            } else {
+              // case 2: 欄位錯誤
+              message = Object.entries(data)
+                .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+                .join('\n');
+            }
+          } else {
+            message = 'Account or password is incorrect';
+          }
+      
+          alert(`log in failed:\n${message}`);
+        } else if (err.request) {
+          alert('log in failed: No response from server');
+        } else {
+          alert(`log in failed: ${err.message}`);
         }
-        else if (err.request){
-          alert('log in failed：No response from server');
-        }
-        else{
-          alert(`log in failed：${err.message}`);
-        }
-      }
+      }      
     }
   };
 

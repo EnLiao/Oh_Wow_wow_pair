@@ -12,6 +12,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
+
 class DollListCreateView(generics.ListCreateAPIView):
     queryset = Doll.objects.all()
     serializer_class = DollSerializer

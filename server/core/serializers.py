@@ -21,10 +21,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             avatar_url=validated_data.get('avatar_url', ''),
         )
         return user
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ['tag_id', 'name', 'category']
+
 class DollSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     tag_ids = serializers.ListField(write_only=True, child=serializers.IntegerField(), required=False)
