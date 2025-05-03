@@ -35,7 +35,7 @@ class Tag(models.Model):
 
 class DollTag(models.Model):
     doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, blank = True)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, blank=True, null=True)
     class Meta:
         unique_together = ('doll', 'tag') #複合主鍵
 
