@@ -66,7 +66,7 @@ ROOT_URLCONF = 'wowpair.urls'
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",  # 前端的開發伺服器 URL
-    "http://localhost:5173",  # 前端的開發伺服器 loclalhost URL OK
+    "http://localhost:5173",  # 前端的開發伺服器 localhost URL OK
 ]
 
 TEMPLATES = [
