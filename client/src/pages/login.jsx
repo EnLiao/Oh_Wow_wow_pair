@@ -27,7 +27,7 @@ export default function Login() {
         const res = await register(data); // axios 呼叫 register
         console.log('sign up success', res.data);
         alert('sign up success');
-        setIsSignUp(false);
+        navigate('/create_doll');
       } catch (err) {
         if (err.response) {
           const data = err.response.data;
@@ -64,7 +64,10 @@ export default function Login() {
   
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
+        localStorage.setItem('doll_id', '1');
         console.log('log in success', res.data);
+        const dollInfoRes = await getDollInfo(dollId);
+        localStorage.setItem('doll_info', JSON.stringify(dollInfoRes.data));
         alert('log in success');
         navigate('/main_page');
       } catch (err) {
