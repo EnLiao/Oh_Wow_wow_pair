@@ -33,13 +33,17 @@
 }
 ```
 
-- **未填寫必要欄位時的錯誤範例（JSON）**：
+- **所有失敗的錯誤範例（JSON）**：
 
 ```json
-{
-  "username": ["This field is required."],
-  "password": ["This field is required."]
-}
+已存在
+{"username":["這個 username 在 user 已經存在。"],"email":["這個 email 在 user 已經存在。"]}
+username沒填
+{"username":["此為必需欄位。"]}
+email格式不正確
+{"email":["請輸入有效的電子郵件地址。"]}
+avatar_url 格式不正確
+{"avatar_url":["請輸入有效的URL。"]}
 ```
 
 ---
@@ -109,10 +113,11 @@
 
 ```json
 {
-  "name": "小桃",
-  "birthday": "2023-03-14",
-  "description": "這是我的最愛",
-  "avatar_url": "https://example.com/momo.jpg",
+  "id": "doll001",
+  "name": "小白",
+  "birthday": "2023-10-01",
+  "description": "這是我最喜歡的娃娃",
+  "avatar_url": "https://example.com/doll.jpg",
   "tag_ids": [1, 2]
 }
 ```
@@ -121,21 +126,21 @@
 
 ```json
 {
-  "doll_id": 5,
-  "user": 1,
-  "name": "小桃",
-  "birthday": "2023-03-14",
-  "description": "這是我的最愛",
-  "avatar_url": "https://example.com/momo.jpg",
-  "created_at": "2024-04-19T13:00:00Z",
+  "id": "doll001",
+  "username": "momo",
+  "name": "小白",
+  "birthday": "2023-10-01",
+  "description": "這是我最喜歡的娃娃",
+  "avatar_url": "https://example.com/doll.jpg",
+  "created_at": "2025-05-05T00:00:00Z",
   "tags": [
     {
-      "tag_id": 1,
+      "id": 1,
       "name": "可愛",
       "category": "風格"
     },
     {
-      "tag_id": 2,
+      "id": 2,
       "name": "活潑",
       "category": "性格"
     }
@@ -143,29 +148,17 @@
 }
 ```
 
-- **未登入（缺少或錯誤的 JWT token）時回應（JSON）**：
+- **失敗時回應（JSON）**：
 
 ```json
+沒登入
 {
   "detail": "Authentication credentials were not provided."
 }
-```
-
-- **傳入不存在的 tag_id 時回應（JSON）**：
-
-```json
-{
-  "non_field_errors": ["Invalid pk \"99\" - object does not exist."]
-}
-```
-
-- **缺少欄位時回應（JSON）**：
-
-```json
-{
-  "name": ["This field is required."],
-  "birthday": ["This field is required."]
-}
+Tag不存在
+{"tag_ids":["這個 tag id 2 不存在"]}
+doll id重複
+{"id":["這個 id 在 doll 已經存在。"]}
 ```
 
 ---
@@ -196,7 +189,37 @@ Authorization: Bearer <access_token>
 ```
 
 ---
+
+---
+### 取得娃娃資訊
+```bash
+curl -X GET http://127.0.0.1:8000/core/dolls/doll006/ \
+  -H "Authorization: Bearer <access_token>"
+```
+
+
+- **成功時回應範例（JSON）**：
+```json
+{
+  "id": "doll006",
+  "username": "momo",
+  "name": "小白",
+  "birthday": "2023-10-01",
+  "description": "這是我最喜歡的娃娃",
+  "avatar_url": "https://example.com/doll.jpg",
+  "created_at": "2025-05-05T00:30:42.075549+08:00",
+  "tags": [
+    {
+      "id": 1,
+      "name": "可愛",
+      "category": "風格"
+    }
+  ]
+}
+```
 ### 建立新貼文
+
+---
 
 - **路徑**：`POST /post/posts/`
 - **說明**：建立新貼文

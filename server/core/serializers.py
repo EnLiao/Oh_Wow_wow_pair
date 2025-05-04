@@ -25,20 +25,39 @@ class RegisterSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ['tag_id', 'name', 'category']
+        fields = ['id', 'name', 'category']
 
 class DollSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
+    tags = serializers.SerializerMethodField()
     tag_ids = serializers.ListField(write_only=True, child=serializers.IntegerField(), required=False)
 
     class Meta:
         model = Doll
-        fields = ['doll_id', 'user', 'name', 'birthday', 'description', 'avatar_url', 'created_at', 'tags', 'tag_ids']
-        read_only_fields = ['doll_id', 'created_at', 'user']
+        fields = ['id', 'username', 'name', 'birthday', 'description', 'avatar_url', 'created_at', 'tags', 'tag_ids']
+        read_only_fields = ['created_at', 'username']
 
     def create(self, validated_data):
         tag_ids = validated_data.pop('tag_ids', [])
         doll = Doll.objects.create(**validated_data)
         for tag_id in tag_ids:
-            DollTag.objects.create(doll=doll, tag_id=tag_id)
+            try:
+                tag = Tag.objects.get(id=tag_id)
+            except Tag.DoesNotExist:
+                raise serializers.ValidationError({"tag_ids": [f"這個 tag id {tag_id} 不存在"]})
+            DollTag.objects.create(doll_id=doll, tag_id=tag)
+        doll.tags = [tag for tag in Tag.objects.filter(id__in=tag_ids)]
         return doll
+    def validate_tag_ids(self, value):
+        for tag_id in value:
+            if not Tag.objects.filter(id=tag_id).exists():
+                raise serializers.ValidationError(f"這個 tag id {tag_id} 不存在")
+        return value
+    def validate_id(self, value):
+        if Doll.objects.filter(id=value).exists():
+            raise serializers.ValidationError("A doll with this ID already exists.")
+        return value
+    def get_tags(self, obj):
+        return TagSerializer(
+            Tag.objects.filter(dolltag__doll_id=obj.id),
+            many=True
+        ).data
