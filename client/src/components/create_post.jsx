@@ -31,10 +31,17 @@ export default function create_post() {
     }
 
     return (
-        <div>
+        <div style={
+            { 
+                paddingTop: 50,
+                textAlign: 'center',
+            }
+        }>
             <h1>Create Post</h1>
             <input type="text" placeholder="Content" onChange={(e) => setPostContent(e.target.value)} />
+            <br></br>
             <input type="file" onChange={(e) => setPostImage(e.target.files[0])} />
+            <br></br>
             <button onClick={handleSubmit}>Submit</button>
         </div>
     )
