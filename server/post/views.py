@@ -2,8 +2,12 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .models import Post
+from .models import Post, PostSeen
 from .serializers import PostSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
+from rest_framework.exceptions import NotFound, PermissionDenied
+from core.models import Doll
 
 class PostCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # 需要登入
@@ -13,3 +17,22 @@ class PostCreateView(APIView):
             serializer.save() 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PostListView(ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        doll_id = self.request.query_params.get('doll_id')
+        if not doll_id:
+            raise NotFound("doll_id is required in query parameters.")
+
+        try:
+            doll = Doll.objects.get(id=doll_id)
+        except Doll.DoesNotExist:
+            raise NotFound("Doll not found.")
+
+        followed_dolls = doll.following.values_list('id', flat=True)
+        seen_posts = PostSeen.objects.filter(doll=doll).values_list('post_id', flat=True)
+
+        return Post.objects.filter(doll_id__in=followed_dolls).exclude(id__in=seen_posts).order_by('-created_at')
