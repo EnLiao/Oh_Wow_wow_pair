@@ -307,13 +307,14 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ...WN3_byQUEaejDFIopEpsQy0" \
   -d '{
+        "id": "doll001",
         "name": "小白",
         "birthday": "2023-10-01",
-        "description": "超可愛娃娃",
+        "description": "這是我最喜歡的娃娃",
         "avatar_url": "https://example.com/doll.jpg",
-        "tag_ids": [1]
+        "tag_ids":[1, 2],
       }'
-# → {"doll_id":1,"user":1,"name":"小白","birthday":"2023-10-01","description":"超可愛娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-04-20T01:36:59.484864Z","tags":[{"tag_id":1,"name":"可愛","category":"風格"}]}
+# → {"id":"doll001","username":"momo","name":"小白","birthday":"2023-10-01","description":"這是我最喜歡的娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-05-05T11:24:22.180047+08:00","tags":[]}
 
 # 建立貼文
 curl -X POST http://127.0.0.1:8000/post/posts/ \ 
