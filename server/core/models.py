@@ -26,6 +26,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    is_staff = models.BooleanField(default=False)
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
