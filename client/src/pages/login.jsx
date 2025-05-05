@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { login, register } from '../services/api'
+import { useState, useContext} from 'react'
+import { login, register, getDollInfo} from '../services/api'
 import { useNavigate } from 'react-router-dom';
+import { DollContext } from '../components/doll_context';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -11,6 +12,8 @@ export default function Login() {
   const [avatar_url, setAvatar_url] = useState('')
   const [bio, setBio] = useState('')
   const navigate = useNavigate()
+
+  const { setDollInfo } = useContext(DollContext);
 
   const handleSubmit = async () => {
     if (isSignUp) {
@@ -64,10 +67,13 @@ export default function Login() {
   
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
-        localStorage.setItem('doll_id', '1');
-        console.log('log in success', res.data);
-        const dollInfoRes = await getDollInfo(dollId);
-        localStorage.setItem('doll_info', JSON.stringify(dollInfoRes.data));
+        // get doll info by doll_id
+        // const dollId = 'doll001';
+        // localStorage.setItem('doll_id', dollId);
+        // const dollRes = await getDollInfo(dollId);
+        // localStorage.setItem('doll_info', JSON.stringify(dollRes.data));
+        // setDollInfo(dollRes.data);
+
         alert('log in success');
         navigate('/main_page');
       } catch (err) {
