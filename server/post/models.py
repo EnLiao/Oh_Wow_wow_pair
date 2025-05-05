@@ -7,8 +7,8 @@ from core.models import User, Doll, Tag, DollTag
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
-    content = models.TextField(blank=True)
-    image_url = models.URLField(blank=True)
+    content = models.TextField()
+    image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):
