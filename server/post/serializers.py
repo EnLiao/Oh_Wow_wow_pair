@@ -13,7 +13,8 @@ class PostSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
     class Meta:
         model = Post
-        fields =  '__all__'
+        fields = ['id', 'doll_id', 'content', 'image_url', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 class CommentSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
