@@ -3,6 +3,7 @@ import img2 from '../assets/carrot.jpg';
 import img3 from '../assets/omuba.jpg';
 import Post from '../components/load_post';
 // I can use <Post> unlimited!
+// 新增切換帳號、新增帳號UI
 
 const following_list = [
   { id: 1, img: img1, name: 'Windy' },

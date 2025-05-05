@@ -3,6 +3,8 @@ import MainPage from './pages/main_page'
 import DollPage from './pages/doll_page'
 import NavBar from './components/nav_bar'
 import Login from './pages/login'
+import CreateDoll from './components/create_doll'
+import CreatePost from './components/create_post'
 
 function AppLayout() {
   const location = useLocation()
@@ -15,6 +17,8 @@ function AppLayout() {
         <Route path='/login' element={<Login />} />
         <Route path="/doll_page" element={<DollPage />} />
         <Route path="/main_page" element={<MainPage />} />
+        <Route path="/create_doll" element={<CreateDoll />} />
+        <Route path="/create_post" element={<CreatePost />} />
       </Routes>
     </>
   )

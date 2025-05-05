@@ -1,14 +1,19 @@
-import log_out_icon from '../assets/log_out.png';
 import search_icon from '../assets/search.png';
+import SwitchDoll from './switch_doll';
 import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 
 export default function NavBar() {
   const navigate = useNavigate();
 
-  const handleLogOut = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    navigate('/login');
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState('user1');
+
+
+  const handleSwitchUser = (newUser) => {
+    setCurrentUser(newUser);
+    console.log(`switch to：${newUser}`);
+    // 你也可以在這裡更新 localStorage 或全域狀態
   };
 
   return (
@@ -98,19 +103,12 @@ export default function NavBar() {
         </p>
       </div>
 
-      {/* 右邊：登出 icon */}
+      {/* 右邊：doll avatar */}
       <div style={{ flex: '1 1 20%', display: 'flex', justifyContent: 'flex-end' }}>
-        <img
-          src={log_out_icon}
-          alt="log out icon"
-          onClick={handleLogOut}
-          onMouseOver={(e) => { e.currentTarget.style.opacity = 0.5; }}
-          onMouseOut={(e) => { e.currentTarget.style.opacity = 1; }}
-          style={{
-            width: 'clamp(15px, 2vw, 25px)',
-            height: 'clamp(15px, 2vw, 25px)',
-            cursor: 'pointer',
-          }}
+        <SwitchDoll
+          isOpen={isModalOpen}
+          onClose={() => { setModalOpen(false); }}
+          onSwitchUser={handleSwitchUser}
         />
       </div>
     </div>
