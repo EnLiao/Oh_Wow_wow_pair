@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+from datetime import timedelta
+import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,9 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-5tm)%o@#bp(dxk48n2rpj#p7*m3%c@nze_d04+ud_9la8&i2g*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'username',  #告訴 SimpleJWT 你不是用 id，而是 username 當 primary key
+    'USER_ID_CLAIM': 'user_id',   #token 裡存的是哪個 key，可以留 user_id
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -51,6 +58,15 @@ REST_FRAMEWORK = {
     ),
 }
 AUTH_USER_MODEL = 'core.User' #自定義 User 模型
+'''
+刪除資料方法
+rm db.sqlite3
+find core/migrations -name "*.py" -not -name "__init__.py" -delete
+find core/migrations -name "*.pyc" -delete
+建立 migration
+python manage.py makemigrations
+python manage.py migrate
+'''
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -139,3 +155,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}

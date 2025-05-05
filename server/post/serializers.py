@@ -10,28 +10,29 @@ class UserPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'nickname', 'avatar_url']
 
 class PostSerializer(serializers.ModelSerializer):
-    #doll = DollSerializer(read_only=True)
-    doll = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
-    user = UserPublicSerializer(read_only=True)
-
+    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['id', 'doll_id', 'content', 'image_url', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserPublicSerializer(read_only=True)
-    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
-
+    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
+    post_id = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
     class Meta:
         model = Comment
         fields = '__all__'
 
 class LikesSerializer(serializers.ModelSerializer):
+    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
+    post_id = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
     class Meta:
         model = Likes
         fields = '__all__'
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
+    post_id = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
     class Meta:
         model = Favorite
         fields = '__all__'

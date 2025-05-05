@@ -5,35 +5,31 @@ import uuid
 from core.models import User, Doll, Tag, DollTag
 
 class Post(models.Model):
-    post_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
-    content = models.TextField(blank=True)
-    image_url = models.URLField(blank=True)
-    visibility = models.CharField(max_length=10, choices=[('public', 'Public'), ('private', 'Private')], default='public')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
+    content = models.TextField()
+    image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, # 或其他刪除策略，如 models.SET_NULL
-        related_name='posts' # 方便從 User 反查 Post
-    )
 
 class Comment(models.Model):
-    comment_id = models.AutoField(primary_key=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    post_id = models.ForeignKey(Post, to_field='id', on_delete=models.CASCADE)
+    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('post_id', 'id')
 
 class Likes(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
+    post_id = models.ForeignKey(Post, to_field='id', on_delete=models.CASCADE)
     like_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together = ('user', 'post')
+        unique_together = ('doll_id', 'post_id')
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
+    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
+    post_id = models.ForeignKey(Post, to_field='id', on_delete=models.CASCADE)
     favorite_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together = ('user', 'doll')
+        unique_together = ('doll_id', 'post_id')
