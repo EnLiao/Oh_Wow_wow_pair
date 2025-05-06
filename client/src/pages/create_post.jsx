@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import { CreatePost } from '../services/api'
+import React, { useState, useContext} from 'react'
+import { create_post } from '../services/api'
+import { DollContext } from '../components/doll_context'
 
-export default function create_post() {
+export default function CreatePost() {
     const dollId = localStorage.getItem('doll_id')
     const [postContent, setPostContent] = useState('')
     const [image_url, setImage_url] = useState('')
 
-    const doll_info = JSON.parse(localStorage.getItem('doll_info'))
-    console.log('doll_info', doll_info)
+    const { dollInfo } = useContext(DollContext);
+    console.log('dollInfo', dollInfo)
 
     const handleSubmit = async () => {
         if (!postContent || !image_url) {
@@ -21,7 +22,7 @@ export default function create_post() {
         formData.append('image', postImage)
 
         try {
-            const res = await CreatePost(formData) // axios 呼叫 createPost
+            const res = await create_post(formData) // axios 呼叫 createPost
             console.log('create post success', res.data)
             alert('create post success')
         } catch (err) {
