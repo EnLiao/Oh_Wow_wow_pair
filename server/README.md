@@ -307,6 +307,7 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ...WN3_byQUEaejDFIopEpsQy0" \
   -d '{
+        "id" : "doll_1",s
         "name": "小白",
         "birthday": "2023-10-01",
         "description": "超可愛娃娃",
