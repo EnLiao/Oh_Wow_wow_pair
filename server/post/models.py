@@ -33,3 +33,10 @@ class Favorite(models.Model):
     favorite_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         unique_together = ('doll_id', 'post_id')
+
+class PostSeen(models.Model):
+    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
+    post_id = models.ForeignKey(Post, to_field='id', on_delete=models.CASCADE)
+    seen_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('doll_id', 'post_id')

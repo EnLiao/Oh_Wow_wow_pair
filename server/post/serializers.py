@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from core.models import User, Doll, Tag, DollTag
-from post.models import Post, Comment, Likes, Favorite
+from post.models import Post, Comment, Likes, Favorite, PostSeen
 from core.serializers import DollSerializer, RegisterSerializer
 
 class UserPublicSerializer(serializers.ModelSerializer):
@@ -36,3 +36,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = '__all__'
+
+class PostSeenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostSeen
+        fields = '__all__'
+        read_only_fields = ['seen_at']
