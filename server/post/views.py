@@ -7,7 +7,7 @@ from .serializers import PostSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework.exceptions import NotFound, PermissionDenied
-from core.models import Doll
+from core.models import Doll, Follow
 
 class PostCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # 需要登入
@@ -25,14 +25,8 @@ class PostListView(ListAPIView):
     def get_queryset(self):
         doll_id = self.request.query_params.get('doll_id')
         if not doll_id:
-            raise NotFound("doll_id is required in query parameters.")
+            return Post.objects.none()
+        followed_doll_ids = Follow.objects.filter(from_doll_id=doll_id).values_list('to_doll_id', flat=True)
+        seen_post_ids = PostSeen.objects.filter(doll_id=doll_id).values_list('post_id', flat=True)
 
-        try:
-            doll = Doll.objects.get(id=doll_id)
-        except Doll.DoesNotExist:
-            raise NotFound("Doll not found.")
-
-        followed_dolls = doll.following.values_list('id', flat=True)
-        seen_posts = PostSeen.objects.filter(doll=doll).values_list('post_id', flat=True)
-
-        return Post.objects.filter(doll_id__in=followed_dolls).exclude(id__in=seen_posts).order_by('-created_at')
+        return Post.objects.filter(doll_id__in=followed_doll_ids).exclude(id__in=seen_post_ids).order_by('-created_at')
