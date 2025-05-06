@@ -7,3 +7,6 @@ dist/
 # misc
 .DS_Store
 .env
+
+# json-server
+db.json
