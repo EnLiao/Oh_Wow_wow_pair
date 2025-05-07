@@ -2,6 +2,16 @@ import { useState, useContext} from 'react'
 import { login, register, getDollInfo} from '../services/api'
 import { useNavigate } from 'react-router-dom';
 import { DollContext } from '../components/doll_context';
+import { 
+  Button, 
+  Input, 
+  Container, 
+  Form, 
+  FormGroup,
+  Card,
+  CardBody,
+  CardHeader
+} from 'reactstrap';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -106,74 +116,93 @@ export default function Login() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh'
-    }}>
-      <h1>{isSignUp ? 'Sign Up' : 'Login'}</h1>
-
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        style={{ marginBottom: '10px' }}
-      />
-
-      {isSignUp && (
-        <>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ marginBottom: '10px' }}
-          />
-          <input
-            type="text"
-            placeholder="Nickname"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            style={{ marginBottom: '10px' }}
-          />
-          <input
-            type="text"
-            placeholder="Avatar URL"
-            value={avatar_url}
-            onChange={(e) => setAvatar_url(e.target.value)}
-            style={{ marginBottom: '10px' }}
-          />
-          <input
-            type="text"
-            placeholder="Bio"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            style={{ marginBottom: '10px' }}
-          />
-        </>
-      )}
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ marginBottom: '20px' }}
-      />
-
-      <button style={{ padding: '10px 20px' }} onClick={handleSubmit}>
-        {isSignUp ? 'Sign Up' : 'Login'}
-      </button>
-
-      <button
-        style={{ padding: '10px 20px', marginTop: '10px' }}
-        onClick={() => setIsSignUp(prev => !prev)}
-      >
-        {isSignUp ? 'Back to Login' : 'Sign Up'}
-      </button>
-    </div>
+    <Container className="d-flex align-items-center justify-content-center vh-100">
+      <Card style={{ width: '400px' }}>
+        <CardHeader>
+          <h2 className="text-center mb-0">{isSignUp ? 'Sign Up' : 'Login'}</h2>
+        </CardHeader>
+        <CardBody>
+          <Form>
+            <FormGroup>
+              <Input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mb-3"
+              />
+            </FormGroup>
+    
+            {isSignUp && (
+              <>
+                <FormGroup>
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mb-3"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Input
+                    type="text"
+                    placeholder="Nickname"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    className="mb-3"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Input
+                    type="text"
+                    placeholder="Avatar URL"
+                    value={avatar_url}
+                    onChange={(e) => setAvatar_url(e.target.value)}
+                    className="mb-3"
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Input
+                    type="text"
+                    placeholder="Bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    className="mb-3"
+                  />
+                </FormGroup>
+              </>
+            )}
+    
+            <FormGroup>
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mb-4"
+              />
+            </FormGroup>
+  
+            <Button 
+              color="primary" 
+              block 
+              onClick={handleSubmit}
+              className="mb-3"
+            >
+              {isSignUp ? 'Sign Up' : 'Login'}
+            </Button>
+    
+            <Button
+              color="secondary"
+              block
+              onClick={() => setIsSignUp(prev => !prev)}
+            >
+              {isSignUp ? 'Back to Login' : 'Sign Up'}
+            </Button>
+          </Form>
+        </CardBody>
+      </Card>
+    </Container>
   )
 }
