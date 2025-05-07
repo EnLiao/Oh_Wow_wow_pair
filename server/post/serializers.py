@@ -13,8 +13,8 @@ class PostSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
     class Meta:
         model = Post
-        fields = ['id', 'doll_id', 'content', 'image_url', 'created_at', 'likes_count']
-        read_only_fields = ['id', 'created_at', 'likes_count']
+        fields = ['id', 'doll_id', 'content', 'image_url', 'created_at']
+        read_only_fields = ['id', 'created_at']
     def get_like_count(self, post):
         return Likes.objects.filter(post_id=post).count()
 
