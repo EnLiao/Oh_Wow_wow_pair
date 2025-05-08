@@ -10,13 +10,14 @@ class UserPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'nickname', 'avatar_url']
 
 class PostSerializer(serializers.ModelSerializer):
-    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all()) # 建議加上 source='doll' 如果模型欄位是 doll
+    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
     like_count = serializers.SerializerMethodField()
     liked_by_me = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'doll_id', 'content', 'image_url', 'created_at', 'like_count', 'liked_by_me']
+        fields = ['id', 'doll_id', 'content', 'image_url', 'created_at', 'like_count', 'liked_by_me', 'comment_count']
         read_only_fields = ['id', 'created_at']
 
     def get_like_count(self, post_instance):
@@ -27,6 +28,9 @@ class PostSerializer(serializers.ModelSerializer):
         if not requesting_doll_id:
             return False
         return Likes.objects.filter(post_id=post_instance, doll_id=requesting_doll_id).exists()
+    
+    def get_comment_count(self, post_instance):
+        return Comment.objects.filter(post_id=post_instance).count()
 
 class CommentSerializer(serializers.ModelSerializer):
     post_id = serializers.PrimaryKeyRelatedField(

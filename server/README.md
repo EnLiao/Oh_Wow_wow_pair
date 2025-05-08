@@ -361,7 +361,7 @@ curl -X POST http://localhost:8000/post/posts/ \
 # 確認可瀏覽的貼文
 curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro"   
   -H "Authorization: Bearer eyJ0eX...ldos" 
-# → [{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
+# → [{"id":"050ad8cb-1c21-4edc-a38d-988f8a658bbe","doll_id":"omuba","content":"我是笨狗汪汪汪","image_url":"https://github.com/","created_at":"2025-05-09T01:59:56.196575+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"omuba","content":"第一篇文嘻嘻嘻","image_url":"https://github.com/","created_at":"2025-05-08T21:33:53.106715+08:00","like_count":0,"liked_by_me":false,"comment_count":2}]
 
 # 按讚貼文
 curl -X POST 
