@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# 切換到專案根目錄（假設 manage.py 在這裡）
+# 切到 manage.py 所在目錄
 cd "$(dirname "$0")"
 
-# 刪除資料庫
+# 刪除 SQLite 資料庫
 rm -f server/db.sqlite3
 
-# 刪除遷移檔案
-find server/core/migrations -name "*.py" ! -name "__init__.py" -delete
-find server/core/migrations -name "*.pyc" -delete
+# 刪除所有 app 的遷移檔（保留 __init__.py）
+find server -type d -name migrations | while read dir; do
+    find "$dir" -name "*.py" ! -name "__init__.py" -delete
+    find "$dir" -name "*.pyc" -delete
+done
 
-echo "已清除 db.sqlite3 與 core/migrations 中的遷移檔"
+echo "已清除所有 app 的遷移檔與資料庫"
