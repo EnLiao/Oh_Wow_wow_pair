@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .models import Post, PostSeen
+from .models import Post, PostSeen, Comment, Likes, Favorite
 from .serializers import PostSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
@@ -51,3 +51,34 @@ class PostListView(ListAPIView):
         PostSeen.objects.bulk_create(seen_objects, ignore_conflicts=True)
 
         return response
+    
+class LikePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, post_id):
+        doll_id = request.data.get('doll_id')
+        doll = get_object_or_404(Doll, id=doll_id)
+        post = get_object_or_404(Post, id=post_id)
+
+        like, created = Likes.objects.get_or_create(doll_id=doll, post_id=post.id)
+        
+        serializer = PostSerializer(post, context={'request': request, 'doll_id': doll_id})
+
+        if created:
+            return Response({'message': 'Liked', 'post': serializer.data}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'message': 'Already liked', 'post': serializer.data}, status=status.HTTP_200_OK)
+
+    def delete(self, request, post_id):
+        doll_id = request.data.get('doll_id')
+        doll = get_object_or_404(Doll, id=doll_id)
+        post = get_object_or_404(Post, id=post_id)
+
+        deleted, _ = Likes.objects.filter(doll_id=doll, post_id=post.id).delete()
+
+        serializer = PostSerializer(post, context={'request': request, 'doll_id': doll_id})
+
+        if deleted:
+            return Response({'message': 'Unliked', 'post': serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Not previously liked', 'post': serializer.data}, status=status.HTTP_400_BAD_REQUEST)

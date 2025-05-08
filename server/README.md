@@ -260,7 +260,37 @@ curl -X GET http://127.0.0.1:8000/core/users/<username>/dolls/ \
 缺少image
 {"image_url":["此欄位不可為空白。"]}
 ```
+### 瀏覽貼文（尚未全部完成）
 
+---
+
+- **路徑**：`POST /post/feed/?doll_id=cheesetaro/`
+- **說明**：瀏覽貼文
+
+- **成功回應格式範例（總之就是回傳可以看到的貼文資料）（若是再使用一次則是回傳[]）**：
+
+```json
+[{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
+```
+### 按讚貼文
+
+---
+
+- **路徑**：`POST /post/posts/<uuid:post_id>/like/`
+- **說明**：按讚貼文
+- **請求格式範例（JSON）（post id 在 api 裡了）**：
+
+```json
+{
+  "doll_id": "doll001",
+}
+```
+- **成功回應格式範例（JSON）**：
+
+```json
+{"message":"Liked"}
+{"message":"Already liked"}
+```
 ## 用curl測試指令紀錄（終端機）
 
 ```bash
@@ -327,5 +357,26 @@ curl -X POST http://localhost:8000/post/posts/ \
           "image_url": "https://example.com/test-image.jpg"
       }'
 # → {"id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d","doll_id":"doll001","content":"這是測試用的貼文內容","image_url":"https://example.com/test-image.jpg","created_at":"2025-05-05T13:59:54.4212}
+
+# 確認可瀏覽的貼文
+curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro"   
+  -H "Authorization: Bearer eyJ0eX...ldos" 
+# → [{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
+
+# 按讚貼文
+curl -X POST 
+ -H "Authorization: Bearer eyJ0..B6zu2UMQ4" 
+ -H "Content-Type: application/json" 
+ -d '{"doll_id": "cheesetaro"}' 
+ http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
+# → [{"message":"Already liked","post":{"id":"e6666593-3d06-4563-8b38-67a411476c3c","doll_id":"omuba","content":"我是一條笨狗 汪汪汪 我叫歐姆嘎抓","image_url":"https://github.com/","created_at":"2025-05-08T15:12:00.939363+08:00","like_count":1,"liked_by_me":true}}]
+
+# 取消按讚貼文
+curl -X DELETE 
+  -H "Authorization: Bearer eyJ0...dB6zu2UMQ4" 
+  -H "Content-Type: application/json" 
+  -d '{"doll_id": "cheesetaro"}' 
+  http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
+# → [{"message":"Unliked","post":{"id":"e6666593-3d06-4563-8b38-67a411476c3c","doll_id":"omuba","content":"我是一條笨狗 汪汪汪 我叫歐姆嘎抓","image_url":"https://github.com/","created_at":"2025-05-08T15:12:00.939363+08:00","like_count":0,"liked_by_me":false}}]
 ```
 
