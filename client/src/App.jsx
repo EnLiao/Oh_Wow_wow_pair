@@ -5,7 +5,7 @@ import NavBar from './components/nav_bar'
 import Login from './pages/login'
 import CreateDoll from './pages/create_doll'
 import CreatePost from './pages/create_post'
-import { DollProvider } from './components/doll_context';
+import { DollProvider } from './components/auth_context';
 
 function AppLayout() {
   const location = useLocation()

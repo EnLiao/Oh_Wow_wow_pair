@@ -1,8 +1,8 @@
 import { useState, useContext} from 'react'
-import { login, register, getDollInfo} from '../services/api'
+import { login, register, getDollInfo, doll_list_view} from '../services/api'
 import { useNavigate } from 'react-router-dom';
-import { DollContext } from '../components/doll_context';
-import { 
+import { AuthContext } from '../components/auth_context';
+import {
   Button, 
   Input, 
   Container, 
@@ -22,8 +22,6 @@ export default function Login() {
   const [avatar_url, setAvatar_url] = useState('')
   const [bio, setBio] = useState('')
   const navigate = useNavigate()
-
-  const { setDollInfo } = useContext(DollContext);
 
   const handleSubmit = async () => {
     if (isSignUp) {
@@ -77,6 +75,19 @@ export default function Login() {
   
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
+
+        const dollRes = await doll_list_view(username);
+        const doll_list = dollRes.data;
+        localStorage.setItem('doll_list', JSON.stringify(doll_list));
+        console.log('doll_list', doll_list);
+        // if (doll_list.length > 0) {
+        //   const firstDollId = doll_list[0].id;
+        //   localStorage.setItem('current_doll_id', firstDollId);
+    
+        //   const dollRes = await getDollInfo(firstDollId);
+        //   setDollInfo(dollRes.data);          // DollContext 給全站使用
+        // }
+
         // get doll info by doll_id
         // const dollId = 'doll001';
         // localStorage.setItem('doll_id', dollId);
@@ -185,18 +196,26 @@ export default function Login() {
             </FormGroup>
   
             <Button 
-              color="primary" 
               block 
               onClick={handleSubmit}
               className="mb-3"
+              style={{
+                color: '#000',
+                backgroundColor: '#ffd5fc',
+                border: 'none',
+              }}
             >
               {isSignUp ? 'Sign Up' : 'Login'}
             </Button>
     
             <Button
-              color="secondary"
               block
               onClick={() => setIsSignUp(prev => !prev)}
+              style={{
+                color: '#000',
+                backgroundColor: '#ffd5fc',
+                border: 'none',
+              }}
             >
               {isSignUp ? 'Back to Login' : 'Sign Up'}
             </Button>

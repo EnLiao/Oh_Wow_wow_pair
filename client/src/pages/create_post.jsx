@@ -1,13 +1,13 @@
 import React, { useState, useContext} from 'react'
 import { create_post } from '../services/api'
-import { DollContext } from '../components/doll_context'
+import { AuthContext } from '../components/auth_context'
 
 export default function CreatePost() {
     const dollId = localStorage.getItem('doll_id')
     const [postContent, setPostContent] = useState('')
     const [image_url, setImage_url] = useState('')
 
-    const { dollInfo } = useContext(DollContext);
+    const { dollInfo } = useContext(AuthContext);
     console.log('dollInfo', dollInfo)
 
     const handleSubmit = async () => {
