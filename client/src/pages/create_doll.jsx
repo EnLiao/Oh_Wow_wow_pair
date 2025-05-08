@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { create_doll } from '../services/api'
 
 export default function CreateDoll() {
+    const navigate = useNavigate()
+
     const [dollId, setDollId] = useState('')
     const [dollName, setDollName] = useState('')
     const [dollBirthday, setDollDate] = useState('')
@@ -8,22 +12,24 @@ export default function CreateDoll() {
     const [dollImage, setDollImage] = useState('')
     
     const handleSubmit = async () => {
-        if (!dollName || !dollImage || !dollDescription || !dollType) {
+        if (!dollName || !dollImage || !dollDescription || !dollBirthday || !dollId) {
         alert('Please fill in all fields')
         return
         }
     
         const formData = new FormData()
-        formData.append('doll_id', dollId)
+        formData.append('id', dollId)
         formData.append('name', dollName)
         formData.append('birthday', dollBirthday)
         formData.append('description', dollDescription)
         formData.append('image', dollImage)
     
         try {
-        const res = await createDoll(formData) // axios 呼叫 createDoll
+        const res = await create_doll(formData) // axios 呼叫 createDoll
         console.log('create doll success', res.data)
         alert('create doll success')
+        localStorage.setItem('current_doll_id', dollId)
+        navigate('/main_page')
         } catch (err) {
         console.error(err)
         alert('create doll failed')
