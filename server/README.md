@@ -163,37 +163,35 @@ doll id重複
 
 ---
 
-### 建立新 Tag
+### 列出所有 Tag
 
-- **成功建立 tag 的請求與回應範例（JSON）**：
+- **成功建立列出所有 tag 的請求與回應範例（JSON）**：
+```bash
+curl -X GET http://127.0.0.1:8000/core/tags/ \
+  -H "Accept: application/json"
+```
 
+- **成功時回應範例（JSON）**：
 ```json
 {
-  "tag_id": 3,
-  "name": "可愛",
-  "category": "風格"
+    "id": 1,
+    "name": "可愛"
+  },
+  {
+    "id": 2,
+    "name": "活潑"
+  },
+  {
+    "id": 3,
+    "name": "溫柔"
 }
 ```
-
-- **後端失敗回傳（JSON）**：
-
-```json
-{
-  "name": ["tag with this name already exists."]
-}
-```
-
-📌 備註：需在 Header 中附上 JWT Token，例如：
-```
-Authorization: Bearer <access_token>
-```
-
 ---
 
 ---
 ### 取得娃娃資訊
 ```bash
-curl -X GET http://127.0.0.1:8000/core/dolls/doll006/ \
+curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
@@ -217,10 +215,21 @@ curl -X GET http://127.0.0.1:8000/core/dolls/doll006/ \
   ]
 }
 ```
-### 建立新貼文
+
 
 ---
-
+### 使用者列出所有娃娃
+---
+```bash
+curl -X GET http://127.0.0.1:8000/core/users/<username>/dolls/ \
+  -H "Authorization: Bearer <access_token>"
+```
+- **成功時回應範例（JSON）**：
+```json
+{"id":"doll_1"},{"id":"doll_2"}
+```
+### 建立新貼文
+---
 - **路徑**：`POST /post/posts/`
 - **說明**：建立新貼文
 - **請求格式範例（JSON）**：
@@ -289,24 +298,10 @@ curl -X POST http://127.0.0.1:8000/core/login/ \
       }'
 # → 回傳 refresh 與 access token
 
-# 使用 refresh token 錯誤測試建立 tag
-curl -X POST http://127.0.0.1:8000/core/tags/ \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <refresh_token>" \
-  -d '{
-        "name": "可愛",
-        "category": "風格"
-      }'
-
-# 正確使用 access token 建立 tag
-curl -X POST http://127.0.0.1:8000/core/tags/ \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ...WN3_byQUEaejDFIopEpsQy0" \
-  -d '{
-        "name": "可愛",
-        "category": "風格"
-      }'
-# → {"tag_id":2,"name":"可愛","category":"風格"}
+# 列出所有官方自訂的 tag
+curl -X GET http://127.0.0.1:8000/core/tags/ \
+  -H "Accept: application/json"
+# → {"id":2,"name":"可愛"}
 
 # 建立娃娃
 curl -X POST http://127.0.0.1:8000/core/dolls/ \

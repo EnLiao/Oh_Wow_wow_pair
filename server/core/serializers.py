@@ -1,16 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Doll, Tag, DollTag
+from .models import Doll, Tag, DollTag, Follow
 
 User = get_user_model()
-
+#我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_url 為可選欄位，但email 為必填欄位
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-
     class Meta:
         model = User
         fields = ('username', 'password', 'nickname', 'email', 'bio', 'avatar_url')
-
+        extra_kwargs = {'email': {'required': True}}
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -25,7 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ['id', 'name', 'category']
+        fields = ['id', 'name']
 
 class DollSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
@@ -45,7 +44,6 @@ class DollSerializer(serializers.ModelSerializer):
             except Tag.DoesNotExist:
                 raise serializers.ValidationError({"tag_ids": [f"這個 tag id {tag_id} 不存在"]})
             DollTag.objects.create(doll_id=doll, tag_id=tag)
-        doll.tags = [tag for tag in Tag.objects.filter(id__in=tag_ids)]
         return doll
     def validate_tag_ids(self, value):
         for tag_id in value:
@@ -61,3 +59,11 @@ class DollSerializer(serializers.ModelSerializer):
             Tag.objects.filter(dolltag__doll_id=obj.id),
             many=True
         ).data
+class DollIdOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doll
+        fields = ['id']
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ['from_doll_id', 'to_doll_id']
