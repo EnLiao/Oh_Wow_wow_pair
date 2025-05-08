@@ -378,5 +378,17 @@ curl -X DELETE
   -d '{"doll_id": "cheesetaro"}' 
   http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
 # → [{"message":"Unliked","post":{"id":"e6666593-3d06-4563-8b38-67a411476c3c","doll_id":"omuba","content":"我是一條笨狗 汪汪汪 我叫歐姆嘎抓","image_url":"https://github.com/","created_at":"2025-05-08T15:12:00.939363+08:00","like_count":0,"liked_by_me":false}}]
+
+# 留言貼文
+curl -X POST 
+  -H "Authorization: Bearer eyJ...zrJx8" 
+  -H "Content-Type: application/json" 
+  -d '{
+        "doll_id": "tomorin",
+        "content": "這是一則留言",
+        "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb"
+      }' 
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
+# → {"local_id":2,"post_id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"tomorin","content":"這是一則留言","created_at":"2025-05-08T22:38:21.862059+08:00"}
 ```
 
