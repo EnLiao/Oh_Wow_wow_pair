@@ -6,9 +6,9 @@
 
 ### 使用者註冊 API
 
-- **路徑**：`POST /core/register/`
-- **說明**：建立新使用者帳號
-- **請求格式範例（JSON）**：
+***路徑**：`POST /core/register/`
+***說明**：建立新使用者帳號
+***請求格式範例（JSON）**：
 
 ```json
 {
@@ -21,7 +21,7 @@
 }
 ```
 
-- **回應格式範例（JSON）**：
+* **回應格式範例（JSON）**：
 
 ```json
 {
@@ -33,7 +33,7 @@
 }
 ```
 
-- **所有失敗的錯誤範例（JSON）**：
+* **所有失敗的錯誤範例（JSON）**：
 
 ```json
 已存在
@@ -50,12 +50,12 @@ avatar_url 格式不正確
 
 ### 使用者登入 API
 
-- **路徑**：`POST /core/login/`
-- **說明**：使用者登入
+* **路徑**：`POST /core/login/`
+* **說明**：使用者登入
 
 > ⚠️ 如果前端未提供完整的 `username` 或 `password`，後端會回傳錯誤，請確保兩者都提供
 
-- **成功請求格式範例（JSON）**：
+* **成功請求格式範例（JSON）**：
 
 ```json
 {
@@ -64,7 +64,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **成功時回應格式範例（JSON）**：
+* **成功時回應格式範例（JSON）**：
 
 ```json
 {
@@ -73,7 +73,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **失敗請求範例（密碼錯誤）**：
+* **失敗請求範例（密碼錯誤）**：
 
 ```json
 {
@@ -82,7 +82,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **失敗時回應格式範例（JSON）**：
+* **失敗時回應格式範例（JSON）**：
 
 ```json
 {
@@ -90,7 +90,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **缺少欄位時的錯誤回應（JSON）**：
+* **缺少欄位時的錯誤回應（JSON）**：
 
 ```json
 {
@@ -98,18 +98,21 @@ avatar_url 格式不正確
 }
 ```
 
-| 欄位 | 說明 |
-|------|------|
-| access | 短效 token，前端每次發 API 都要帶這個 |
+| 欄位      | 說明                       |
+| ------- | ------------------------ |
+| access  | 短效 token，前端每次發 API 都要帶這個 |
 | refresh | 用來在 token 過期時重新取得新 token |
 
 ---
 
 ### 建立新娃娃
 
-> 我自己的理解是使用這知道 tag_id 對應哪種 tag，比如說 1 -> 可愛
+* **路徑**：`POST /core/dolls/`
+* **說明**：建立新娃娃（需附帶 access token）
 
-- **請求格式範例（JSON）**：
+> 我自己的理解是使用這知道 tag\_id 對應哪種 tag，比如說 1 -> 可愛
+
+* **請求格式範例（JSON）**：
 
 ```json
 {
@@ -122,7 +125,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **成功建立娃娃時回應（JSON）**：
+* **成功建立娃娃時回應（JSON）**：
 
 ```json
 {
@@ -148,7 +151,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **失敗時回應（JSON）**：
+***失敗時回應（JSON）**：
 
 ```json
 沒登入
@@ -165,13 +168,19 @@ doll id重複
 
 ### 列出所有 Tag
 
-- **成功建立列出所有 tag 的請求與回應範例（JSON）**：
+* **路徑**：`GET /core/tags/`
+
+* **說明**：取得所有官方定義的 Tag（提供前端選項）
+
+* **成功建立列出所有 tag 的請求與回應範例（JSON）**：
+
 ```bash
 curl -X GET http://127.0.0.1:8000/core/tags/ \
   -H "Accept: application/json"
 ```
 
-- **成功時回應範例（JSON）**：
+* **成功時回應範例（JSON）**：
+
 ```json
 {
     "id": 1,
@@ -186,17 +195,21 @@ curl -X GET http://127.0.0.1:8000/core/tags/ \
     "name": "溫柔"
 }
 ```
----
 
 ---
+
 ### 取得娃娃資訊
+
+* **路徑**：`GET /core/dolls/<doll_id>/`
+* **說明**：查詢單隻娃娃的所有詳細資訊（需帶 token）
+
 ```bash
 curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
+* **成功時回應範例（JSON）**：
 
-- **成功時回應範例（JSON）**：
 ```json
 {
   "id": "doll006",
@@ -216,17 +229,22 @@ curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
 }
 ```
 
+---
 
----
 ### 使用者列出所有娃娃
----
+
+* **路徑**：`GET /core/users/<username>/dolls/`
+* **說明**：查詢指定使用者所擁有的所有娃娃 id（需帶 token）
+
 ```bash
 curl -X GET http://127.0.0.1:8000/core/users/<username>/dolls/ \
   -H "Authorization: Bearer <access_token>"
 ```
-- **成功時回應範例（JSON）**：
+
+***成功時回應範例（JSON）**：
+
 ```json
-{"id":"doll_1"},{"id":"doll_2"}
+[{"id":"doll_1"},{"id":"doll_2"}]
 ```
 ### 建立新貼文
 ---
