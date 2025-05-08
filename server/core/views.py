@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from .serializers import DollSerializer, TagSerializer
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, DollIdOnlySerializer
 from .models import Doll, Tag, Follow
 
 User = get_user_model()
@@ -50,7 +50,7 @@ class FollowersToListView(ListAPIView):
             id__in=Follow.objects.filter(from_doll_id=doll_id).values_list('to_doll_id', flat=True)
         )
 class UserDollListView(generics.ListAPIView):
-    serializer_class = DollSerializer
+    serializer_class = DollIdOnlySerializer
 
     def get_queryset(self):
         username = self.kwargs['username']

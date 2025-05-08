@@ -59,6 +59,10 @@ class DollSerializer(serializers.ModelSerializer):
             Tag.objects.filter(dolltag__doll_id=obj.id),
             many=True
         ).data
+class DollIdOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doll
+        fields = ['id']
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow

@@ -228,7 +228,7 @@ curl -X GET http://127.0.0.1:8000/core/users/momo/dolls/ \
 ```
 - **成功時回應範例（JSON）**：
 ```json
-{"id":"doll_1","username":"momo","name":"小白","birthday":"2023-10-01","description":"超可愛娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-05-06T20:11:42.942518+08:00","tags":[{"id":1,"name":"可愛","category":"風格"}]},{"id":"doll_2","username":"momo","name":"小白","birthday":"2023-10-01","description":"超可愛娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-05-08T09:44:40.593900+08:00","tags":[{"id":1,"name":"可愛","category":"風格"}]}
+{"id":"doll_1"},{"id":"doll_2"}
 ```
 
 ---
