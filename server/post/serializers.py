@@ -35,13 +35,13 @@ class PostSerializer(serializers.ModelSerializer):
         # 'doll_id' 是 Likes 模型中指向 Doll 的 ForeignKey 欄位名稱
         return Likes.objects.filter(post_id=post_instance, doll_id=requesting_doll_id).exists()
 
-
 class CommentSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
     post_id = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['local_id', 'post', 'doll', 'content', 'created_at']
+        read_only_fields = ['local_id', 'created_at']
 
 class LikesSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
