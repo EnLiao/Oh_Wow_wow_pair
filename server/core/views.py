@@ -49,3 +49,9 @@ class FollowersToListView(ListAPIView):
         return Doll.objects.filter(
             id__in=Follow.objects.filter(from_doll_id=doll_id).values_list('to_doll_id', flat=True)
         )
+class UserDollListView(generics.ListAPIView):
+    serializer_class = DollSerializer
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return Doll.objects.filter(username=username)
