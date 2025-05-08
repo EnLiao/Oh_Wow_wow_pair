@@ -90,4 +90,4 @@ class CommentListCreateView(generics.ListCreateAPIView):
         post = get_object_or_404(Post, id=post_id)
         doll_id = self.request.data.get('doll_id')
         doll = get_object_or_404(Doll, id=doll_id)
-        serializer.save(post=post, doll=doll)
+        serializer.save(post_id=post, doll_id=doll)

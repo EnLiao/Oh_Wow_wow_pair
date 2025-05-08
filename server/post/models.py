@@ -13,19 +13,22 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
+    post_id = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', db_column='post_id')
+    doll_id = models.ForeignKey(Doll, on_delete=models.CASCADE, db_column='doll_id')
+    
     local_id = models.IntegerField()
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
-        unique_together = ('post', 'local_id') 
+        unique_together = ('post_id', 'local_id') 
         ordering = ['local_id']
 
     def save(self, *args, **kwargs):
         if self.local_id is None:
-            max_local_id = Comment.objects.filter(post=self.post).aggregate(Max('local_id'))['local_id__max'] or 0
-            self.local_id = max_local_id + 1
+            if self.post_id:
+                 max_local_id = Comment.objects.filter(post_id=self.post_id).aggregate(Max('local_id'))['local_id__max'] or 0
+                 self.local_id = max_local_id + 1
         super().save(*args, **kwargs)
 
 class Likes(models.Model):

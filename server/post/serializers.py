@@ -20,28 +20,30 @@ class PostSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
 
     def get_like_count(self, post_instance):
-        # 'post_instance' 是一個 Post 物件
-        # 這裡的 post_id 是 Likes 模型中的欄位名稱，查詢正確
         return Likes.objects.filter(post_id=post_instance).count()
 
     def get_liked_by_me(self, post_instance):
-        # 'post_instance' 是一個 Post 物件
         requesting_doll_id = self.context.get('doll_id')
         if not requesting_doll_id:
             return False
-        
-        # 修正這裡：將 post=post_instance 改為 post_id=post_instance
-        # 'post_id' 是 Likes 模型中指向 Post 的 ForeignKey 欄位名稱
-        # 'doll_id' 是 Likes 模型中指向 Doll 的 ForeignKey 欄位名稱
         return Likes.objects.filter(post_id=post_instance, doll_id=requesting_doll_id).exists()
 
 class CommentSerializer(serializers.ModelSerializer):
-    doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
-    post_id = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+    post_id = serializers.PrimaryKeyRelatedField(
+        queryset=Post.objects.all(),
+    )
+    doll_id = serializers.PrimaryKeyRelatedField(
+        queryset=Doll.objects.all(),
+    )
+
     class Meta:
         model = Comment
-        fields = ['local_id', 'post', 'doll', 'content', 'created_at']
+        fields = ['local_id', 'post_id', 'doll_id', 'content', 'created_at']
         read_only_fields = ['local_id', 'created_at']
+
+    def create(self, validated_data):
+        comment = Comment.objects.create(**validated_data)
+        return comment
 
 class LikesSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
