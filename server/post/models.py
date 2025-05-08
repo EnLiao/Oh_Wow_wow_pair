@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import uuid
 from core.models import User, Doll, Tag, DollTag
+from django.db.models import Max
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -12,13 +13,20 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):
-    id = models.AutoField(primary_key=True)
-    post_id = models.ForeignKey(Post, to_field='id', on_delete=models.CASCADE)
-    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    doll = models.ForeignKey(Doll, on_delete=models.CASCADE)
+    local_id = models.IntegerField()
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together = ('post_id', 'id')
+        unique_together = ('post', 'local_id') 
+        ordering = ['local_id']
+
+    def save(self, *args, **kwargs):
+        if self.local_id is None:
+            max_local_id = Comment.objects.filter(post=self.post).aggregate(Max('local_id'))['local_id__max'] or 0
+            self.local_id = max_local_id + 1
+        super().save(*args, **kwargs)
 
 class Likes(models.Model):
     doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
