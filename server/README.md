@@ -301,7 +301,7 @@ curl -X POST http://127.0.0.1:8000/core/login/ \
 # 列出所有官方自訂的 tag
 curl -X GET http://127.0.0.1:8000/core/tags/ \
   -H "Accept: application/json"
-# → {"tag_id":2,"name":"可愛"}
+# → {"id":2,"name":"可愛"}
 
 # 建立娃娃
 curl -X POST http://127.0.0.1:8000/core/dolls/ \
