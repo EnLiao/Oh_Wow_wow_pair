@@ -3,23 +3,29 @@ import MainPage from './pages/main_page'
 import DollPage from './pages/doll_page'
 import NavBar from './components/nav_bar'
 import Login from './pages/login'
-import CreateDoll from './components/create_doll'
-import CreatePost from './components/create_post'
+import CreateDoll from './pages/create_doll'
+import CreatePost from './pages/create_post'
+import { AuthProvider } from './components/auth_context';
 
 function AppLayout() {
   const location = useLocation()
-  const isLoginPage = location.pathname === '/login'
+  const NoNeedNavBar = 
+    location.pathname === '/login' ||
+    location.pathname === '/create_doll' ||
+    location.pathname === '/create_post';
 
   return (
     <>
-      {!isLoginPage && <NavBar />}
-      <Routes>
-        <Route path='/login' element={<Login />} />
-        <Route path="/doll_page" element={<DollPage />} />
-        <Route path="/main_page" element={<MainPage />} />
-        <Route path="/create_doll" element={<CreateDoll />} />
-        <Route path="/create_post" element={<CreatePost />} />
-      </Routes>
+      {!NoNeedNavBar && <NavBar />}
+      <AuthProvider>
+        <Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path="/doll_page" element={<DollPage />} />
+          <Route path="/main_page" element={<MainPage />} />
+          <Route path="/create_doll" element={<CreateDoll />} />
+          <Route path="/create_post" element={<CreatePost />} />
+        </Routes>
+      </AuthProvider>
     </>
   )
 }

@@ -12,7 +12,7 @@ export default function NavBar() {
 
   const handleSwitchUser = (newUser) => {
     setCurrentUser(newUser);
-    console.log(`switch to：${newUser}`);
+    console.log('switch to：${newUser}');
     // 你也可以在這裡更新 localStorage 或全域狀態
   };
 
@@ -85,12 +85,14 @@ export default function NavBar() {
               top: '50%',
               left: 5,
               transform: 'translateY(-50%)',
+              userSelect: 'none',
             }}
           />
         </div>
         <p
           onMouseOver={(e) => { e.currentTarget.style.opacity = 0.5; }}
           onMouseOut={(e) => { e.currentTarget.style.opacity = 1; }}
+          onClick={() => { navigate('/create_post'); }}
           style={{
             fontSize: 'clamp(20px, 2vw, 30px)',
             cursor: 'pointer',

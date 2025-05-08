@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import { CreatePost } from '../services/api'
+import React, { useState, useContext} from 'react'
+import { create_post } from '../services/api'
+import { AuthContext } from '../components/auth_context'
 
-export default function create_post() {
+export default function CreatePost() {
     const dollId = localStorage.getItem('doll_id')
     const [postContent, setPostContent] = useState('')
     const [image_url, setImage_url] = useState('')
 
-    const doll_info = JSON.parse(localStorage.getItem('doll_info'))
-    console.log('doll_info', doll_info)
+    const { dollInfo } = useContext(AuthContext);
+    console.log('dollInfo', dollInfo)
 
     const handleSubmit = async () => {
         if (!postContent || !image_url) {
@@ -15,13 +16,14 @@ export default function create_post() {
             return
         }
 
-        const formData = new FormData()
-        formData.append('doll_id', dollId)
-        formData.append('content', postContent)
-        formData.append('image', postImage)
+        const data = {
+            doll_id: dollId,
+            content: postContent,
+            image_url: image_url
+        }
 
         try {
-            const res = await CreatePost(formData) // axios 呼叫 createPost
+            const res = await create_post(data) // axios 呼叫 createPost
             console.log('create post success', res.data)
             alert('create post success')
         } catch (err) {
@@ -40,7 +42,7 @@ export default function create_post() {
             <h1>Create Post</h1>
             <input type="text" placeholder="Content" onChange={(e) => setPostContent(e.target.value)} />
             <br></br>
-            <input type="file" onChange={(e) => setPostImage(e.target.files[0])} />
+            <input type="url" placeholder='image_url' onChange={(e) => setImage_url(e.target.value)} />
             <br></br>
             <button onClick={handleSubmit}>Submit</button>
         </div>

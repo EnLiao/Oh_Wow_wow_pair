@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Doll, DollTag, Tag
+from .models import User, Doll, DollTag, Tag, Follow
 
 
 class DollAdmin(admin.ModelAdmin):
@@ -95,3 +95,4 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Doll, DollAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DollTag)
+admin.site.register(Follow)

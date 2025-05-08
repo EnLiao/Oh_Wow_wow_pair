@@ -2,6 +2,7 @@ import img1 from '../assets/windy.jpg';
 import img2 from '../assets/carrot.jpg';
 import img3 from '../assets/omuba.jpg';
 import Post from '../components/load_post';
+import { useNavigate } from 'react-router-dom';
 // I can use <Post> unlimited!
 // 新增切換帳號、新增帳號UI
 
@@ -21,6 +22,7 @@ const doll = {
 }
 
 export default function MainPage() {
+  const navigate = useNavigate();
   return (
     <div style={{ paddingLeft: '3%', paddingTop: 50, display: 'flex', flexDirection: 'flex-start'}}>
       {/* left following list */}
@@ -87,6 +89,7 @@ export default function MainPage() {
         <img
           src={doll.photo}
           alt={doll.name}
+          onClick={() => {navigate('/doll_page')}} // 點擊圖片跳轉到 doll profile
           style={{
             width: 70,
             height: 70,
