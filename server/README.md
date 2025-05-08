@@ -369,11 +369,12 @@ curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro"
 # → [{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
 
 # 按讚貼文
-curl -X POST -H "Authorization: Bearer eyJ0...dos"      
-  -H "Content-Type: application/json"      
-  -d '{"doll_id": "cheesetaro"}'      
-  http://localhost:8000/post/posts/7f65e081-1724-4650-ab1d-0df3a93bc633/like/
-# → {"message":"Already liked"}
+curl -X POST 
+ -H "Authorization: Bearer eyJ0..B6zu2UMQ4" 
+ -H "Content-Type: application/json" 
+ -d '{"doll_id": "cheesetaro"}' 
+ http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
+# → [{"message":"Already liked","post":{"id":"e6666593-3d06-4563-8b38-67a411476c3c","doll_id":"omuba","content":"我是一條笨狗 汪汪汪 我叫歐姆嘎抓","image_url":"https://github.com/","created_at":"2025-05-08T15:12:00.939363+08:00","like_count":1,"liked_by_me":true}}]
 
 # 取消按讚貼文
 curl -X DELETE -H "Authorization: Bearer eyJ..dos"      
