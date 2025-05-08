@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions
+from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from .serializers import DollSerializer, TagSerializer
-from .serializers import RegisterSerializer, DollIdOnlySerializer
+from .serializers import RegisterSerializer, DollIdOnlySerializer, FollowSerializer
 from .models import Doll, Tag, Follow
 
 User = get_user_model()
@@ -55,3 +58,33 @@ class UserDollListView(generics.ListAPIView):
     def get_queryset(self):
         username = self.kwargs['username']
         return Doll.objects.filter(username=username)
+class FollowView(APIView):
+    def post(self, request):
+        serializer = FollowSerializer(data=request.data)
+        if serializer.is_valid():
+            from_doll_id = serializer.validated_data['from_doll_id']
+            to_doll_id = serializer.validated_data['to_doll_id']
+
+            if from_doll_id == to_doll_id:
+                return Response({'detail': '不能追蹤自己'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if Follow.objects.filter(from_doll_id=from_doll_id, to_doll_id=to_doll_id).exists():
+                return Response({'detail': '已經追蹤過了'}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        from_doll_id = request.data.get('from_doll_id')
+        to_doll_id = request.data.get('to_doll_id')
+
+        if not from_doll_id or not to_doll_id:
+            return Response({'detail': '缺少 from_doll_id 或 to_doll_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            follow = Follow.objects.get(from_doll_id=from_doll_id, to_doll_id=to_doll_id)
+            follow.delete()
+            return Response({'detail': '已取消追蹤'}, status=status.HTTP_204_NO_CONTENT)
+        except Follow.DoesNotExist:
+            return Response({'detail': '尚未追蹤，無法取消'}, status=status.HTTP_400_BAD_REQUEST)

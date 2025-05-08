@@ -246,6 +246,79 @@ curl -X GET http://127.0.0.1:8000/core/users/<username>/dolls/ \
 ```json
 [{"id":"doll_1"},{"id":"doll_2"}]
 ```
+## 娃娃追蹤與取消追蹤 API 說明
+
+
+### 1. 建立追蹤關係
+
+* 方法：POST
+* 路徑：/core/follow/
+* 說明：讓一個娃娃追蹤另一個娃娃 -> from_doll_id 追蹤 to_doll_id
+
+#### 請求格式（JSON）：
+
+```json
+{
+  "from_doll_id": "doll1",
+  "to_doll_id": "doll2"
+}
+```
+
+#### 成功回應（HTTP 201）：
+
+```json
+{
+  "from_doll_id": "doll1",
+  "to_doll_id": "doll2"
+}
+```
+
+#### 測試指令（curl 範例）：
+
+```bash
+curl -X POST http://127.0.0.1:8000/core/follow/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"from_doll_id": "doll1", "to_doll_id": "doll2"}'
+```
+
+### 2. 取消追蹤關係
+
+* 方法：DELETE
+* 路徑：/core/follow/
+* 說明：讓一個娃娃取消對另一個娃娃的追蹤 -> from_doll_id是追蹤者取消追蹤to_doll_id
+
+#### 請求格式（JSON）：
+
+```json
+{
+  "from_doll_id": "doll1",
+  "to_doll_id": "doll2"
+}
+```
+
+#### 成功回應（HTTP 204）：
+
+無內容
+
+#### 測試指令（curl 範例）：
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/core/follow/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"from_doll_id": "doll1", "to_doll_id": "doll2"}'
+```
+
+### 3. 錯誤處理情況
+
+| 錯誤情境      | HTTP 狀態碼 | 回應訊息                             |
+| --------- | -------- | -------------------------------- |
+| 自己追蹤自己    | 400      | 不能追蹤自己                           |
+| 已經追蹤過     | 400      | 已經追蹤過了                           |
+| 要取消的關係不存在 | 400      | 尚未追蹤，無法取消                        |
+| 缺少必要欄位    | 400      | 缺少 from\_doll\_id 或 to\_doll\_id |
+
 ### 建立新貼文
 ---
 - **路徑**：`POST /post/posts/`
@@ -361,7 +434,7 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
         "birthday": "2023-10-01",
         "description": "這是我最喜歡的娃娃",
         "avatar_url": "https://example.com/doll.jpg",
-        "tag_ids":[1, 2],
+        "tag_ids":[1, 2]
       }'
 # → {"id":"doll001","username":"momo","name":"小白","birthday":"2023-10-01","description":"這是我最喜歡的娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-05-05T11:24:22.180047+08:00","tags":[]}
 

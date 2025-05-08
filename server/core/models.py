@@ -52,8 +52,8 @@ class DollTag(models.Model):
         unique_together = ('doll_id', 'tag_id')
 
 class Follow(models.Model):
-    from_doll = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='following')
-    to_doll = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='followers')
+    from_doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='following')
+    to_doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='followers')
 
     class Meta:
-        unique_together = ('from_doll', 'to_doll')
+        unique_together = ('from_doll_id', 'to_doll_id')
