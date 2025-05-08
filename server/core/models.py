@@ -34,6 +34,7 @@ class Doll(models.Model):
     description = models.TextField(blank=True)
     avatar_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    tag = models.ManyToManyField('Tag',  related_name='dolls')
 
     def __str__(self):
         return self.name
@@ -43,13 +44,6 @@ class Tag(models.Model):
     
     def __str__(self):
         return self.name
-
-class DollTag(models.Model):
-    doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
-    tag_id = models.ForeignKey(Tag, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('doll_id', 'tag_id')
 
 class Follow(models.Model):
     from_doll = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='following')

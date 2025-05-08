@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import User, Doll, DollTag, Tag, Follow
+from .models import User, Doll, Tag, Follow
 
 
 class DollAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'birthday')
+    filter_horizontal = ('tag',)
 
 class TagAdmin(admin.ModelAdmin):
     pass
@@ -27,6 +28,9 @@ class UserAdmin(admin.ModelAdmin):
             'fields': ('username', 'nickname', 'email', 'password1', 'password2', 'is_staff')}
         ),
     )
+
+    
+
     def save_model(self, request, obj, form, change):
         if not change:  # If creating a new user
             obj.set_password(form.cleaned_data['password1'])
@@ -94,5 +98,5 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Doll, DollAdmin)
 admin.site.register(Tag, TagAdmin)
-admin.site.register(DollTag)
+
 admin.site.register(Follow)
