@@ -5,7 +5,7 @@ import NavBar from './components/nav_bar'
 import Login from './pages/login'
 import CreateDoll from './pages/create_doll'
 import CreatePost from './pages/create_post'
-import { DollProvider } from './components/auth_context';
+import { AuthProvider } from './components/auth_context';
 
 function AppLayout() {
   const location = useLocation()
@@ -17,7 +17,7 @@ function AppLayout() {
   return (
     <>
       {!NoNeedNavBar && <NavBar />}
-      <DollProvider>
+      <AuthProvider>
         <Routes>
           <Route path='/login' element={<Login />} />
           <Route path="/doll_page" element={<DollPage />} />
@@ -25,7 +25,7 @@ function AppLayout() {
           <Route path="/create_doll" element={<CreateDoll />} />
           <Route path="/create_post" element={<CreatePost />} />
         </Routes>
-      </DollProvider>
+      </AuthProvider>
     </>
   )
 }
