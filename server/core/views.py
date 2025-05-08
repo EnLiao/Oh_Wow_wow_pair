@@ -22,10 +22,10 @@ class DollListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(username=self.request.user)
 
-class TagListCreateView(generics.ListCreateAPIView):
+class TagListView(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 class DollDetailView(RetrieveAPIView):
     queryset = Doll.objects.all()
     serializer_class = DollSerializer

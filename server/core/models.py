@@ -39,11 +39,10 @@ class Doll(models.Model):
         return self.name
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    category = models.CharField(max_length=100)
-
+    name = models.CharField(max_length=100, unique=True)
+    
     def __str__(self):
-        return f"{self.name} ({self.category})"
+        return self.name
 
 class DollTag(models.Model):
     doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)

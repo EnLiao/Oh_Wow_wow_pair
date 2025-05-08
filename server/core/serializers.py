@@ -24,7 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ['id', 'name', 'category']
+        fields = ['id', 'name']
 
 class DollSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
