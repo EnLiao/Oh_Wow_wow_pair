@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import uuid
@@ -25,10 +25,12 @@ class Comment(models.Model):
         ordering = ['local_id']
 
     def save(self, *args, **kwargs):
-        if self.local_id is None:
-            if self.post_id:
-                 max_local_id = Comment.objects.filter(post_id=self.post_id).aggregate(Max('local_id'))['local_id__max'] or 0
-                 self.local_id = max_local_id + 1
+        if self.local_id is None and self.post_id:
+            with transaction.atomic():
+                last_comment = Comment.objects.select_for_update().filter(post_id=self.post_id).order_by('-local_id').first()
+                max_local_id = last_comment.local_id if last_comment else 0
+                self.local_id = max_local_id + 1
+
         super().save(*args, **kwargs)
 
 class Likes(models.Model):
