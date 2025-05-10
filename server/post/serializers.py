@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from core.models import User, Doll, Tag, DollTag
+from core.models import User, Doll, Tag
 from post.models import Post, Comment, Likes, Favorite, PostSeen
 from core.serializers import DollSerializer, RegisterSerializer
 

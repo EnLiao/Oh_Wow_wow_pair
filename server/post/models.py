@@ -2,7 +2,7 @@ from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import uuid
-from core.models import User, Doll, Tag, DollTag
+from core.models import User, Doll, Tag
 from django.db.models import Max
 
 class Post(models.Model):
