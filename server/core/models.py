@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.core.validators import FileExtensionValidator
 '''
 super user:
 admin
@@ -18,7 +19,11 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, primary_key=True)
     nickname = models.CharField(max_length=100, blank=True)
     bio = models.TextField(blank=True)
-    avatar_url = models.URLField(blank=True)
+    avatar_image = models.ImageField(
+        upload_to='avatars/',
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 '''
 我設定了 id 為 primary key
@@ -32,7 +37,11 @@ class Doll(models.Model):
     name = models.CharField(max_length=100)
     birthday = models.DateField()
     description = models.TextField(blank=True)
-    avatar_url = models.URLField(blank=True)
+    avatar_image = models.ImageField(
+        upload_to='avatars/',
+        blank=True, #這邊要是可選欄位嗎?
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
