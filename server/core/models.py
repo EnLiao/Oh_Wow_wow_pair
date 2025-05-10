@@ -12,7 +12,7 @@ abcde
 '''
 我設定了 username 為 primary key
 這樣就不需要額外的 id 欄位了
-且使nickname, bio, avatar_url 為可選欄位
+且使nickname, bio, avatar_image 為可選欄位
 但email, username, password為必填欄位
 '''
 class User(AbstractUser):
@@ -27,7 +27,7 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
 '''
 我設定了 id 為 primary key
-且使 description, avatar_url, created_at 為可選欄位
+且使 description, avatar_image, created_at 為可選欄位
 username 為 ForeignKey，指向 User 的 username 欄位 -> 表示主人的名字
 但 id, name, birthday 為必填欄位
 '''
