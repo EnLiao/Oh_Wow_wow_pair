@@ -8,18 +8,17 @@
 
 ***路徑**：`POST /core/register/`
 ***說明**：建立新使用者帳號
-***請求格式範例（JSON）**：
+***請求格式範例**：
 
-```json
-{
-  "username": "momo",
-  "password": "abc12345",
-  "email": "momo@example.com",
-  "nickname": "小桃",
-  "bio": "我愛娃娃",
-  "avatar_url": "https://example.com/momo.jpg"
-}
-```
+| 欄位名            | 型別     | 是否必填 | 說明                    |
+| -------------- | ------ | ---- | --------------------- |
+| `username`     | string |  是  | 最多 150 字元，唯一主鍵        |
+| `password`     | string |  是  | 使用者密碼                 |
+| `email`        | string |  是  | 使用者信箱，需符合格式           |
+| `nickname`     | string |  否  | 最多 100 字元             |
+| `bio`          | string |  否  | 使用者自我介紹               |
+| `avatar_image` | file   |  否  | 使用者頭像圖，支援 jpg/png/gif |
+
 
 * **回應格式範例（JSON）**：
 
@@ -29,7 +28,7 @@
   "email": "momo@example.com",
   "nickname": "小桃",
   "bio": "我愛娃娃",
-  "avatar_url": "https://example.com/momo.jpg"
+  "avatar_image": "/media/avatars/momo.jpg"
 }
 ```
 
@@ -42,8 +41,6 @@ username沒填
 {"username":["此為必需欄位。"]}
 email格式不正確
 {"email":["請輸入有效的電子郵件地址。"]}
-avatar_url 格式不正確
-{"avatar_url":["請輸入有效的URL。"]}
 ```
 
 ---
@@ -108,22 +105,21 @@ avatar_url 格式不正確
 ### 建立新娃娃
 
 * **路徑**：`POST /core/dolls/`
-* **說明**：建立新娃娃（需附帶 access token）
+* **說明**：建立屬於目前登入使用者的娃娃（需附帶 access token）。每位使用者最多只能創建 10 個娃娃。
 
 > 我自己的理解是使用這知道 tag\_id 對應哪種 tag，比如說 1 -> 可愛
 
-* **請求格式範例（JSON）**：
+* **請求格式範例**：
 
-```json
-{
-  "id": "doll001",
-  "name": "小白",
-  "birthday": "2023-10-01",
-  "description": "這是我最喜歡的娃娃",
-  "avatar_url": "https://example.com/doll.jpg",
-  "tag_ids": [1, 2]
-}
-```
+| 欄位名            | 型別          | 是否必填 | 說明                   |
+| -------------- | ----------- | ---- | -------------------- |
+| `id`           | string      |  是  | 娃娃主鍵，最多 64 字元，需唯一    |
+| `name`         | string      |  是  | 娃娃名稱，最多 100 字元       |
+| `birthday`     | date        |  是  | 格式為 `YYYY-MM-DD`     |
+| `description`  | string      |  否  | 娃娃介紹                 |
+| `avatar_image` | file        |  否  | 娃娃頭像圖，支援 jpg/png/gif |
+| `tag_ids`      | array\[int] |  否  | 傳入要標記的 tag ID（整數陣列）  |
+
 
 * **成功建立娃娃時回應（JSON）**：
 
@@ -134,19 +130,11 @@ avatar_url 格式不正確
   "name": "小白",
   "birthday": "2023-10-01",
   "description": "這是我最喜歡的娃娃",
-  "avatar_url": "https://example.com/doll.jpg",
-  "created_at": "2025-05-05T00:00:00Z",
+  "avatar_image": "/media/avatars/doll001.jpg",
+  "created_at": "2024-05-09T14:30:00Z",
   "tags": [
-    {
-      "id": 1,
-      "name": "可愛",
-      "category": "風格"
-    },
-    {
-      "id": 2,
-      "name": "活潑",
-      "category": "性格"
-    }
+    {"id": 1, "name": "可愛"},
+    {"id": 2, "name": "白色"}
   ]
 }
 ```
@@ -162,6 +150,8 @@ Tag不存在
 {"tag_ids":["這個 tag id 2 不存在"]}
 doll id重複
 {"id":["這個 id 在 doll 已經存在。"]}
+建立超過10個娃娃
+{"non_field_errors": ["每位使用者最多只能創建 10 個娃娃"]}
 ```
 
 ---
@@ -385,31 +375,6 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 ## 用curl測試指令紀錄（終端機）
 
 ```bash
-# 註冊（若已存在使用者）預設中文
-curl -X POST http://127.0.0.1:8000/core/register/ \
-  -H "Content-Type: application/json" \
-  -d '{
-        "username": "momo",
-        "password": "abc12345",
-        "email": "momo@example.com",
-        "nickname": "小桃",
-        "bio": "我愛娃娃",
-        "avatar_url": "https://example.com/momo.jpg"
-      }'
-# → {"username":["一個相同名稱的使用者已經存在。"]}
-# 註冊（若已存在使用者）指定語言為英文 -> 要在header加上Accept-Language
-curl -X POST http://127.0.0.1:8000/core/register/ \
-  -H "Content-Type: application/json" \
-  -H "Accept-Language: en" \
-  -d '{
-        "username": "momo",
-        "password": "abc12345",
-        "email": "momo@example.com",
-        "nickname": "小桃",
-        "bio": "我愛娃娃",
-        "avatar_url": "https://example.com/momo.jpg"
-      }'
-# → {"username":["A user with that username already exists."]}
 # 登入，取得 token
 curl -X POST http://127.0.0.1:8000/core/login/ \
   -H "Content-Type: application/json" \
