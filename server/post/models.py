@@ -25,7 +25,7 @@ class Comment(models.Model):
         ordering = ['local_id']
 
     def save(self, *args, **kwargs):
-        if self.local_id is None and self.post_id:
+        if self.pk is None and self.local_id is None and self.post_id:
             with transaction.atomic():
                 last_comment = Comment.objects.select_for_update().filter(post_id=self.post_id).order_by('-local_id').first()
                 max_local_id = last_comment.local_id if last_comment else 0
