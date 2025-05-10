@@ -30,7 +30,7 @@ class PostSerializer(serializers.ModelSerializer):
         return Likes.objects.filter(post_id=post_instance, doll_id=requesting_doll_id).exists()
     
     def get_comment_count(self, post_instance):
-        return Comment.objects.filter(post_id=post_instance).count()
+        return post_instance.comments.count()
 
 class CommentSerializer(serializers.ModelSerializer):
     post_id = serializers.PrimaryKeyRelatedField(
