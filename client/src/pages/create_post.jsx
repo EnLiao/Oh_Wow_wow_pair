@@ -1,6 +1,6 @@
 import React, { useState, useContext} from 'react'
 import { create_post } from '../services/api'
-import { AuthContext } from '../components/auth_context'
+import { AuthContext } from '../services/auth_context'
 
 export default function CreatePost() {
     const dollId = localStorage.getItem('doll_id')
