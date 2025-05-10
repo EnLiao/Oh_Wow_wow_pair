@@ -3,13 +3,22 @@ from django.contrib.auth import get_user_model
 from .models import Doll, Tag, DollTag, Follow
 
 User = get_user_model()
-#我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_url 為可選欄位，但email 為必填欄位
+#我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_image 為可選欄位，但email 為必填欄位
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = User
-        fields = ('username', 'password', 'nickname', 'email', 'bio', 'avatar_url')
+        fields = ('username', 'password', 'nickname', 'email', 'bio', 'avatar_image')
         extra_kwargs = {'email': {'required': True}}
+    def validate_username(self, value):
+        if len(value) > 150:
+            raise serializers.ValidationError("使用者名稱長度不能超過 150 字元")
+        return value
+
+    def validate_nickname(self, value):
+        if len(value) > 100:
+            raise serializers.ValidationError("暱稱長度不能超過 100 字元")
+        return value
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -17,7 +26,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             nickname=validated_data.get('nickname', ''),
             bio=validated_data.get('bio', ''),
-            avatar_url=validated_data.get('avatar_url', ''),
+            avatar_image=validated_data.get('avatar_image', ''),
         )
         return user
 
@@ -25,6 +34,10 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ['id', 'name']
+    def validate_name(self, value):
+        if len(value) > 100:
+            raise serializers.ValidationError("標籤名稱長度不能超過 100 字元")
+        return value
 
 class DollSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
@@ -32,7 +45,7 @@ class DollSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doll
-        fields = ['id', 'username', 'name', 'birthday', 'description', 'avatar_url', 'created_at', 'tags', 'tag_ids']
+        fields = ['id', 'username', 'name', 'birthday', 'description', 'avatar_image', 'created_at', 'tags', 'tag_ids']
         read_only_fields = ['created_at', 'username']
 
     def create(self, validated_data):
@@ -50,9 +63,22 @@ class DollSerializer(serializers.ModelSerializer):
             if not Tag.objects.filter(id=tag_id).exists():
                 raise serializers.ValidationError(f"這個 tag id {tag_id} 不存在")
         return value
+    def validate(self, value):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            doll_count = Doll.objects.filter(username=request.user.username).count()
+            if doll_count >= 10:
+                raise serializers.ValidationError("每位使用者最多只能創建 10 個娃娃")
+        return value
     def validate_id(self, value):
+        if len(value) > 64:
+            raise serializers.ValidationError("娃娃 ID 長度不能超過 64 字元")
         if Doll.objects.filter(id=value).exists():
-            raise serializers.ValidationError("A doll with this ID already exists.")
+            raise serializers.ValidationError("娃娃 id 已存在")
+        return value
+    def validate_name(self, value):
+        if len(value) > 100:
+            raise serializers.ValidationError("娃娃名稱長度不能超過 100 字元")
         return value
     def get_tags(self, obj):
         return TagSerializer(
