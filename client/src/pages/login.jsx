@@ -1,7 +1,6 @@
 import { useState, useContext} from 'react'
-import { login, register, getDollInfo, doll_list_view} from '../services/api'
+import { login, register, doll_list_view} from '../services/api'
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../components/auth_context';
 import {
   Button, 
   Input, 
@@ -37,8 +36,10 @@ export default function Login() {
       try {
         const res = await register(data); // axios 呼叫 register
         console.log('sign up success', res.data);
+        localStorage.setItem('access_token', res.data.access);
+        localStorage.setItem('refresh_token', res.data.refresh);
         alert('sign up success');
-        navigate('/create_doll');
+        setIsSignUp(false);
       } catch (err) {
         if (err.response) {
           const data = err.response.data;
@@ -76,27 +77,20 @@ export default function Login() {
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
 
-        const dollRes = await doll_list_view(username);
-        const doll_list = dollRes.data;
-        localStorage.setItem('doll_list', JSON.stringify(doll_list));
-        console.log('doll_list', doll_list);
-        // if (doll_list.length > 0) {
-        //   const firstDollId = doll_list[0].id;
-        //   localStorage.setItem('current_doll_id', firstDollId);
-    
-        //   const dollRes = await getDollInfo(firstDollId);
-        //   setDollInfo(dollRes.data);          // DollContext 給全站使用
-        // }
-
-        // get doll info by doll_id
-        // const dollId = 'doll001';
-        // localStorage.setItem('doll_id', dollId);
-        // const dollRes = await getDollInfo(dollId);
-        // localStorage.setItem('doll_info', JSON.stringify(dollRes.data));
-        // setDollInfo(dollRes.data);
-
-        alert('log in success');
-        navigate('/main_page');
+        try{
+          const dollRes = await doll_list_view(username);
+          const doll_list = dollRes.data;
+          localStorage.setItem('doll_list', JSON.stringify(doll_list));
+          console.log('doll_list', doll_list);
+          const current_doll_id = doll_list[0].id;
+          localStorage.setItem('current_doll_id', current_doll_id);
+          console.log(username, current_doll_id, access);
+          alert('log in success');
+          navigate('/main_page');
+        }
+        catch(err){
+          navigate('/create_doll');
+        }
       } catch (err) {
         if (err.response) {
           const data = err.response.data;

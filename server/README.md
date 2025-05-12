@@ -415,24 +415,42 @@ curl -X POST http://localhost:8000/post/posts/ \
 # → {"id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d","doll_id":"doll001","content":"這是測試用的貼文內容","image_url":"https://example.com/test-image.jpg","created_at":"2025-05-05T13:59:54.4212}
 
 # 確認可瀏覽的貼文
-curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro"   
+curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro"\   
   -H "Authorization: Bearer eyJ0eX...ldos" 
-# → [{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
+# → [{"id":"050ad8cb-1c21-4edc-a38d-988f8a658bbe","doll_id":"omuba","content":"我是笨狗汪汪汪","image_url":"https://github.com/","created_at":"2025-05-09T01:59:56.196575+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"omuba","content":"第一篇文嘻嘻嘻","image_url":"https://github.com/","created_at":"2025-05-08T21:33:53.106715+08:00","like_count":0,"liked_by_me":false,"comment_count":2}]
 
 # 按讚貼文
-curl -X POST 
- -H "Authorization: Bearer eyJ0..B6zu2UMQ4" 
- -H "Content-Type: application/json" 
- -d '{"doll_id": "cheesetaro"}' 
+curl -X POST \
+ -H "Authorization: Bearer eyJ0..B6zu2UMQ4" \
+ -H "Content-Type: application/json" \
+ -d '{"doll_id": "cheesetaro"}' \
  http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
 # → [{"message":"Already liked","post":{"id":"e6666593-3d06-4563-8b38-67a411476c3c","doll_id":"omuba","content":"我是一條笨狗 汪汪汪 我叫歐姆嘎抓","image_url":"https://github.com/","created_at":"2025-05-08T15:12:00.939363+08:00","like_count":1,"liked_by_me":true}}]
 
 # 取消按讚貼文
-curl -X DELETE 
-  -H "Authorization: Bearer eyJ0...dB6zu2UMQ4" 
-  -H "Content-Type: application/json" 
-  -d '{"doll_id": "cheesetaro"}' 
+curl -X DELETE \
+  -H "Authorization: Bearer eyJ0...dB6zu2UMQ4" \
+  -H "Content-Type: application/json" \
+  -d '{"doll_id": "cheesetaro"}' \
   http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
 # → [{"message":"Unliked","post":{"id":"e6666593-3d06-4563-8b38-67a411476c3c","doll_id":"omuba","content":"我是一條笨狗 汪汪汪 我叫歐姆嘎抓","image_url":"https://github.com/","created_at":"2025-05-08T15:12:00.939363+08:00","like_count":0,"liked_by_me":false}}]
+
+# 留言貼文
+curl -X POST \
+  -H "Authorization: Bearer eyJ...zrJx8" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "doll_id": "tomorin",
+        "content": "這是一則留言",
+        "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb"
+      }' \
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
+# → {"local_id":2,"post_id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"tomorin","content":"這是一則留言","created_at":"2025-05-08T22:38:21.862059+08:00"}
+
+# 取得貼文留言
+curl -X GET \
+  -H "Authorization: Bearer eyJ..pqPCyA" \
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
+# → [{"local_id":1,"post_id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"tomorin","content":"這是一則留言","created_at":"2025-05-08T22:36:51.879810+08:00"},{"local_id":2,"post_id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"tomorin","content":"這是一則留言","created_at":"2025-05-08T22:38:21.862059+08:00"}]
 ```
 
