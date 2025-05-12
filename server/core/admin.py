@@ -10,13 +10,13 @@ class TagAdmin(admin.ModelAdmin):
     pass
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'nickname', 'email', 'bio', 'avatar_url', 'created_at')
+    list_display = ('username', 'nickname', 'email', 'bio', 'created_at')
     search_fields = ('username', 'nickname', 'email')
     ordering = ('-created_at',)
     list_filter = ('is_staff',)
     fieldsets = (
         (None, {
-            'fields': ('username', 'nickname', 'email', 'bio', 'avatar_url')
+            'fields': ('username', 'nickname', 'email', 'bio')
         }),
         ('Permissions', {
             'fields': ('is_staff',)
@@ -77,21 +77,21 @@ class UserAdmin(admin.ModelAdmin):
         if obj is not None and obj.username == request.user.username:
             return (
                 (None, {
-                    'fields': ('username', 'nickname', 'email', 'bio', 'avatar_url')
+                    'fields': ('username', 'nickname', 'email', 'bio')
                 }),
             )
         return (
             (None, {
-                'fields': ('username', 'nickname', 'email', 'bio', 'avatar_url')
+                'fields': ('username', 'nickname', 'email', 'bio')
             }),
         )
     def get_list_display(self, request):
         if request.user.is_superuser:
-            return ('username', 'nickname', 'email', 'bio', 'avatar_url', 'created_at')
-        return ('username', 'nickname', 'email', 'bio', 'avatar_url')
+            return ('username', 'nickname', 'email', 'bio', 'created_at')
+        return ('username', 'nickname', 'email', 'bio')
     def get_search_fields(self, request):
         if request.user.is_superuser:
-            return ('username', 'nickname', 'email', 'bio', 'avatar_url')
+            return ('username', 'nickname', 'email', 'bio')
         return ('username', 'nickname', 'email')
 
 # Register your models here.

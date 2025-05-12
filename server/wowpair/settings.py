@@ -86,6 +86,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # 前端的開發伺服器 localhost URL OK
 ]
 
+# 圖片上傳相關
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

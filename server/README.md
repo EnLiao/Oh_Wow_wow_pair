@@ -6,34 +6,33 @@
 
 ### 使用者註冊 API
 
-- **路徑**：`POST /core/register/`
-- **說明**：建立新使用者帳號
-- **請求格式範例（JSON）**：
+* **路徑**：`POST /core/register/`
+* **說明**：建立新使用者帳號
+* **請求格式範例**：
+
+| 欄位名            | 型別     | 是否必填 | 說明                    |
+| -------------- | ------ | ---- | --------------------- |
+| `username`     | string |  是  | 最多 150 字元，唯一主鍵        |
+| `password`     | string |  是  | 使用者密碼                 |
+| `email`        | string |  是  | 使用者信箱，需符合格式           |
+| `nickname`     | string |  否  | 最多 100 字元             |
+| `bio`          | string |  否  | 使用者自我介紹               |
+| `avatar_image` | file   |  否  | 使用者頭像圖，支援 jpg/png/gif |
+
+
+* **回應格式範例（JSON）**：
 
 ```json
 {
   "username": "momo",
-  "password": "abc12345",
   "email": "momo@example.com",
   "nickname": "小桃",
   "bio": "我愛娃娃",
-  "avatar_url": "https://example.com/momo.jpg"
+  "avatar_image": "/media/avatars/momo.jpg"
 }
 ```
 
-- **回應格式範例（JSON）**：
-
-```json
-{
-  "username": "momo",
-  "email": "momo@example.com",
-  "nickname": "小桃",
-  "bio": "我愛娃娃",
-  "avatar_url": "https://example.com/momo.jpg"
-}
-```
-
-- **所有失敗的錯誤範例（JSON）**：
+* **所有失敗的錯誤範例（JSON）**：
 
 ```json
 已存在
@@ -42,20 +41,18 @@ username沒填
 {"username":["此為必需欄位。"]}
 email格式不正確
 {"email":["請輸入有效的電子郵件地址。"]}
-avatar_url 格式不正確
-{"avatar_url":["請輸入有效的URL。"]}
 ```
 
 ---
 
 ### 使用者登入 API
 
-- **路徑**：`POST /core/login/`
-- **說明**：使用者登入
+* **路徑**：`POST /core/login/`
+* **說明**：使用者登入
 
 > ⚠️ 如果前端未提供完整的 `username` 或 `password`，後端會回傳錯誤，請確保兩者都提供
 
-- **成功請求格式範例（JSON）**：
+* **成功請求格式範例（JSON）**：
 
 ```json
 {
@@ -64,7 +61,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **成功時回應格式範例（JSON）**：
+* **成功時回應格式範例（JSON）**：
 
 ```json
 {
@@ -73,7 +70,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **失敗請求範例（密碼錯誤）**：
+* **失敗請求範例（密碼錯誤）**：
 
 ```json
 {
@@ -82,7 +79,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **失敗時回應格式範例（JSON）**：
+* **失敗時回應格式範例（JSON）**：
 
 ```json
 {
@@ -90,7 +87,7 @@ avatar_url 格式不正確
 }
 ```
 
-- **缺少欄位時的錯誤回應（JSON）**：
+* **缺少欄位時的錯誤回應（JSON）**：
 
 ```json
 {
@@ -98,31 +95,33 @@ avatar_url 格式不正確
 }
 ```
 
-| 欄位 | 說明 |
-|------|------|
-| access | 短效 token，前端每次發 API 都要帶這個 |
+| 欄位      | 說明                       |
+| ------- | ------------------------ |
+| access  | 短效 token，前端每次發 API 都要帶這個 |
 | refresh | 用來在 token 過期時重新取得新 token |
 
 ---
 
 ### 建立新娃娃
 
-> 我自己的理解是使用這知道 tag_id 對應哪種 tag，比如說 1 -> 可愛
+* **路徑**：`POST /core/dolls/`
+* **說明**：建立屬於目前登入使用者的娃娃（需附帶 access token）。每位使用者最多只能創建 10 個娃娃。
 
-- **請求格式範例（JSON）**：
+> 我自己的理解是使用這知道 tag\_id 對應哪種 tag，比如說 1 -> 可愛
 
-```json
-{
-  "id": "doll001",
-  "name": "小白",
-  "birthday": "2023-10-01",
-  "description": "這是我最喜歡的娃娃",
-  "avatar_url": "https://example.com/doll.jpg",
-  "tag_ids": [1, 2]
-}
-```
+* **請求格式範例**：
 
-- **成功建立娃娃時回應（JSON）**：
+| 欄位名            | 型別          | 是否必填 | 說明                   |
+| -------------- | ----------- | ---- | -------------------- |
+| `id`           | string      |  是  | 娃娃主鍵，最多 64 字元，需唯一    |
+| `name`         | string      |  是  | 娃娃名稱，最多 100 字元       |
+| `birthday`     | date        |  是  | 格式為 `YYYY-MM-DD`     |
+| `description`  | string      |  否  | 娃娃介紹                 |
+| `avatar_image` | file        |  否  | 娃娃頭像圖，支援 jpg/png/gif |
+| `tag_ids`      | array\[int] |  否  | 傳入要標記的 tag ID（整數陣列）  |
+
+
+* **成功建立娃娃時回應（JSON）**：
 
 ```json
 {
@@ -131,24 +130,16 @@ avatar_url 格式不正確
   "name": "小白",
   "birthday": "2023-10-01",
   "description": "這是我最喜歡的娃娃",
-  "avatar_url": "https://example.com/doll.jpg",
-  "created_at": "2025-05-05T00:00:00Z",
+  "avatar_image": "/media/avatars/doll001.jpg",
+  "created_at": "2024-05-09T14:30:00Z",
   "tags": [
-    {
-      "id": 1,
-      "name": "可愛",
-      "category": "風格"
-    },
-    {
-      "id": 2,
-      "name": "活潑",
-      "category": "性格"
-    }
+    {"id": 1, "name": "可愛"},
+    {"id": 2, "name": "白色"}
   ]
 }
 ```
 
-- **失敗時回應（JSON）**：
+***失敗時回應（JSON）**：
 
 ```json
 沒登入
@@ -159,19 +150,27 @@ Tag不存在
 {"tag_ids":["這個 tag id 2 不存在"]}
 doll id重複
 {"id":["這個 id 在 doll 已經存在。"]}
+建立超過10個娃娃
+{"non_field_errors": ["每位使用者最多只能創建 10 個娃娃"]}
 ```
 
 ---
 
 ### 列出所有 Tag
 
-- **成功建立列出所有 tag 的請求與回應範例（JSON）**：
+* **路徑**：`GET /core/tags/`
+
+* **說明**：取得所有官方定義的 Tag（提供前端選項）
+
+* **成功建立列出所有 tag 的請求與回應範例（JSON）**：
+
 ```bash
 curl -X GET http://127.0.0.1:8000/core/tags/ \
   -H "Accept: application/json"
 ```
 
-- **成功時回應範例（JSON）**：
+* **成功時回應範例（JSON）**：
+
 ```json
 {
     "id": 1,
@@ -186,17 +185,21 @@ curl -X GET http://127.0.0.1:8000/core/tags/ \
     "name": "溫柔"
 }
 ```
----
 
 ---
+
 ### 取得娃娃資訊
+
+* **路徑**：`GET /core/dolls/<doll_id>/`
+* **說明**：查詢單隻娃娃的所有詳細資訊（需帶 token）
+
 ```bash
 curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
+* **成功時回應範例（JSON）**：
 
-- **成功時回應範例（JSON）**：
 ```json
 {
   "id": "doll006",
@@ -216,18 +219,96 @@ curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
 }
 ```
 
+---
 
----
 ### 使用者列出所有娃娃
----
+
+* **路徑**：`GET /core/users/<username>/dolls/`
+* **說明**：查詢指定使用者所擁有的所有娃娃 id（需帶 token）
+
 ```bash
 curl -X GET http://127.0.0.1:8000/core/users/<username>/dolls/ \
   -H "Authorization: Bearer <access_token>"
 ```
-- **成功時回應範例（JSON）**：
+
+***成功時回應範例（JSON）**：
+
 ```json
-{"id":"doll_1"},{"id":"doll_2"}
+[{"id":"doll_1"},{"id":"doll_2"}]
 ```
+## 娃娃追蹤與取消追蹤 API 說明
+
+
+### 1. 建立追蹤關係
+
+* 方法：POST
+* 路徑：/core/follow/
+* 說明：讓一個娃娃追蹤另一個娃娃 -> from_doll_id 追蹤 to_doll_id
+
+#### 請求格式（JSON）：
+
+```json
+{
+  "from_doll_id": "doll1",
+  "to_doll_id": "doll2"
+}
+```
+
+#### 成功回應（HTTP 201）：
+
+```json
+{
+  "from_doll_id": "doll1",
+  "to_doll_id": "doll2"
+}
+```
+
+#### 測試指令（curl 範例）：
+
+```bash
+curl -X POST http://127.0.0.1:8000/core/follow/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"from_doll_id": "doll1", "to_doll_id": "doll2"}'
+```
+
+### 2. 取消追蹤關係
+
+* 方法：DELETE
+* 路徑：/core/follow/
+* 說明：讓一個娃娃取消對另一個娃娃的追蹤 -> from_doll_id是追蹤者取消追蹤to_doll_id
+
+#### 請求格式（JSON）：
+
+```json
+{
+  "from_doll_id": "doll1",
+  "to_doll_id": "doll2"
+}
+```
+
+#### 成功回應（HTTP 204）：
+
+無內容
+
+#### 測試指令（curl 範例）：
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/core/follow/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"from_doll_id": "doll1", "to_doll_id": "doll2"}'
+```
+
+### 3. 錯誤處理情況
+
+| 錯誤情境      | HTTP 狀態碼 | 回應訊息                             |
+| --------- | -------- | -------------------------------- |
+| 自己追蹤自己    | 400      | 不能追蹤自己                           |
+| 已經追蹤過     | 400      | 已經追蹤過了                           |
+| 要取消的關係不存在 | 400      | 尚未追蹤，無法取消                        |
+| 缺少必要欄位    | 400      | 缺少 from\_doll\_id 或 to\_doll\_id |
+
 ### 建立新貼文
 ---
 - **路徑**：`POST /post/posts/`
@@ -294,31 +375,6 @@ curl -X GET http://127.0.0.1:8000/core/users/<username>/dolls/ \
 ## 用curl測試指令紀錄（終端機）
 
 ```bash
-# 註冊（若已存在使用者）預設中文
-curl -X POST http://127.0.0.1:8000/core/register/ \
-  -H "Content-Type: application/json" \
-  -d '{
-        "username": "momo",
-        "password": "abc12345",
-        "email": "momo@example.com",
-        "nickname": "小桃",
-        "bio": "我愛娃娃",
-        "avatar_url": "https://example.com/momo.jpg"
-      }'
-# → {"username":["一個相同名稱的使用者已經存在。"]}
-# 註冊（若已存在使用者）指定語言為英文 -> 要在header加上Accept-Language
-curl -X POST http://127.0.0.1:8000/core/register/ \
-  -H "Content-Type: application/json" \
-  -H "Accept-Language: en" \
-  -d '{
-        "username": "momo",
-        "password": "abc12345",
-        "email": "momo@example.com",
-        "nickname": "小桃",
-        "bio": "我愛娃娃",
-        "avatar_url": "https://example.com/momo.jpg"
-      }'
-# → {"username":["A user with that username already exists."]}
 # 登入，取得 token
 curl -X POST http://127.0.0.1:8000/core/login/ \
   -H "Content-Type: application/json" \
@@ -343,7 +399,7 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
         "birthday": "2023-10-01",
         "description": "這是我最喜歡的娃娃",
         "avatar_url": "https://example.com/doll.jpg",
-        "tag_ids":[1, 2],
+        "tag_ids":[1, 2]
       }'
 # → {"id":"doll001","username":"momo","name":"小白","birthday":"2023-10-01","description":"這是我最喜歡的娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-05-05T11:24:22.180047+08:00","tags":[]}
 
