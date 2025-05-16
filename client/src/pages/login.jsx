@@ -38,8 +38,6 @@ export default function Login() {
       try {
         const res = await register(data); // axios 呼叫 register
         console.log('sign up success', res.data);
-        localStorage.setItem('access_token', res.data.access);
-        localStorage.setItem('refresh_token', res.data.refresh);
         alert('sign up success');
         setIsSignUp(false);
       } catch (err) {
@@ -76,8 +74,8 @@ export default function Login() {
         const res = await login({ username, password }); // axios 呼叫 login
         const { access, refresh } = res.data;
   
-        auth_context.setUsername(username);
-        auth_context.setToken(access);
+        auth_context.updateToken(access);
+        auth_context.updateUsername(username);
         localStorage.setItem('refresh_token', refresh);
 
         try{
@@ -85,7 +83,7 @@ export default function Login() {
           const doll_list = dollRes.data;
           localStorage.setItem('doll_list', JSON.stringify(doll_list));
           console.log('doll_list', doll_list);
-          auth_context.setDollId(doll_list[0].id);
+          auth_context.updateDollId(doll_list[0].id);
           console.log(username, auth_context.currentDollId, access);
           alert('log in success');
           navigate('/main_page');

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { create_doll } from '../services/api';
+import { AuthContext } from '../services/auth_context';
 import { 
   Container, 
   Card, 
@@ -15,6 +16,7 @@ import {
 
 export default function CreateDoll() {
     const navigate = useNavigate();
+    const auth_context = useContext(AuthContext);
 
     const [dollId, setDollId] = useState('');
     const [dollName, setDollName] = useState('');
@@ -39,7 +41,7 @@ export default function CreateDoll() {
             const res = await create_doll(formData);
             console.log('create doll success', res.data);
             alert('create doll success');
-            localStorage.setItem('current_doll_id', dollId);
+            auth_context.setCurrentDollId(dollId);
             navigate('/main_page');
         } catch (err) {
             console.error(err);

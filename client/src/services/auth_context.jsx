@@ -1,31 +1,44 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // 1. 先用 lazy initializer 從 localStorage 把值帶進來
-  const [username, setUsername]     = useState(() => localStorage.getItem('username'));
-  const [accessToken, setToken]     = useState(() => localStorage.getItem('access_token'));
-  const [currentDollId, setDollId]  = useState(() => localStorage.getItem('current_doll_id'));
+  // 初始狀態從 localStorage 拿
+  const [username, setUsernameState] = useState(() => localStorage.getItem('username'));
+  const [accessToken, setTokenState] = useState(() => localStorage.getItem('access_token'));
+  const [currentDollId, setDollIdState] = useState(() => localStorage.getItem('current_doll_id'));
 
-  // 2. 任何值變動時，同步寫回 localStorage
-  useEffect(() => {
-    username      ? localStorage.setItem('username',      username)     : localStorage.removeItem('username');
-  }, [username]);
+  const updateUsername = (newUsername) => {
+    if (newUsername) {
+      localStorage.setItem('username', newUsername);
+    } else {
+      localStorage.removeItem('username');
+    }
+    setUsernameState(newUsername);
+  };
 
-  useEffect(() => {
-    accessToken   ? localStorage.setItem('access_token',  accessToken)  : localStorage.removeItem('access_token');
-  }, [accessToken]);
+  const updateToken = (newToken) => {
+    if (newToken) {
+      localStorage.setItem('access_token', newToken);
+    } else {
+      localStorage.removeItem('access_token');
+    }
+    setTokenState(newToken);
+  };
 
-  useEffect(() => {
-    currentDollId ? localStorage.setItem('current_doll_id', currentDollId) : localStorage.removeItem('current_doll_id');
-  }, [currentDollId]);
+  const updateDollId = (newDollId) => {
+    if (newDollId) {
+      localStorage.setItem('current_doll_id', newDollId);
+    } else {
+      localStorage.removeItem('current_doll_id');
+    }
+    setDollIdState(newDollId);
+  };
 
-  // 3. 統一登出 helper（清空狀態 + localStorage）
   const logout = () => {
-    setUsername(null);
-    setToken(null);
-    setDollId(null);
+    updateUsername(null);
+    updateToken(null);
+    updateDollId(null);
     localStorage.clear();
   };
 
@@ -33,11 +46,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         username,
-        setUsername,
         accessToken,
-        setToken,
         currentDollId,
-        setDollId,
+        updateUsername,
+        updateToken,
+        updateDollId,
         logout,
       }}
     >

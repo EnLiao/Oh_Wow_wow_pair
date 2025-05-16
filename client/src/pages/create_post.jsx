@@ -42,7 +42,7 @@ export default function CreatePost() {
             <h1>Create Post</h1>
             <input type="text" placeholder="Content" onChange={(e) => setPostContent(e.target.value)} />
             <br></br>
-            <input type="url" placeholder='image_url' onChange={(e) => setImage_url(e.target.value)} />
+            <input type="file" placeholder='image_url' onChange={(e) => setImage_url(e.target.value)} />
             <br></br>
             <button onClick={handleSubmit}>Submit</button>
         </div>
