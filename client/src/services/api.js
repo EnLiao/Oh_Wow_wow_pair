@@ -7,7 +7,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token'); // 從 localStorage 取 token
+    const token = localStorage.getItem('access_token');
     if (token && !config.url.includes('/core/login/') && !config.url.includes('/core/register/')) {
       config.headers.Authorization = `Bearer ${token}`;
     }

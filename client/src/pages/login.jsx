@@ -1,6 +1,7 @@
 import { useState, useContext} from 'react'
 import { login, register, doll_list_view} from '../services/api'
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../services/auth_context'
 import {
   Button, 
   Input, 
@@ -18,9 +19,10 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [nickname, setNickname] = useState('')
-  const [avatar_url, setAvatar_url] = useState('')
+  const [avatarFile, setAvatarFile] = useState(null)
   const [bio, setBio] = useState('')
   const navigate = useNavigate()
+  const auth_context = useContext(AuthContext)
 
   const handleSubmit = async () => {
     if (isSignUp) {
@@ -29,7 +31,7 @@ export default function Login() {
         password,
         email,
         nickname,
-        avatar_url,
+        avatarFile,
         bio
       };
   
@@ -74,7 +76,8 @@ export default function Login() {
         const res = await login({ username, password }); // axios 呼叫 login
         const { access, refresh } = res.data;
   
-        localStorage.setItem('access_token', access);
+        auth_context.setUsername(username);
+        auth_context.setToken(access);
         localStorage.setItem('refresh_token', refresh);
 
         try{
@@ -82,9 +85,8 @@ export default function Login() {
           const doll_list = dollRes.data;
           localStorage.setItem('doll_list', JSON.stringify(doll_list));
           console.log('doll_list', doll_list);
-          const current_doll_id = doll_list[0].id;
-          localStorage.setItem('current_doll_id', current_doll_id);
-          console.log(username, current_doll_id, access);
+          auth_context.setDollId(doll_list[0].id);
+          console.log(username, auth_context.currentDollId, access);
           alert('log in success');
           navigate('/main_page');
         }
@@ -160,11 +162,9 @@ export default function Login() {
                 </FormGroup>
                 <FormGroup>
                   <Input
-                    type="text"
-                    placeholder="Avatar URL"
-                    value={avatar_url}
-                    onChange={(e) => setAvatar_url(e.target.value)}
-                    className="mb-3"
+                    type="file"
+                    accept="image/png, image/jpeg, image/gif"
+                    onChange={e => setAvatarFile(e.target.files[0])}
                   />
                 </FormGroup>
                 <FormGroup>
