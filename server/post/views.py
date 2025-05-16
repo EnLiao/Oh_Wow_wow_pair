@@ -10,6 +10,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from core.models import Doll, Follow
 from django.shortcuts import get_object_or_404
 from itertools import chain
+from django.db import transaction
 
 class PostCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # 需要登入
