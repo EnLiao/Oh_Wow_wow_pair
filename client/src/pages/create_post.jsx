@@ -32,7 +32,6 @@ export default function CreatePost() {
             content: postContent,
             img_file: imgFile
         }
-        console.log('data', data)
 
         try {
             const res = await create_post(data) // axios 呼叫 createPost
