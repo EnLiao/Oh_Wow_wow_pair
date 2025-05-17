@@ -5,8 +5,6 @@ __pycache__/
 *.sqlite3
 node_modules/
 .DS_Store 
-server/post/migrations/*.py
-!server/post/migrations/__init__.py
-server/core/migrations/*.py
-!server/core/migrations/__init__.py
+
+# 忽略 media 上傳檔案
 /media/
