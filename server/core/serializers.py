@@ -19,6 +19,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         if len(value) > 100:
             raise serializers.ValidationError("暱稱長度不能超過 100 字元")
         return value
+    def validate_avatar_image(self, value):
+        limit = 2 * 1024 * 1024  # 2MB
+        if value.size > limit:
+            raise serializers.ValidationError("圖片太大，不能超過 2MB")
+        return value
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -56,8 +61,13 @@ class DollSerializer(serializers.ModelSerializer):
                 tag = Tag.objects.get(id=tag_id)
             except Tag.DoesNotExist:
                 raise serializers.ValidationError({"tag_ids": [f"這個 tag id {tag_id} 不存在"]})
-            DollTag.objects.create(doll_id=doll, tag_id=tag)
+            doll.tag.add(tag)
         return doll
+    def validate_avatar_image(self, value):
+        limit = 2 * 1024 * 1024  # 2MB
+        if value.size > limit:
+            raise serializers.ValidationError("圖片太大，不能超過 2MB")
+        return value
     def validate_tag_ids(self, value):
         for tag_id in value:
             if not Tag.objects.filter(id=tag_id).exists():
@@ -82,7 +92,7 @@ class DollSerializer(serializers.ModelSerializer):
         return value
     def get_tags(self, obj):
         return TagSerializer(
-            Tag.objects.filter(dolltag__doll_id=obj.id),
+            obj.tag.all(),
             many=True
         ).data
 class DollIdOnlySerializer(serializers.ModelSerializer):
