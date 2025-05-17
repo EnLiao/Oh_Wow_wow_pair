@@ -35,7 +35,7 @@ export default function CreateDoll() {
         formData.append('name', dollName);
         formData.append('birthday', dollBirthday);
         formData.append('description', dollDescription);
-        formData.append('image', dollImage);
+        formData.append('avatar_image', dollImage);
     
         try {
             const res = await create_doll(formData);

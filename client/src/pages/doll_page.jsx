@@ -89,7 +89,7 @@ export default function DollPage() {
   const dollData = doll || {
     id: 'doll_id',
     name: 'Unknown',
-    photo: doll_img,
+    avatar_image: doll_img,
     username: '-',
     birthday: '-',
     bio: '-',
@@ -104,8 +104,16 @@ export default function DollPage() {
             <CardHeader tag="h2">{dollData.id}</CardHeader>
             <CardBody>
               <CardImg 
-                src={dollData.photo} 
+                src={typeof dollData.avatar_image === 'string' 
+                  ? dollData.avatar_image 
+                  : dollData.avatar_image instanceof File 
+                    ? URL.createObjectURL(dollData.avatar_image)
+                    : doll_img} 
                 alt={dollData.name} 
+                onError={(e) => {
+                  console.log('圖片載入失敗', e);
+                  e.target.src = doll_img; // 設置為預設圖片
+                }}
                 className="mb-3"
                 style={{
                   aspectRatio: '1 / 1',
