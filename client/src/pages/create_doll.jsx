@@ -41,7 +41,7 @@ export default function CreateDoll() {
             const res = await create_doll(formData);
             console.log('create doll success', res.data);
             alert('create doll success');
-            auth_context.setCurrentDollId(dollId);
+            auth_context.updateDollId(dollId);
             navigate('/main_page');
         } catch (err) {
             console.error(err);
