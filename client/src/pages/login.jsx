@@ -84,6 +84,8 @@ export default function Login() {
           localStorage.setItem('doll_list', JSON.stringify(doll_list));
           console.log('doll_list', doll_list);
           auth_context.updateDollId(doll_list[0].id);
+          auth_context.updateDollImg(doll_list[0].avatar_image);
+          auth_context.updateDollName(doll_list[0].name);
           console.log(username, auth_context.currentDollId, access);
           alert('log in success');
           navigate('/main_page');

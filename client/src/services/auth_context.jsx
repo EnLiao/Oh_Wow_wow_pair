@@ -7,6 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsernameState] = useState(() => localStorage.getItem('username'));
   const [accessToken, setTokenState] = useState(() => localStorage.getItem('access_token'));
   const [currentDollId, setDollIdState] = useState(() => localStorage.getItem('current_doll_id'));
+  const [doll_img, setDollImgState] = useState(() => localStorage.getItem('doll_img'));
+  const [doll_name, setDollNameState] = useState(() => localStorage.getItem('doll_name'));
 
   const updateUsername = (newUsername) => {
     if (newUsername) {
@@ -35,10 +37,30 @@ export const AuthProvider = ({ children }) => {
     setDollIdState(newDollId);
   };
 
+  const updateDollImg = (newDollImg) => {
+    if (newDollImg) {
+      localStorage.setItem('doll_img', newDollImg);
+    } else {
+      localStorage.removeItem('doll_img');
+    }
+    setDollImgState(newDollImg);
+  }
+
+  const updateDollName = (newDollName) => {
+    if (newDollName) {
+      localStorage.setItem('doll_name', newDollName);
+    } else {
+      localStorage.removeItem('doll_name');
+    }
+    setDollNameState(newDollName);
+  }
+
   const logout = () => {
     updateUsername(null);
     updateToken(null);
     updateDollId(null);
+    updateDollImg(null);
+    updateDollName(null);
     localStorage.clear();
   };
 
@@ -48,9 +70,13 @@ export const AuthProvider = ({ children }) => {
         username,
         accessToken,
         currentDollId,
+        doll_img,
+        doll_name,
         updateUsername,
         updateToken,
         updateDollId,
+        updateDollImg,
+        updateDollName,
         logout,
       }}
     >

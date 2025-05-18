@@ -7,14 +7,6 @@ export default function NavBar() {
   const navigate = useNavigate();
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState('user1');
-
-
-  const handleSwitchUser = (newUser) => {
-    setCurrentUser(newUser);
-    console.log('switch to：${newUser}');
-    // 你也可以在這裡更新 localStorage 或全域狀態
-  };
 
   return (
     <div
@@ -110,7 +102,6 @@ export default function NavBar() {
         <SwitchDoll
           isOpen={isModalOpen}
           onClose={() => { setModalOpen(false); }}
-          onSwitchUser={handleSwitchUser}
         />
       </div>
     </div>
