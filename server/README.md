@@ -419,6 +419,15 @@ curl -X GET "http://localhost:8000/post/feed/?doll_id=omuba"\
 -H "Authorization: Bearer eyJ0eX4hI"
 # → [{"id":"6f227e7d-538a-41e4-8af9-504ed6ac5ff5","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-16T19:55:46.062910+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"c24f464d-2edc-4685-8f2b-a5605178673a","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-16T19:55:37.751486+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"d0ebd4ea-b14b-4c89-b27b-dc0ad79a39c3","doll_id":"tomorin","content":"f","image_url":"https://github.com/","created_at":"2025-05-16T19:55:30.679483+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"6b367624-ec72-4789-a0de-715274998580","doll_id":"tomorin","content":"f","image_url":"https://github.com/","created_at":"2025-05-16T19:55:23.294855+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"a0133140-274c-46ec-847c-23eeb8857ea6","doll_id":"tomorin","content":"8","image_url":"https://github.com/","created_at":"2025-05-16T19:55:17.096527+08:00","like_count":0,"liked_by_me":false,"comment_count":0}]
 
+# 取得某隻 doll 的貼文
+curl "http://localhost:8000/post/profile_feed/?doll_id=tomorin&viewer_doll_id=cheesetaro" \
+  -H "Authorization: Bearer ey...gI"
+# → {"count":23,"next":"http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=15&viewer_doll_id=cheesetaro","previous":"http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=5&viewer_doll_id=cheesetaro","results":[{"id":"42f94958-9abc-4df6-9ffe-cdb8d26a35ce","doll_id":"tomorin","content":"3","image_url":"https://github.com/","created_at":"2025-05-18T10:56:39.209232+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"e3892b72-5a13-43d1-b502-64a70bd2d3fa","doll_id":"tomorin","content":"2","image_url":"https://github.com/","created_at":"2025-05-18T10:56:33.080855+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"4cbc2639-bc3a-4c67-b279-05c8fedc46f9","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-18T10:56:26.329936+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"00ea093d-4c36-4ff8-845c-06490c555ea6","doll_id":"tomorin","content":"456","image_url":"https://github.com/","created_at":"2025-05-18T10:53:09.317580+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"151bb640-df92-48a5-8827-1d8ecaceb3f6","doll_id":"tomorin","content":"123","image_url":"https://github.com/","created_at":"2025-05-18T10:53:00.028697+08:00","like_count":0,"liked_by_me":false,"comment_count":0}]}
+再下五篇文：
+curl "http://localhost:8000/post/profile_feed/?doll_id=tomorin&viewer_doll_id=cheesetaro&offset=5" \
+  -H "Authorization: Bearer eyJ...EgI"
+  以此類推
+
 # 按讚貼文
 curl -X POST \
  -H "Authorization: Bearer eyJ0..B6zu2UMQ4" \
