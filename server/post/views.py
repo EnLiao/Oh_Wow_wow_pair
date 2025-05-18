@@ -11,6 +11,7 @@ from core.models import Doll, Follow
 from django.shortcuts import get_object_or_404
 from itertools import chain
 from django.db import transaction
+from rest_framework.pagination import LimitOffsetPagination
 
 class PostCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # 需要登入
@@ -100,3 +101,24 @@ class CommentListCreateView(generics.ListCreateAPIView):
         doll_id = self.request.data.get('doll_id')
         doll = get_object_or_404(Doll, id=doll_id)
         serializer.save(post_id=post, doll_id=doll)
+
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 5
+    max_limit = 100
+
+class DollProfilePostListView(ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomLimitOffsetPagination
+
+    def get_queryset(self):
+        doll_id = self.request.query_params.get("doll_id")
+        if not doll_id:
+            return Post.objects.none()
+        
+        return Post.objects.filter(doll_id=doll_id).order_by("-created_at")
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["doll_id"] = self.request.query_params.get("viewer_doll_id")
+        return context
