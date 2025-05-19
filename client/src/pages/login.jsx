@@ -86,11 +86,10 @@ export default function Login() {
           auth_context.updateDollId(doll_list[0].id);
           
           try{
-            const res = await getDollInfo(auth_context.currentDollId);
+            const res = await getDollInfo(doll_list[0].id);
             const doll_info = res.data;
             auth_context.updateDollImg(doll_info.avatar_image);
             auth_context.updateDollName(doll_info.name);
-            console.log(auth_context);
             alert('log in success');
             navigate('/main_page');
           }
