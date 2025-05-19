@@ -1,7 +1,18 @@
 from django.contrib import admin
+from django import forms
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import User, Doll, Tag, Follow
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'nickname', 'email', 'bio', 'avatar_image')
 
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'nickname', 'email', 'bio', 'avatar_image')
 class DollAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'birthday')
     filter_horizontal = ('tag',)
@@ -9,7 +20,10 @@ class DollAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     pass
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = User
     list_display = ('username', 'nickname', 'email', 'bio', 'created_at')
     search_fields = ('username', 'nickname', 'email')
     ordering = ('-created_at',)

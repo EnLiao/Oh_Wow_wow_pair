@@ -13,8 +13,7 @@ function AppLayout() {
   const location = useLocation()
   const NoNeedNavBar = 
     location.pathname === '/login' ||
-    location.pathname === '/create_doll' ||
-    location.pathname === '/create_post';
+    location.pathname === '/create_doll'
 
   return (
     <>

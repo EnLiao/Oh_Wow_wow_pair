@@ -7,7 +7,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token'); // 從 localStorage 取 token
+    const token = localStorage.getItem('access_token');
     if (token && !config.url.includes('/core/login/') && !config.url.includes('/core/register/')) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,13 +21,6 @@ export const register = (data) => api.post('/core/register/', data);
 export const doll_list_view = (username) => api.get(`/core/users/${username}/dolls/`)
 export const create_doll = (data) => api.post('/core/dolls/', data);
 export const create_post = (data) => api.post('/post/posts', data);
-// export const create_post = (payload) => {
-//   return axios.post('http://localhost:3000/posts', payload, {
-//       headers: {
-//           'Content-Type': 'application/json'
-//       }
-//   })
-// }
 export const getDollInfo = (dollId) => api.get(`/core/dolls/${dollId}/`);
 
 export default api;

@@ -43,7 +43,7 @@ class Doll(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    tag = models.ManyToManyField('Tag',  related_name='dolls')
+    tag = models.ManyToManyField('Tag',  related_name='dolls', blank=True)
 
     def __str__(self):
         return self.name

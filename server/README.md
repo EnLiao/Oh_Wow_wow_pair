@@ -207,7 +207,7 @@ curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   "name": "小白",
   "birthday": "2023-10-01",
   "description": "這是我最喜歡的娃娃",
-  "avatar_url": "https://example.com/doll.jpg",
+  "avatar_image": "https://example.com/doll.jpg",
   "created_at": "2025-05-05T00:30:42.075549+08:00",
   "tags": [
     {
@@ -444,10 +444,10 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
         "name": "小白",
         "birthday": "2023-10-01",
         "description": "這是我最喜歡的娃娃",
-        "avatar_url": "https://example.com/doll.jpg",
+        "avatar_image": "https://example.com/doll.jpg",
         "tag_ids":[1, 2]
       }'
-# → {"id":"doll001","username":"momo","name":"小白","birthday":"2023-10-01","description":"這是我最喜歡的娃娃","avatar_url":"https://example.com/doll.jpg","created_at":"2025-05-05T11:24:22.180047+08:00","tags":[]}
+# → {"id":"doll001","username":"momo","name":"小白","birthday":"2023-10-01","description":"這是我最喜歡的娃娃","avatar_image":"https://example.com/doll.jpg","created_at":"2025-05-05T11:24:22.180047+08:00","tags":[]}
 
 # 建立貼文
 curl -X POST http://localhost:8000/post/posts/ \
