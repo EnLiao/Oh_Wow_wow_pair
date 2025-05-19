@@ -39,7 +39,7 @@ class PostListView(ListAPIView):
             doll_id__in=followed_ids
         ).exclude(id__in=seen_ids).order_by('-created_at')[:5]
 
-        remaining = 5 - qs_followed.count()
+        remaining = max(5 - qs_followed.count(), 0)
         qs_others = Post.objects.exclude(
             doll_id__in=followed_ids
         ).exclude(id__in=seen_ids).order_by('-created_at')[:remaining]
