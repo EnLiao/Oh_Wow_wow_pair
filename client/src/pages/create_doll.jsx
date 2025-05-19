@@ -42,7 +42,7 @@ export default function CreateDoll() {
             console.log('create doll success', res.data);
             alert('create doll success');
             auth_context.updateDollId(dollId);
-            auth_context.updateDollImg(dollImage);
+            auth_context.updateDollImg(res.data.avatar_image);
             auth_context.updateDollName(dollName);
             console.log('doll_img', dollImage);
             console.log('doll_name', dollName);

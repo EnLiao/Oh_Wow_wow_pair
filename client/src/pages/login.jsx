@@ -1,5 +1,5 @@
 import { useState, useContext} from 'react'
-import { login, register, doll_list_view} from '../services/api'
+import { login, register, doll_list_view, getDollInfo} from '../services/api'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context'
 import {
@@ -84,11 +84,21 @@ export default function Login() {
           localStorage.setItem('doll_list', JSON.stringify(doll_list));
           console.log('doll_list', doll_list);
           auth_context.updateDollId(doll_list[0].id);
-          auth_context.updateDollImg(doll_list[0].avatar_image);
-          auth_context.updateDollName(doll_list[0].name);
-          console.log(username, auth_context.currentDollId, access);
-          alert('log in success');
-          navigate('/main_page');
+          
+          try{
+            const res = await getDollInfo(auth_context.currentDollId);
+            const doll_info = res.data;
+            auth_context.updateDollImg(doll_info.avatar_image);
+            auth_context.updateDollName(doll_info.name);
+            console.log(auth_context);
+            alert('log in success');
+            navigate('/main_page');
+          }
+          catch(err){
+            console.error(err);
+            alert('Failed to fetch doll info');
+          }
+
         }
         catch(err){
           navigate('/create_doll');

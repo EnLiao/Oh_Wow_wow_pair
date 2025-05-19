@@ -11,7 +11,7 @@ export default function SwitchDoll({ onSwitchUser }) {
   const navigate = useNavigate();
   const auth_context = React.useContext(AuthContext);
   const doll_image = auth_context.doll_img;
-  console.log('doll_image', doll_image);
+  console.log(auth_context);
 
   const handleSubmit = async () => {
     try {
