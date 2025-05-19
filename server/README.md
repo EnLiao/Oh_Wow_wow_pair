@@ -353,6 +353,52 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 ```json
 [{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
 ```
+### 取得某隻娃娃的貼文（個人頁）
+
+---
+- **HTTP 方法**：GET
+- **路徑**：`/post/profile_feed/`
+- **說明**：取得某隻娃娃的貼文（個人頁）
+- **請求格式**：URL 查詢參數 (query parameters)
+| 參數名              | 類型     | 是否必填 | 說明                          |
+| ---------------- | ------ | ---- | --------------------------- |
+| `doll_id`        | string | ✅ 是  | 要查詢哪隻娃娃的貼文                  |
+| `viewer_doll_id` | string | ✅ 是  | 目前正在看這些貼文的是哪隻娃娃（用於 like 狀態） |
+| `limit`          | int    | ❌ 否  | 每頁幾篇貼文（預設值看後端設定）            |
+| `offset`         | int    | ❌ 否  | 分頁用的位移量                     |
+
+- **後端回傳格式**：
+```json
+{
+  "count": 23,
+  "next": "http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=15&viewer_doll_id=cheesetaro",
+  "previous": "http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=5&viewer_doll_id=cheesetaro",
+  "results": [
+    {
+      "id": "42f94958-9abc-4df6-9ffe-cdb8d26a35ce",
+      "doll_id": "tomorin",
+      "content": "3",
+      "image_url": "https://github.com/",
+      "created_at": "2025-05-18T10:56:39.209232+08:00",
+      "like_count": 0,
+      "liked_by_me": false,
+      "comment_count": 0
+    },
+    ...
+  ]
+}
+```
+| 欄位名             | 類型       | 說明                             |
+| --------------- | -------- | ------------------------------ |
+| `id`            | UUID     | 貼文的唯一識別碼                       |
+| `doll_id`       | string   | 發文的娃娃 ID                       |
+| `content`       | string   | 文字內容                           |
+| `image_url`     | string   | 圖片網址                           |
+| `created_at`    | datetime | 發文時間（含時區）                      |
+| `like_count`    | int      | 按讚數                            |
+| `liked_by_me`   | bool     | 目前的 `viewer_doll_id` 是否有按讚這篇貼文 |
+| `comment_count` | int      | 留言數量                           |
+
 ### 按讚貼文
 
 ---
