@@ -9,4 +9,4 @@ server/post/migrations/*.py
 !server/post/migrations/__init__.py
 server/core/migrations/*.py
 !server/core/migrations/__init__.py
-/media/
+server/media/

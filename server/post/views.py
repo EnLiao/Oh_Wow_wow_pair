@@ -9,6 +9,9 @@ from rest_framework.generics import ListAPIView
 from rest_framework.exceptions import NotFound, PermissionDenied
 from core.models import Doll, Follow
 from django.shortcuts import get_object_or_404
+from itertools import chain
+from django.db import transaction
+from rest_framework.pagination import LimitOffsetPagination
 
 class PostCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # 需要登入
@@ -23,34 +26,41 @@ class PostListView(ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        doll_id = self.request.query_params.get('doll_id')
-        if not doll_id:
-            return Post.objects.none()
-        
-        seen_post_ids = PostSeen.objects.filter(doll_id=doll_id).values_list('post_id', flat=True)
-        return Post.objects.exclude(id__in=seen_post_ids).order_by('-created_at')
-
     def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-
-        doll_id = self.request.query_params.get('doll_id')
+        doll_id = request.query_params.get('doll_id')
         if not doll_id:
-            return response
-        
+            return super().list(request, *args, **kwargs)
+
         doll = get_object_or_404(Doll, id=doll_id)
-        post_ids = [post['id'] for post in response.data]  # 這些就是尚未看過的貼文
-        
-        posts = Post.objects.filter(id__in=post_ids)
-        post_map = {str(post.id): post for post in posts}
+        seen_ids = PostSeen.objects.filter(doll_id=doll).values_list('post_id', flat=True)
+        followed_ids = Follow.objects.filter(from_doll_id=doll).values_list('to_doll_id', flat=True)
 
-        seen_objects = [
-            PostSeen(doll_id=doll, post_id=post_map[str(post_id)])
-            for post_id in post_ids
-        ]
-        PostSeen.objects.bulk_create(seen_objects, ignore_conflicts=True)
+        qs_followed = Post.objects.filter(
+            doll_id__in=followed_ids
+        ).exclude(id__in=seen_ids).order_by('-created_at')[:5]
 
-        return response
+        remaining = max(5 - qs_followed.count(), 0)
+        qs_others = Post.objects.exclude(
+            doll_id__in=followed_ids
+        ).exclude(id__in=seen_ids).order_by('-created_at')[:remaining]
+
+        posts = sorted(
+            chain(qs_followed, qs_others),
+            key=lambda p: p.created_at,
+            reverse=True
+        )
+
+        serializer = self.get_serializer(posts, many=True, context={'doll_id': doll})
+        data = serializer.data
+
+        seen_objs = [PostSeen(doll_id=doll, post_id=post) for post in posts]
+        with transaction.atomic():
+            PostSeen.objects.bulk_create(seen_objs, ignore_conflicts=True)
+
+        return Response(data, status=status.HTTP_200_OK)
+
+    def get_queryset(self):
+        return Post.objects.none()
     
 class LikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -91,3 +101,24 @@ class CommentListCreateView(generics.ListCreateAPIView):
         doll_id = self.request.data.get('doll_id')
         doll = get_object_or_404(Doll, id=doll_id)
         serializer.save(post_id=post, doll_id=doll)
+
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 5
+    max_limit = 100
+
+class DollProfilePostListView(ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomLimitOffsetPagination
+
+    def get_queryset(self):
+        doll_id = self.request.query_params.get("doll_id")
+        if not doll_id:
+            return Post.objects.none()
+        
+        return Post.objects.filter(doll_id=doll_id).order_by("-created_at")
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["doll_id"] = self.request.query_params.get("viewer_doll_id")
+        return context
