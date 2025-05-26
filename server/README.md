@@ -341,18 +341,64 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 缺少image
 {"image_url":["此欄位不可為空白。"]}
 ```
-### 瀏覽貼文（尚未全部完成）
+### 瀏覽貼文
 
 ---
 
 - **路徑**：`POST /post/feed/?doll_id=cheesetaro/`
 - **說明**：瀏覽貼文
 
-- **成功回應格式範例（總之就是回傳可以看到的貼文資料）（若是再使用一次則是回傳[]）**：
+- **成功回應格式範例（總之就是回傳可以看到的貼文資料，一次五篇，從有追蹤的優先顯示）**：
 
 ```json
 [{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
 ```
+### 取得某隻娃娃的貼文（個人頁）
+
+---
+- **HTTP 方法**：GET
+- **路徑**：`/post/profile_feed/`
+- **說明**：取得某隻娃娃的貼文（個人頁）
+- **請求格式**：URL 查詢參數 (query parameters)
+| 參數名              | 類型     | 是否必填 | 說明                          |
+| ---------------- | ------ | ---- | --------------------------- |
+| `doll_id`        | string | ✅ 是  | 要查詢哪隻娃娃的貼文                  |
+| `viewer_doll_id` | string | ✅ 是  | 目前正在看這些貼文的是哪隻娃娃（用於 like 狀態） |
+| `limit`          | int    | ❌ 否  | 每頁幾篇貼文（預設值看後端設定）            |
+| `offset`         | int    | ❌ 否  | 分頁用的位移量                     |
+
+- **後端回傳格式**：
+```json
+{
+  "count": 23,
+  "next": "http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=15&viewer_doll_id=cheesetaro",
+  "previous": "http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=5&viewer_doll_id=cheesetaro",
+  "results": [
+    {
+      "id": "42f94958-9abc-4df6-9ffe-cdb8d26a35ce",
+      "doll_id": "tomorin",
+      "content": "3",
+      "image_url": "https://github.com/",
+      "created_at": "2025-05-18T10:56:39.209232+08:00",
+      "like_count": 0,
+      "liked_by_me": false,
+      "comment_count": 0
+    },
+    ...
+  ]
+}
+```
+| 欄位名             | 類型       | 說明                             |
+| --------------- | -------- | ------------------------------ |
+| `id`            | UUID     | 貼文的唯一識別碼                       |
+| `doll_id`       | string   | 發文的娃娃 ID                       |
+| `content`       | string   | 文字內容                           |
+| `image_url`     | string   | 圖片網址                           |
+| `created_at`    | datetime | 發文時間（含時區）                      |
+| `like_count`    | int      | 按讚數                            |
+| `liked_by_me`   | bool     | 目前的 `viewer_doll_id` 是否有按讚這篇貼文 |
+| `comment_count` | int      | 留言數量                           |
+
 ### 按讚貼文
 
 ---
@@ -415,9 +461,18 @@ curl -X POST http://localhost:8000/post/posts/ \
 # → {"id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d","doll_id":"doll001","content":"這是測試用的貼文內容","image_url":"https://example.com/test-image.jpg","created_at":"2025-05-05T13:59:54.4212}
 
 # 確認可瀏覽的貼文
-curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro"\   
-  -H "Authorization: Bearer eyJ0eX...ldos" 
-# → [{"id":"050ad8cb-1c21-4edc-a38d-988f8a658bbe","doll_id":"omuba","content":"我是笨狗汪汪汪","image_url":"https://github.com/","created_at":"2025-05-09T01:59:56.196575+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"5cd5473d-5eb4-417d-9ac9-361bc4f22acb","doll_id":"omuba","content":"第一篇文嘻嘻嘻","image_url":"https://github.com/","created_at":"2025-05-08T21:33:53.106715+08:00","like_count":0,"liked_by_me":false,"comment_count":2}]
+curl -X GET "http://localhost:8000/post/feed/?doll_id=omuba"\
+-H "Authorization: Bearer eyJ0eX4hI"
+# → [{"id":"6f227e7d-538a-41e4-8af9-504ed6ac5ff5","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-16T19:55:46.062910+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"c24f464d-2edc-4685-8f2b-a5605178673a","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-16T19:55:37.751486+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"d0ebd4ea-b14b-4c89-b27b-dc0ad79a39c3","doll_id":"tomorin","content":"f","image_url":"https://github.com/","created_at":"2025-05-16T19:55:30.679483+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"6b367624-ec72-4789-a0de-715274998580","doll_id":"tomorin","content":"f","image_url":"https://github.com/","created_at":"2025-05-16T19:55:23.294855+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"a0133140-274c-46ec-847c-23eeb8857ea6","doll_id":"tomorin","content":"8","image_url":"https://github.com/","created_at":"2025-05-16T19:55:17.096527+08:00","like_count":0,"liked_by_me":false,"comment_count":0}]
+
+# 取得某隻 doll 的貼文
+curl "http://localhost:8000/post/profile_feed/?doll_id=tomorin&viewer_doll_id=cheesetaro" \
+  -H "Authorization: Bearer ey...gI"
+# → {"count":23,"next":"http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=15&viewer_doll_id=cheesetaro","previous":"http://localhost:8000/post/profile_feed/?doll_id=tomorin&limit=5&offset=5&viewer_doll_id=cheesetaro","results":[{"id":"42f94958-9abc-4df6-9ffe-cdb8d26a35ce","doll_id":"tomorin","content":"3","image_url":"https://github.com/","created_at":"2025-05-18T10:56:39.209232+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"e3892b72-5a13-43d1-b502-64a70bd2d3fa","doll_id":"tomorin","content":"2","image_url":"https://github.com/","created_at":"2025-05-18T10:56:33.080855+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"4cbc2639-bc3a-4c67-b279-05c8fedc46f9","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-18T10:56:26.329936+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"00ea093d-4c36-4ff8-845c-06490c555ea6","doll_id":"tomorin","content":"456","image_url":"https://github.com/","created_at":"2025-05-18T10:53:09.317580+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"151bb640-df92-48a5-8827-1d8ecaceb3f6","doll_id":"tomorin","content":"123","image_url":"https://github.com/","created_at":"2025-05-18T10:53:00.028697+08:00","like_count":0,"liked_by_me":false,"comment_count":0}]}
+再下五篇文：
+curl "http://localhost:8000/post/profile_feed/?doll_id=tomorin&viewer_doll_id=cheesetaro&offset=5" \
+  -H "Authorization: Bearer eyJ...EgI"
+  以此類推
 
 # 按讚貼文
 curl -X POST \

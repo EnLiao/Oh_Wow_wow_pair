@@ -1,19 +1,47 @@
-import search_icon from '../assets/search.png';
-import SwitchDoll from './switch_doll';
+import React, { useState, useEffect, useContext } from 'react';
+import { Button, UncontrolledPopover, PopoverBody } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { AuthContext } from '../services/auth_context';
+import default_doll_img from '../assets/windy.jpg';
+import { doll_list_view, getDollInfo } from '../services/api';
+import search_icon from '../assets/search.png';
 
 export default function NavBar() {
   const navigate = useNavigate();
+  const auth_context = useContext(AuthContext);
+  
+  const [open, setOpen] = useState(false);
+  const [dollList, setDollList] = useState([]);
+  const dollImage = auth_context.doll_img;
+  const currentDollId = auth_context.currentDollId;
 
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState('user1');
+  useEffect(() => {
+    if (!open) return;
+    const fetchDolls = async () => {
+      try {
+        const res = await doll_list_view(auth_context.username);
+        setDollList(res.data);
+        localStorage.setItem('doll_list', JSON.stringify(res.data));
+      } catch (err) {
+        console.error(err);
+        alert('Failed to fetch doll list');
+      }
+    };
+    fetchDolls();
+  }, [open, auth_context.username]);
 
-
-  const handleSwitchUser = (newUser) => {
-    setCurrentUser(newUser);
-    console.log('switch to：${newUser}');
-    // 你也可以在這裡更新 localStorage 或全域狀態
+  const handleSwitchUser = async (dollId) => {
+    try {
+      auth_context.updateDollId(dollId);
+      const res = await getDollInfo(dollId);
+      auth_context.updateDollImg(res.data.avatar_image);
+      auth_context.updateDollName(res.data.name);
+      setOpen(false);
+      navigate('/main_page');
+    } catch (err) {
+      console.error('切換娃娃失敗:', err);
+      alert('切換娃娃失敗，請重試');
+    }
   };
 
   return (
@@ -33,7 +61,6 @@ export default function NavBar() {
         padding: '0 5%',
       }}
     >
-      {/* 左邊：logo/title */}
       <div style={{ flex: '1 1 30%', minWidth: '100px' }}>
         <h3
           style={{
@@ -41,7 +68,7 @@ export default function NavBar() {
             userSelect: 'none',
             whiteSpace: 'nowrap',
             fontSize: 'clamp(10px, 2vw, 30px)',
-            margin: 0,                        // 清除預設 margin
+            margin: 0,
           }}
           onMouseOver={(e) => { e.currentTarget.style.opacity = 0.5; }}
           onMouseOut={(e) => { e.currentTarget.style.opacity = 1; }}
@@ -51,7 +78,6 @@ export default function NavBar() {
         </h3>
       </div>
 
-      {/* 中間：搜尋欄 + + 號 */}
       <div
         style={{
           flex: '1 1 50%',
@@ -105,13 +131,73 @@ export default function NavBar() {
         </p>
       </div>
 
-      {/* 右邊：doll avatar */}
       <div style={{ flex: '1 1 20%', display: 'flex', justifyContent: 'flex-end' }}>
-        <SwitchDoll
-          isOpen={isModalOpen}
-          onClose={() => { setModalOpen(false); }}
-          onSwitchUser={handleSwitchUser}
-        />
+        <Button
+          id="dollPopover"
+          color="link"
+          style={{ padding: 0, background: 'transparent', border: 'none' }}
+          onClick={() => setOpen(!open)}
+        >
+          <img
+            src={
+              typeof dollImage === 'string'
+                ? dollImage
+                : dollImage instanceof File
+                ? URL.createObjectURL(dollImage)
+                : default_doll_img
+            }
+            onError={(e) => {
+              console.log('圖片載入失敗', e);
+              e.target.src = default_doll_img;
+            }}
+            style={{
+              width: 'clamp(15px,2vw,25px)',
+              height: 'clamp(15px,2vw,25px)',
+              cursor: 'pointer',
+            }}
+          />
+        </Button>
+
+        <UncontrolledPopover
+          isOpen={open}
+          target="dollPopover"
+          toggle={() => setOpen(!open)}
+          placement="bottom"
+          modifiers={[
+            { name: 'preventOverflow', options: { boundary: 'viewport', padding: 8 } },
+          ]}
+        >
+          <PopoverBody className="d-grid gap-2" style={{ minWidth: 150, maxWidth: '90vw' }}>
+            {dollList
+              .filter((d) => d.id !== currentDollId)
+              .map((d) => (
+                <Button
+                  key={d.id}
+                  onClick={() => handleSwitchUser(d.id)}
+                >
+                  {`${d.id}`}
+                </Button>
+              ))}
+
+            {dollList.filter((d) => d.id !== currentDollId).length === 0 && (
+              <div className="text-muted text-center">No other dolls</div>
+            )}
+
+            <Button color="primary" onClick={() => {
+              navigate('/create_doll');
+              setOpen(false);
+            }}>
+              Create&nbsp;new&nbsp;doll
+            </Button>
+
+            <Button color="danger" onClick={() => {
+              auth_context.logout();
+              navigate('/login');
+            }}>
+              Log&nbsp;out
+            </Button>
+          </PopoverBody>
+        </UncontrolledPopover>
       </div>
     </div>
   );

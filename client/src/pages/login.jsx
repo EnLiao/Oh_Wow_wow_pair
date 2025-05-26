@@ -1,6 +1,7 @@
 import { useState, useContext} from 'react'
-import { login, register, doll_list_view} from '../services/api'
+import { login, register, doll_list_view, getDollInfo} from '../services/api'
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../services/auth_context'
 import {
   Button, 
   Input, 
@@ -18,9 +19,10 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [nickname, setNickname] = useState('')
-  const [avatar_url, setAvatar_url] = useState('')
+  const [avatarFile, setAvatarFile] = useState(null)
   const [bio, setBio] = useState('')
   const navigate = useNavigate()
+  const auth_context = useContext(AuthContext)
 
   const handleSubmit = async () => {
     if (isSignUp) {
@@ -29,15 +31,13 @@ export default function Login() {
         password,
         email,
         nickname,
-        avatar_url,
+        avatarFile,
         bio
       };
   
       try {
         const res = await register(data); // axios 呼叫 register
         console.log('sign up success', res.data);
-        localStorage.setItem('access_token', res.data.access);
-        localStorage.setItem('refresh_token', res.data.refresh);
         alert('sign up success');
         setIsSignUp(false);
       } catch (err) {
@@ -74,7 +74,8 @@ export default function Login() {
         const res = await login({ username, password }); // axios 呼叫 login
         const { access, refresh } = res.data;
   
-        localStorage.setItem('access_token', access);
+        auth_context.updateToken(access);
+        auth_context.updateUsername(username);
         localStorage.setItem('refresh_token', refresh);
 
         try{
@@ -82,11 +83,21 @@ export default function Login() {
           const doll_list = dollRes.data;
           localStorage.setItem('doll_list', JSON.stringify(doll_list));
           console.log('doll_list', doll_list);
-          const current_doll_id = doll_list[0].id;
-          localStorage.setItem('current_doll_id', current_doll_id);
-          console.log(username, current_doll_id, access);
-          alert('log in success');
-          navigate('/main_page');
+          auth_context.updateDollId(doll_list[0].id);
+          
+          try{
+            const res = await getDollInfo(doll_list[0].id);
+            const doll_info = res.data;
+            auth_context.updateDollImg(doll_info.avatar_image);
+            auth_context.updateDollName(doll_info.name);
+            alert('log in success');
+            navigate('/main_page');
+          }
+          catch(err){
+            console.error(err);
+            alert('Failed to fetch doll info');
+          }
+
         }
         catch(err){
           navigate('/create_doll');
@@ -160,11 +171,9 @@ export default function Login() {
                 </FormGroup>
                 <FormGroup>
                   <Input
-                    type="text"
-                    placeholder="Avatar URL"
-                    value={avatar_url}
-                    onChange={(e) => setAvatar_url(e.target.value)}
-                    className="mb-3"
+                    type="file"
+                    accept="image/png, image/jpeg, image/gif"
+                    onChange={e => setAvatarFile(e.target.files[0])}
                   />
                 </FormGroup>
                 <FormGroup>
