@@ -4,6 +4,7 @@ import img3 from '../assets/omuba.jpg';
 import Post from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
+import React, { useContext } from 'react';
 // I can use <Post> unlimited!
 // 新增切換帳號、新增帳號UI
 
@@ -24,6 +25,8 @@ const doll = {
 
 export default function MainPage() {
   const navigate = useNavigate();
+  const auth_context = useContext(AuthContext);
+  console.log('auth_context', auth_context);
   return (
     <div style={{ paddingLeft: '3%', paddingTop: 50, display: 'flex', flexDirection: 'flex-start'}}>
       {/* left following list */}
@@ -90,7 +93,7 @@ export default function MainPage() {
         <img
           src={doll.photo}
           alt={doll.name}
-          onClick={() => {navigate('/doll_page')}} // 點擊圖片跳轉到 doll profile
+          onClick={() => {navigate(`/doll_page/${auth_context.currentDollId}`)}} // 點擊圖片跳轉到 doll profile
           style={{
             width: 70,
             height: 70,

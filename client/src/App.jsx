@@ -19,11 +19,11 @@ function AppLayout() {
     <>
       {!NoNeedNavBar && <NavBar />}
       <Routes>
-        <Route path='/login' element={<Login />} />
+        <Route path='/' element={<Login />} />
         <Route element={<RequireAuth />}>
           <Route path='/create_doll' element={<CreateDoll />} />
           <Route element={<RequireDoll />}>
-            <Route path="/doll_page" element={<DollPage />} />
+            <Route path='/doll_page/:doll_id' element={<DollPage />} />
             <Route path="/main_page" element={<MainPage />} />
             <Route path="/create_post" element={<CreatePost />} />
           </Route>
