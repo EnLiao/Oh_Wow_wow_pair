@@ -12,7 +12,7 @@ import RequireDoll from './services/require_doll'
 function AppLayout() {
   const location = useLocation()
   const NoNeedNavBar = 
-    location.pathname === '/login' ||
+    location.pathname === '/' ||
     location.pathname === '/create_doll'
 
   return (

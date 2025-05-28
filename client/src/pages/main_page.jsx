@@ -14,15 +14,6 @@ const following_list = [
   { id: 3, img: img3, name: '歐姆吧' },
 ];
 
-const doll = {
-  name: 'Windy',
-  photo: img1,
-  user_name: 'cyucccx',
-  birthday: '2024-11-16',
-  bio: '我愛藤井風',
-  tag: 'Fujii Kaze',
-}
-
 export default function MainPage() {
   const navigate = useNavigate();
   const auth_context = useContext(AuthContext);
@@ -91,8 +82,8 @@ export default function MainPage() {
       {/* right my area */}
       <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:'5%' }}>
         <img
-          src={doll.photo}
-          alt={doll.name}
+          src={auth_context.doll_img}
+          alt={auth_context.doll_name}
           onClick={() => {navigate(`/doll_page/${auth_context.currentDollId}`)}} // 點擊圖片跳轉到 doll profile
           style={{
             width: 70,
@@ -102,7 +93,7 @@ export default function MainPage() {
             cursor: 'pointer',
           }}
         />
-        <p style={{ textAlign: 'center', fontSize: 12 }}>Good Morning, {doll.name}!</p>
+        <p style={{ textAlign: 'center', fontSize: 12 }}>Good Morning, {auth_context.doll_name}!</p>
       </div>
     </div>
   );
