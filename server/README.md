@@ -399,6 +399,32 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 | `liked_by_me`   | bool     | 目前的 `viewer_doll_id` 是否有按讚這篇貼文 |
 | `comment_count` | int      | 留言數量                           |
 
+---
+
+### 列出所有粉絲娃娃（追蹤我的人）
+
+- **路徑**：`GET /core/dolls/<doll_id>/followers/`
+- **說明**：查詢某隻娃娃的所有粉絲（追蹤這隻娃娃的所有娃娃）。
+- **範例回應（JSON）**：
+```json
+[
+  {"id": "doll002", "name": "小熊", "avatar_image": "/media/avatars/bear.jpg"},
+  {"id": "doll003", "name": "小兔", "avatar_image": "/media/avatars/rabbit.jpg"}
+]
+```
+
+### 列出所有追蹤娃娃（我追蹤的人）
+
+- **路徑**：`GET /core/dolls/<doll_id>/follower_to/`
+- **說明**：查詢某隻娃娃追蹤的所有娃娃（這隻娃娃正在追蹤誰）。
+- **範例回應（JSON）**：
+```json
+[
+  {"id": "doll005", "name": "小貓", "avatar_image": "/media/avatars/cat.jpg"},
+  {"id": "doll006", "name": "小狗", "avatar_image": "/media/avatars/dog.jpg"}
+]
+```
+
 ### 按讚貼文
 
 ---
