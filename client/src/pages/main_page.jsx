@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import React, { useContext } from 'react';
 // I can use <Post> unlimited!
-// 新增切換帳號、新增帳號UI
 
 const following_list = [
   { id: 1, img: img1, name: 'Windy' },
@@ -32,9 +31,9 @@ export default function MainPage() {
         }}
       >
         <p style={{ fontSize: 15 }}>Following</p>
-        {following_list.map(user => (
+        {following_list.map(following_doll => (
           <div
-            key={user.id}
+            key={following_doll.id}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -53,8 +52,8 @@ export default function MainPage() {
               }}
             >
               <img
-                src={user.img}
-                alt={user.name}
+                src={following_doll.img}
+                alt={following_doll.name}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -70,17 +69,42 @@ export default function MainPage() {
                 fontSize: 14,
               }}
             >
-              {user.name}
+              {following_doll.name}
             </p>
           </div>
         ))}
       </div>
 
       {/* middle post */}
-      <div style={{ width: '60%'}}>
+      <div style={{ 
+        width: '60%',
+        alignItems: 'center',
+        paddingTop: 20,
+        }}
+      >
+        <Post
+          user={auth_context.doll_name}
+          content="Hello, this is my first post!"
+          image={auth_context.doll_img}
+        />
+        <Post
+          user="Windy"
+          content="Just chilling with my friends!"
+          image={img1}
+        />
+        <Post
+          user="魔魔胡胡胡蘿蔔"
+          content="Loving the new game update!"
+          image={img2}
+        />
+        <Post
+          user="歐姆吧"
+          content="Can't wait for the next event!"
+          image={img3}
+        />
       </div>
       {/* right my area */}
-      <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:'5%' }}>
+      <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:5, marginLeft: 5 }}>
         <img
           src={auth_context.doll_img}
           alt={auth_context.doll_name}

@@ -22,5 +22,6 @@ export const doll_list_view = (username) => api.get(`/core/users/${username}/dol
 export const create_doll = (data) => api.post('/core/dolls/', data);
 export const create_post = (data) => api.post('/post/posts', data);
 export const getDollInfo = (dollId) => api.get(`/core/dolls/${dollId}/`);
+export const getPosts = (username) => api.get(`/post/feed/?doll_id=${dollId}/`);
 
 export default api;
