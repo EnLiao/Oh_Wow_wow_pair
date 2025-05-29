@@ -4,19 +4,28 @@ import img3 from '../assets/omuba.jpg';
 import Post from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
-import React, { useContext } from 'react';
+import React, { use, useContext, useEffect } from 'react';
+import { getFollowing } from '../services/api';
 // I can use <Post> unlimited!
-
-const following_list = [
-  { id: 1, img: img1, name: 'Windy' },
-  { id: 2, img: img2, name: '魔魔胡胡胡蘿蔔' },
-  { id: 3, img: img3, name: '歐姆吧' },
-];
 
 export default function MainPage() {
   const navigate = useNavigate();
   const auth_context = useContext(AuthContext);
   console.log('auth_context', auth_context);
+  const [following, setFollowing] = React.useState([]);
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      try {
+        const res = await getFollowing(auth_context.currentDollId);
+        setFollowing(res.data);
+        console.log('設置 following 為:', res.data); // 新增：檢查設置的資料
+      } catch (err) {
+        console.error('詳細錯誤:', err.response ? err.response.data : err.message);
+      }
+    };
+    
+    fetchFollowing();
+  }, [auth_context.currentDollId]); // 添加空陣列作為依賴，確保只執行一次
   return (
     <div style={{ paddingLeft: '3%', paddingTop: 50, display: 'flex', flexDirection: 'flex-start'}}>
       {/* left following list */}
@@ -31,7 +40,7 @@ export default function MainPage() {
         }}
       >
         <p style={{ fontSize: 15 }}>Following</p>
-        {following_list.map(following_doll => (
+        {following.map(following_doll => (
           <div
             key={following_doll.id}
             style={{
@@ -52,8 +61,9 @@ export default function MainPage() {
               }}
             >
               <img
-                src={following_doll.img}
+                src={following_doll.avatar_image}
                 alt={following_doll.name}
+                onClick={() => {navigate(`/doll_page/${following_doll.id}`)}}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -68,6 +78,7 @@ export default function MainPage() {
                 whiteSpace: 'nowrap',
                 fontSize: 14,
               }}
+              onClick={() => {navigate(`/doll_page/${following_doll.id}`)}} // 點擊名字跳轉到 doll profile
             >
               {following_doll.name}
             </p>
@@ -82,7 +93,7 @@ export default function MainPage() {
         paddingTop: 20,
         }}
       >
-        <Post
+        {/* <Post
           user={auth_context.doll_name}
           content="Hello, this is my first post!"
           image={auth_context.doll_img}
@@ -101,7 +112,7 @@ export default function MainPage() {
           user="歐姆吧"
           content="Can't wait for the next event!"
           image={img3}
-        />
+        /> */}
       </div>
       {/* right my area */}
       <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:5, marginLeft: 5 }}>

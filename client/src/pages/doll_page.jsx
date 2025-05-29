@@ -18,8 +18,8 @@ import {
 import doll_img from '../assets/windy.jpg'; // 預設圖片，可以作為載入中的替代
 
 export default function DollPage() {
-  const { id } = useParams(); // 從 URL 獲取娃娃 ID
-  const navigate = useNavigate();
+  const { doll_id } = useParams(); // 從 URL 獲取娃娃 ID
+  console.log(doll_id);
   const auth_context = React.useContext(AuthContext);
   
   const [doll, setDoll] = useState(null);
@@ -31,7 +31,7 @@ export default function DollPage() {
     const fetchDollData = async () => {
       try {
         setLoading(true);
-        const res = await getDollInfo(id || auth_context.currentDollId);
+        const res = await getDollInfo(doll_id || auth_context.currentDollId);
         console.log('doll info', res.data);
         setDoll(res.data);
       } catch (err) {
@@ -60,7 +60,7 @@ export default function DollPage() {
     };
     
     fetchDollData();
-  }, [id, auth_context.currentDollId]); // 當 ID 變化時重新獲取數據
+  }, [doll_id, auth_context.currentDollId]); // 當 ID 變化時重新獲取數據
   
   // 顯示載入中狀態
   if (loading) {
