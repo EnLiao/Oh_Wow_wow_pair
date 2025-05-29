@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import { getDollInfo } from '../services/api';
+import PostList from '../components/load_post';
 import { 
   Container, 
   Row, 
@@ -146,16 +147,7 @@ export default function DollPage() {
               <CardTitle className="text-center h4">Recently Posts</CardTitle>
             </CardHeader>
             <CardBody>
-              {/* 這裡可以放置娃娃的貼文列表 */}
-              {dollData.posts && dollData.posts.length > 0 ? (
-                dollData.posts.map(post => (
-                  <Card key={post.id} className="mb-3">
-                    {/* 貼文內容 */}
-                  </Card>
-                ))
-              ) : (
-                <p className="text-center text-muted">尚無貼文</p>
-              )}
+                <PostList mode="profile" profileDollId={dollData.id} />
             </CardBody>
           </Card>
         </Col>

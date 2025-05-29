@@ -3,54 +3,53 @@ import { AuthContext } from '../services/auth_context';
 import { getPosts } from '../services/api';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
 
-export default function PostList() {
-  const auth_context = useContext(AuthContext);
+export default function PostList({ mode = 'feed', profileDollId }) {
+  const auth = useContext(AuthContext);
+  const viewerId = auth.currentDollId;          // 目前登入者
+  const targetId = mode === 'profile' ? profileDollId : viewerId;
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ➜ 依 mode / targetId 變動重新抓取
+  console.log(viewerId, targetId, mode);
   useEffect(() => {
-    const fetchPosts = async () => {
+    if (!viewerId || !targetId) return;
+
+    (async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // 需要傳入當前娃娃的 ID 參數
-        const dollId = auth_context.currentDollId;
-        
-        if (!dollId) {
-          console.error('無法獲取貼文: 缺少娃娃 ID');
-          setError('無法獲取貼文: 缺少娃娃 ID');
-          setLoading(false);
-          return;
-        }
-        
-        const res = await getPosts(dollId);
-        console.log('獲取的貼文:', res.data);
-        setPosts(res.data);
+
+        const fetched = await getPosts({
+          mode,
+          targetDollId: targetId,
+          viewerDollId: viewerId,
+          limit: 5,
+          offset: 0,
+        });
+
+        setPosts(fetched);
+        console.log('已載入貼文:', fetched);
       } catch (err) {
-        console.error('獲取貼文失敗:', err);
-        setError('獲取貼文失敗: ' + (err.response?.data?.detail || err.message));
+        console.error(err);
+        setError(err.response?.data?.detail || err.message);
       } finally {
         setLoading(false);
       }
-    };
-    
-    fetchPosts();
-  }, [auth_context.currentDollId]);
+    })();
+  }, [mode, targetId, viewerId]);
 
-  // 顯示載入中
-  if (loading) {
+  if (loading)
     return (
       <div className="text-center my-4">
         <Spinner color="primary" />
         <p>載入貼文中...</p>
       </div>
     );
-  }
 
-  // 顯示錯誤
-  if (error) {
+  if (error)
     return (
       <Card className="my-3 text-danger">
         <CardBody>
@@ -59,10 +58,8 @@ export default function PostList() {
         </CardBody>
       </Card>
     );
-  }
 
-  // 顯示沒有貼文的情況
-  if (posts.length === 0) {
+  if (!posts.length)
     return (
       <Card className="my-3">
         <CardBody>
@@ -70,49 +67,44 @@ export default function PostList() {
         </CardBody>
       </Card>
     );
-  }
 
-  // 顯示貼文列表
   return (
-    <div>
-      {posts.map((post) => (
-        <Card key={post.id} className="mb-3">
+    <>
+      {posts.map((p) => (
+        <Card key={p.id} className="mb-3">
           <CardBody>
             <div className="d-flex align-items-center mb-2">
-              {post.doll_avatar && (
+              {p.dollAvatar && (
                 <img
-                  src={post.doll_avatar}
-                  alt={post.doll_name}
+                  src={p.dollAvatar}
+                  alt={p.dollName}
                   style={{
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
                     marginRight: 10,
-                    objectFit: 'cover'
+                    objectFit: 'cover',
                   }}
                 />
               )}
               <CardTitle tag="h5" className="mb-0">
-                {post.doll_name}
+                {p.dollName}
               </CardTitle>
             </div>
-            
-            <CardText>{post.content}</CardText>
-            
-            {post.image && (
+
+            <CardText>{p.content}</CardText>
+
+            {p.image && (
               <CardImg
                 bottom
-                src={post.image}
+                src={p.image}
                 alt="貼文圖片"
-                style={{
-                  borderRadius: '10px',
-                  marginTop: '10px'
-                }}
+                style={{ borderRadius: '10px', marginTop: 10 }}
               />
             )}
           </CardBody>
         </Card>
       ))}
-    </div>
+    </>
   );
 }

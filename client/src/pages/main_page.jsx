@@ -1,12 +1,8 @@
-import img1 from '../assets/windy.jpg';
-import img2 from '../assets/carrot.jpg';
-import img3 from '../assets/omuba.jpg';
 import PostList from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import React, { use, useContext, useEffect } from 'react';
 import { getFollowing } from '../services/api';
-// I can use <Post> unlimited!
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -93,8 +89,7 @@ export default function MainPage() {
         paddingTop: 20,
         }}
       >
-        <PostList />
-        
+        <PostList mode="feed" />
       </div>
       {/* right my area */}
       <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:5, marginLeft: 5 }}>
