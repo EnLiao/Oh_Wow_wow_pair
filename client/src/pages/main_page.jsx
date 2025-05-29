@@ -1,7 +1,7 @@
 import img1 from '../assets/windy.jpg';
 import img2 from '../assets/carrot.jpg';
 import img3 from '../assets/omuba.jpg';
-import Post from '../components/load_post';
+import PostList from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import React, { use, useContext, useEffect } from 'react';
@@ -93,26 +93,8 @@ export default function MainPage() {
         paddingTop: 20,
         }}
       >
-        {/* <Post
-          user={auth_context.doll_name}
-          content="Hello, this is my first post!"
-          image={auth_context.doll_img}
-        />
-        <Post
-          user="Windy"
-          content="Just chilling with my friends!"
-          image={img1}
-        />
-        <Post
-          user="魔魔胡胡胡蘿蔔"
-          content="Loving the new game update!"
-          image={img2}
-        />
-        <Post
-          user="歐姆吧"
-          content="Can't wait for the next event!"
-          image={img3}
-        /> */}
+        <PostList />
+        
       </div>
       {/* right my area */}
       <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:5, marginLeft: 5 }}>
