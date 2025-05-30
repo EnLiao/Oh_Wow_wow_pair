@@ -88,7 +88,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # 圖片上傳相關
 MEDIA_URL = '/media/'
-MEDIA_ROOT = Path(__file__).resolve().parent.parent.parent / 'media'
+MEDIA_ROOT = BASE_DIR.parent / 'media'
+
 
 TEMPLATES = [
     {
