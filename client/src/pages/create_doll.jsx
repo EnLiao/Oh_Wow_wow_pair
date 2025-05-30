@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { create_doll } from '../services/api';
+import { create_doll, get_tags } from '../services/api';
 import { AuthContext } from '../services/auth_context';
 import { 
   Container, 
