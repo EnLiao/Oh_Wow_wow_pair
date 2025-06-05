@@ -9,7 +9,7 @@ class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
     content = models.TextField()
-    image_url = models.URLField()
+    image = models.ImageField(upload_to='avatars/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):
