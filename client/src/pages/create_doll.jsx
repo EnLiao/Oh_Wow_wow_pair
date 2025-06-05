@@ -11,7 +11,8 @@ import {
   FormGroup, 
   Label, 
   Input, 
-  Button 
+  Button, 
+  Col
 } from 'reactstrap';
 
 export default function CreateDoll() {
@@ -55,44 +56,58 @@ export default function CreateDoll() {
     
     return (
         <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', paddingTop: '50px' }}>
-            <Card style={{ width: '400px' }}>
+            <Card style={{ width: '500px' }}>
                 <CardHeader>
                     <h2 className="text-center mb-0">Create Doll</h2>
                 </CardHeader>
                 <CardBody>
                     <Form>
-                        <FormGroup>
-                            <Input
-                                type="text"
-                                placeholder="Doll ID"
-                                value={dollId}
-                                onChange={(e) => setDollId(e.target.value)}
-                                className="mb-3"
-                            />
+                        <FormGroup row>
+                            <Label for="dollId" sm={3}>Doll ID</Label>
+                            <Col sm={9}>
+                                <Input
+                                    id="dollId"
+                                    type="text"
+                                    placeholder="Doll ID"
+                                    value={dollId}
+                                    onChange={(e) => setDollId(e.target.value)}
+                                    className="mb-0"
+                                />
+                            </Col>
+                        </FormGroup>
+                        
+                        <FormGroup row>
+                            <Label for="dollName" sm={3}>Doll Name</Label>
+                            <Col sm={9}>
+                                <Input
+                                    id="dollName"
+                                    type="text"
+                                    placeholder="Doll Name"
+                                    value={dollName}
+                                    onChange={(e) => setDollName(e.target.value)}
+                                    className="mb-0"
+                                />
+                            </Col>
+                        </FormGroup>
+                        
+                        <FormGroup row>
+                            <Label for="dollBirthday" sm={3}>Doll Birthday</Label>
+                            <Col sm={9}>
+                                <Input
+                                    id="dollBirthday"
+                                    type="date"
+                                    placeholder="Birthday"
+                                    value={dollBirthday}
+                                    onChange={(e) => setDollDate(e.target.value)}
+                                    className="mb-0"
+                                />
+                            </Col>
                         </FormGroup>
                         
                         <FormGroup>
+                            <Label for="dollDescription">Description</Label>
                             <Input
-                                type="text"
-                                placeholder="Doll Name"
-                                value={dollName}
-                                onChange={(e) => setDollName(e.target.value)}
-                                className="mb-3"
-                            />
-                        </FormGroup>
-                        
-                        <FormGroup>
-                            <Input
-                                type="date"
-                                placeholder="Birthday"
-                                value={dollBirthday}
-                                onChange={(e) => setDollDate(e.target.value)}
-                                className="mb-3"
-                            />
-                        </FormGroup>
-                        
-                        <FormGroup>
-                            <Input
+                                id="dollDescription"
                                 type="textarea"
                                 placeholder="Doll Description"
                                 value={dollDescription}
@@ -101,13 +116,17 @@ export default function CreateDoll() {
                             />
                         </FormGroup>
                         
-                        <FormGroup>
-                            <Input
-                                type="file"
-                                accept="image/png, image/jpeg, image/gif"
-                                onChange={e => setDollImage(e.target.files[0])}
-                                className="mb-3"
-                            />
+                        <FormGroup row>
+                            <Label for="dollImage" sm={3}>Doll Image</Label>
+                            <Col sm={9}>
+                                <Input
+                                    id="dollImage"
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/gif"
+                                    onChange={e => setDollImage(e.target.files[0])}
+                                    className="mb-0"
+                                />
+                            </Col>
                         </FormGroup>
                         
                         <Button 

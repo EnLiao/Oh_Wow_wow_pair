@@ -10,7 +10,9 @@ import {
   FormGroup,
   Card,
   CardBody,
-  CardHeader
+  CardHeader,
+  Col, 
+  Label
 } from 'reactstrap';
 
 export default function Login() {
@@ -133,69 +135,102 @@ export default function Login() {
 
   return (
     <Container className="d-flex align-items-center justify-content-center vh-100">
-      <Card style={{ width: '400px' }}>
+      <Card style={{ width: '500px' }}>
         <CardHeader>
           <h2 className="text-center mb-0">{isSignUp ? 'Sign Up' : 'Login'}</h2>
         </CardHeader>
         <CardBody>
           <Form>
-            <FormGroup>
-              <Input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mb-3"
-              />
+            <FormGroup row>
+              <Label for="usernameInput" sm={3}>
+                Username
+              </Label>
+              <Col sm={9}>
+                <Input
+                  id="usernameInput"
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="mb-0"
+                />
+              </Col>
             </FormGroup>
     
             {isSignUp && (
               <>
-                <FormGroup>
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="mb-3"
-                  />
+                <FormGroup row>
+                  <Label for="emailInput" sm={3}>
+                    Email
+                  </Label>
+                  <Col sm={9}>
+                    <Input
+                      id="emailInput"
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mb-0"
+                    />
+                  </Col>
                 </FormGroup>
-                <FormGroup>
-                  <Input
-                    type="text"
-                    placeholder="Nickname"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    className="mb-3"
-                  />
+                <FormGroup row>
+                  <Label for="nicknameInput" sm={3}>
+                    Nickname
+                  </Label>
+                  <Col sm={9}>
+                    <Input
+                      type="text"
+                      placeholder="Nickname"
+                      value={nickname}
+                      onChange={(e) => setNickname(e.target.value)}
+                      className="mb-0"
+                    />
+                  </Col>
                 </FormGroup>
-                <FormGroup>
-                  <Input
-                    type="file"
-                    accept="image/png, image/jpeg, image/gif"
-                    onChange={e => setAvatarFile(e.target.files[0])}
-                  />
+                <FormGroup row>
+                  <Label for="avatarFileInput" sm={3}>
+                    User Avatar
+                  </Label>
+                  <Col sm={9}>
+                    <Input
+                      id="avatarFileInput"
+                      type="file"
+                      accept="image/png, image/jpeg, image/gif"
+                      onChange={e => setAvatarFile(e.target.files[0])}
+                    />
+                  </Col>
                 </FormGroup>
-                <FormGroup>
-                  <Input
-                    type="text"
-                    placeholder="Bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    className="mb-3"
-                  />
+                <FormGroup row>
+                  <Label for="bioInput" sm={3}>Bio</Label>
+                  <Col sm={9}>
+                    <Input
+                      id="bioInput"
+                      type="text"
+                      placeholder="Bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      className="mb-0"
+                    />
+                  </Col>
                 </FormGroup>
               </>
             )}
     
-            <FormGroup>
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mb-4"
-              />
+            <FormGroup row>
+              <Label for="passwordInput" sm={3}>
+                Password
+              </Label>
+              <Col sm={9}>
+                <Input
+                  id="passwordInput"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mb-0"
+                />
+              </Col>
             </FormGroup>
   
             <Button 
