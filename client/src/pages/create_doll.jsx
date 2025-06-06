@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { create_doll, get_tags } from '../services/api';
 import { AuthContext } from '../services/auth_context';
@@ -12,7 +12,8 @@ import {
   Label, 
   Input, 
   Button, 
-  Col
+  Col,
+  ButtonGroup
 } from 'reactstrap';
 
 export default function CreateDoll() {
@@ -24,6 +25,37 @@ export default function CreateDoll() {
     const [dollBirthday, setDollDate] = useState('');
     const [dollDescription, setDollDescription] = useState('');
     const [dollImage, setDollImage] = useState(null);
+    const [showTags, setShowTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
+
+    const handleTagToggle = (tag) => {
+        // 檢查標籤是否已被選中
+        const isSelected = selectedTags.some(t => t.id === tag.id);
+        
+        if (isSelected) {
+            // 如果已選中，則移除
+            setSelectedTags(selectedTags.filter(t => t.id !== tag.id));
+        } else {
+            // 如果未選中，則添加
+            setSelectedTags([...selectedTags, tag]);
+        }
+    };
+
+    const isTagSelected = (tag) => {
+        return selectedTags.some(t => t.id === tag.id);
+    };
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await get_tags();
+                console.log('fetched tags:', res.data);
+                setShowTags(res.data);
+            } catch (err) {
+                console.error('Error fetching tags:', err);
+            }
+        })();
+    }, []);
     
     const handleSubmit = async () => {
         if (!dollName || !dollImage || !dollDescription || !dollBirthday || !dollId) {
@@ -37,6 +69,11 @@ export default function CreateDoll() {
         formData.append('birthday', dollBirthday);
         formData.append('description', dollDescription);
         formData.append('avatar_image', dollImage);
+        if (selectedTags.length > 0) {
+            // 將整個標籤陣列轉換為 JSON 字串
+            formData.append('tags', JSON.stringify(selectedTags));
+        }
+        console.log(selectedTags);
     
         try {
             const res = await create_doll(formData);
@@ -126,6 +163,25 @@ export default function CreateDoll() {
                                     onChange={e => setDollImage(e.target.files[0])}
                                     className="mb-0"
                                 />
+                            </Col>
+                        </FormGroup>
+
+                        <FormGroup row>
+                            <Label for="dollTags" sm={3}>Tags</Label>
+                            <Col sm={9}>
+                                <div className="d-flex flex-wrap mb-2">
+                                    {showTags.map((tag) => (
+                                        <Button
+                                            key={tag.id || tag.name} // 確保有唯一的 key
+                                            color={isTagSelected(tag) ? 'primary' : 'secondary'}
+                                            onClick={() => handleTagToggle(tag)}
+                                            className="me-1 mb-1" // 添加間距
+                                            size="sm"
+                                        >
+                                            {tag.name || tag} {/* 顯示標籤名稱或值 */}
+                                        </Button>
+                                    ))}
+                                </div>
                             </Col>
                         </FormGroup>
                         
