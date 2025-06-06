@@ -192,7 +192,7 @@ export default function NavBar() {
 
             <Button color="danger" onClick={() => {
               auth_context.logout();
-              navigate('/login');
+              navigate('/');
             }}>
               Log&nbsp;out
             </Button>
