@@ -70,8 +70,9 @@ export default function CreateDoll() {
         formData.append('description', dollDescription);
         formData.append('avatar_image', dollImage);
         if (selectedTags.length > 0) {
-            // 將整個標籤陣列轉換為 JSON 字串
-            formData.append('tags', JSON.stringify(selectedTags));
+            selectedTags.forEach(tag => {
+                formData.append('tag_ids', tag.id);
+            });
         }
         console.log(selectedTags);
     
