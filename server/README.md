@@ -360,6 +360,7 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 - **路徑**：`/post/profile_feed/`
 - **說明**：取得某隻娃娃的貼文（個人頁）
 - **請求格式**：URL 查詢參數 (query parameters)
+
 | 參數名              | 類型     | 是否必填 | 說明                          |
 | ---------------- | ------ | ---- | --------------------------- |
 | `doll_id`        | string | ✅ 是  | 要查詢哪隻娃娃的貼文                  |
@@ -444,6 +445,116 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 {"message":"Liked"}
 {"message":"Already liked"}
 ```
+
+### 取消按讚貼文
+
+---
+
+* **路徑**：`DELETE /post/posts/<uuid:post_id>/like/`
+* **說明**：取消按讚指定貼文
+
+- **請求格式範例（Curl 指令）**：
+
+```bash
+curl -X DELETE \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"doll_id": "cheesetaro"}' \
+  http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
+```
+
+- **成功回應格式範例（JSON）**：
+
+```json
+[
+  {
+    "message": "Unliked",
+    "post": {
+      "id": "e6666593-3d06-4563-8b38-67a411476c3c",
+      "doll_id": "omuba",
+      "content": "我是一條笨狗 汪汪汪 我叫歐姆嘎抓",
+      "image_url": "https://github.com/",
+      "created_at": "2025-05-08T15:12:00.939363+08:00",
+      "like_count": 0,
+      "liked_by_me": false
+    }
+  }
+]
+```
+
+---
+
+### 留言貼文
+
+---
+
+* **路徑**：`POST /post/posts/<uuid:post_id>/comments/`
+* **說明**：對指定貼文留言
+
+- **請求格式範例（Curl 指令）**：
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "doll_id": "tomorin",
+        "content": "這是一則留言",
+        "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb"
+      }' \
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
+```
+
+- **成功回應格式範例（JSON）**：
+
+```json
+{
+  "local_id": 2,
+  "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb",
+  "doll_id": "tomorin",
+  "content": "這是一則留言",
+  "created_at": "2025-05-08T22:38:21.862059+08:00"
+}
+```
+
+---
+
+### 取得貼文留言
+
+---
+
+* **路徑**：`GET /post/posts/<uuid:post_id>/comments/`
+* **說明**：取得指定貼文下所有留言
+
+- **請求格式範例（Curl 指令）**：
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
+```
+
+- **成功回應格式範例（JSON）**：
+
+```json
+[
+  {
+    "local_id": 1,
+    "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb",
+    "doll_id": "tomorin",
+    "content": "這是一則留言",
+    "created_at": "2025-05-08T22:36:51.879810+08:00"
+  },
+  {
+    "local_id": 2,
+    "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb",
+    "doll_id": "tomorin",
+    "content": "這是一則留言",
+    "created_at": "2025-05-08T22:38:21.862059+08:00"
+  }
+]
+```
+
 ## 用curl測試指令紀錄（終端機）
 
 ```bash
