@@ -16,9 +16,14 @@ from rest_framework.pagination import LimitOffsetPagination
 class PostCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # 需要登入
     def post(self, request):
+        doll_id = request.data.get('doll_id')
+        doll = Doll.objects.filter(id=doll_id, username=request.user).first()
+        if not doll:
+            raise PermissionDenied("你不能用不屬於你的娃娃發文！")
+
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save() 
+            serializer.save(doll_id=doll)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

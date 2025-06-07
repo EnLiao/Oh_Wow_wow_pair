@@ -310,37 +310,91 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 | 缺少必要欄位    | 400      | 缺少 from\_doll\_id 或 to\_doll\_id |
 
 ### 建立新貼文
+
 ---
-- **路徑**：`POST /post/posts/`
-- **說明**：建立新貼文
-- **請求格式範例（JSON）**：
+
+* **路徑**：`POST /post/posts/`
+* **說明**：
+
+  * 建立新貼文
+  * **只能使用自己擁有的娃娃（doll）發文，否則會被拒絕**
+  * 圖片需用「檔案格式」上傳（`multipart/form-data`），欄位名稱為 `image`
+
+---
+
+#### **請求格式範例（multipart/form-data）：**
+
+```
+doll_id=doll001
+content=這是我的第一篇文
+image=@momo.jpg    ← 這裡的 @ 表示本地檔案
+```
+
+**curl 範例：**
+
+```bash
+curl -X POST http://localhost:8000/post/posts/ \
+  -H "Authorization: Bearer <你的 token>" \
+  -F "doll_id=doll001" \
+  -F "content=這是我的第一篇文" \
+  -F "image=@momo.jpg"
+```
+
+---
+
+#### **成功回應格式範例（JSON）：**
 
 ```json
 {
+  "id": "54005c5b-4d47-4b77-b6e5-d5448ec98f7d",
   "doll_id": "doll001",
-  "content": "這是我的第一篇文",
-  "image_url": "https://example.com/momo.jpg"
+  "content": "這是測試用的貼文內容",
+  "image": "/media/avatars/momo.jpg",
+  "created_at": "2025-05-05T13:59:54.4212",
+  "like_count": 0,
+  "liked_by_me": false,
+  "comment_count": 0
 }
 ```
-- **成功回應格式範例（JSON）**：
+
+> 注意：`image` 會是上傳後的檔案路徑（通常是 `/media/avatars/檔案名`）
+
+---
+
+#### **失敗時回應（JSON）：**
+
+**缺少 content：**
 
 ```json
-{
-  "id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d",
-  "doll_id":"doll001",
-  "content":"這是測試用的貼文內容",
-  "image_url":"https://example.com/test-image.jpg",
-  "created_at":"2025-05-05T13:59:54.4212"
-}
+{"content": ["此欄位不可為空白。"]}
 ```
-- **失敗時回應（JSON）**：
+
+**缺少 image：**
 
 ```json
-缺少content
-{"content":["此欄位不可為空白。"]}
-缺少image
-{"image_url":["此欄位不可為空白。"]}
+{"image": ["此欄位不可為空白。"]}
 ```
+
+**doll 不是自己的（權限錯誤）：**
+
+```json
+{"detail": "你不能用不屬於你的娃娃發文！"}
+```
+
+**圖片欄位不是檔案格式：**
+
+```json
+{"image": ["提交的資料並不是檔案格式，請確認表單的編碼類型。"]}
+```
+
+---
+
+#### **補充說明**
+
+* `doll_id` 必須是登入者本人所擁有的娃娃 id
+* `image` 欄位必須上傳檔案（支援 jpg、jpeg、png、gif），**不能用網址或文字**
+* 請用 `multipart/form-data` 傳送
+
 ### 瀏覽貼文
 
 ---
