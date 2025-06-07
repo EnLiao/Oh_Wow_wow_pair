@@ -75,7 +75,9 @@ class LikePostView(APIView):
 
     def post(self, request, post_id):
         doll_id = request.data.get('doll_id')
-        doll = get_object_or_404(Doll, id=doll_id)
+        doll = Doll.objects.filter(id=doll_id, username=request.user).first()
+        if not doll:
+            raise PermissionDenied("你不能用不屬於你的娃娃按讚！")
         post = get_object_or_404(Post, id=post_id)
         like, created = Likes.objects.get_or_create(doll_id=doll, post_id=post.id)
         serializer = PostSerializer(post, context={'request': request, 'doll_id': doll_id})
@@ -86,7 +88,9 @@ class LikePostView(APIView):
 
     def delete(self, request, post_id):
         doll_id = request.data.get('doll_id')
-        doll = get_object_or_404(Doll, id=doll_id)
+        doll = Doll.objects.filter(id=doll_id, username=request.user).first()
+        if not doll:
+            raise PermissionDenied("你不能用不屬於你的娃娃取消讚！")
         post = get_object_or_404(Post, id=post_id)
         deleted, _ = Likes.objects.filter(doll_id=doll, post_id=post.id).delete()
         serializer = PostSerializer(post, context={'request': request, 'doll_id': doll_id})
@@ -94,7 +98,7 @@ class LikePostView(APIView):
             return Response({'message': 'Unliked', 'post': serializer.data}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Not previously liked', 'post': serializer.data}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
