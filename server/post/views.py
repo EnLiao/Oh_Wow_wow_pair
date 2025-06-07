@@ -36,7 +36,10 @@ class PostListView(ListAPIView):
         if not doll_id:
             return super().list(request, *args, **kwargs)
 
-        doll = get_object_or_404(Doll, id=doll_id)
+        doll = Doll.objects.filter(id=doll_id, username=request.user).first()
+        if not doll:
+            raise PermissionDenied('你不能查詢不是你的娃娃的貼文 feed')
+
         seen_ids = PostSeen.objects.filter(doll_id=doll).values_list('post_id', flat=True)
         followed_ids = Follow.objects.filter(from_doll_id=doll).values_list('to_doll_id', flat=True)
 
@@ -63,10 +66,10 @@ class PostListView(ListAPIView):
             PostSeen.objects.bulk_create(seen_objs, ignore_conflicts=True)
 
         return Response(data, status=status.HTTP_200_OK)
-
+    
     def get_queryset(self):
         return Post.objects.none()
-    
+
 class LikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

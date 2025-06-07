@@ -399,14 +399,65 @@ curl -X POST http://localhost:8000/post/posts/ \
 
 ---
 
-- **路徑**：`POST /post/feed/?doll_id=cheesetaro/`
-- **說明**：瀏覽貼文
+* **路徑**：`GET /post/feed/?doll_id=cheesetaro`
+* **說明**：
 
-- **成功回應格式範例（總之就是回傳可以看到的貼文資料，一次五篇，從有追蹤的優先顯示）**：
+  * 瀏覽 feed 貼文（只能查詢自己擁有的娃娃）
+  * 回傳一次最多 5 篇，優先顯示有追蹤的娃娃的貼文
+  * 必須帶上登入 token
+
+---
+
+#### **請求範例：**
+
+```bash
+curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro" \
+  -H "Authorization: Bearer <你的 token>"
+```
+
+---
+
+#### **成功回應格式範例（JSON）：**
 
 ```json
-[{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
+[
+  {
+    "id": "64ef2849-7f8c-43aa-b088-5c1b5e831448",
+    "doll_id": "tomorin",
+    "content": "第一篇文OuOb",
+    "image": "/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_BVV00yW.png",
+    "created_at": "2025-06-07T21:12:09.575028+08:00",
+    "like_count": 0,
+    "liked_by_me": false,
+    "comment_count": 0
+  }
+]
 ```
+
+---
+
+#### **失敗時回應（JSON）：**
+
+**未帶登入憑證（token）：**
+
+```json
+{"detail": "Authentication credentials were not provided."}
+```
+
+**doll\_id 不是自己的娃娃：**
+
+```json
+{"detail": "你不能查詢不是你的娃娃的貼文 feed"}
+```
+
+---
+
+#### **補充說明**
+
+* 這個 API 只允許查詢登入者本人的娃娃
+* 每個請求最多回傳 5 篇貼文，依據有追蹤的娃娃優先顯示
+* 若想看更多貼文，可以用 offset/分頁查詢
+
 ### 取得某隻娃娃的貼文（個人頁）
 
 ---
