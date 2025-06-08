@@ -41,9 +41,8 @@ class PostListView(ListAPIView):
             raise PermissionDenied('你不能查詢不是你的娃娃的貼文 feed')
 
         seen_ids = PostSeen.objects.filter(doll_id=doll).values_list('post_id', flat=True)
-        followed_ids = list(Follow.objects.filter(from_doll_id=doll).values_list('to_doll_id', flat=True))
-        if doll.id not in followed_ids:
-            followed_ids.append(doll.id)
+        followed_ids = set(Follow.objects.filter(from_doll_id=doll).values_list('to_doll_id', flat=True))
+        followed_ids.add(doll.id)
 
         qs_followed = Post.objects.filter(
             doll_id__in=followed_ids
