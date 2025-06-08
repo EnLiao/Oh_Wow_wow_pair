@@ -484,7 +484,7 @@ curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro" \
       "id": "42f94958-9abc-4df6-9ffe-cdb8d26a35ce",
       "doll_id": "tomorin",
       "content": "3",
-      "image_url": "https://github.com/",
+      "image": "/media/avatars/momo.jpg",
       "created_at": "2025-05-18T10:56:39.209232+08:00",
       "like_count": 0,
       "liked_by_me": false,
@@ -493,18 +493,7 @@ curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro" \
     ...
   ]
 }
-```
-| 欄位名             | 類型       | 說明                             |
-| --------------- | -------- | ------------------------------ |
-| `id`            | UUID     | 貼文的唯一識別碼                       |
-| `doll_id`       | string   | 發文的娃娃 ID                       |
-| `content`       | string   | 文字內容                           |
-| `image_url`     | string   | 圖片網址                           |
-| `created_at`    | datetime | 發文時間（含時區）                      |
-| `like_count`    | int      | 按讚數                            |
-| `liked_by_me`   | bool     | 目前的 `viewer_doll_id` 是否有按讚這篇貼文 |
-| `comment_count` | int      | 留言數量                           |
-
+```                         
 ---
 
 ### 列出所有粉絲娃娃（追蹤我的人）
@@ -694,6 +683,13 @@ curl -X POST \
 ```
 
 ---
+#### **失敗時回應（JSON）**
+
+**權限錯誤（doll 不是自己的）：**
+
+```json
+{"detail": "你不能用不屬於你的娃娃留言！"}
+```
 
 ### 取得貼文留言
 
