@@ -65,6 +65,14 @@ class FollowView(APIView):
             from_doll_id = serializer.validated_data['from_doll_id']
             to_doll_id = serializer.validated_data['to_doll_id']
 
+            # 僅允許操作自己帳號下的娃娃
+            try:
+                doll = Doll.objects.get(id=from_doll_id.id if hasattr(from_doll_id, 'id') else from_doll_id)
+            except Doll.DoesNotExist:
+                return Response({'detail': '娃娃不存在'}, status=status.HTTP_400_BAD_REQUEST)
+            if doll.username != request.user:
+                return Response({'detail': '你只能操作自己擁有的娃娃'}, status=status.HTTP_403_FORBIDDEN)
+
             if from_doll_id == to_doll_id:
                 return Response({'detail': '不能追蹤自己'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -81,6 +89,13 @@ class FollowView(APIView):
 
         if not from_doll_id or not to_doll_id:
             return Response({'detail': '缺少 from_doll_id 或 to_doll_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            doll = Doll.objects.get(id=from_doll_id)
+        except Doll.DoesNotExist:
+            return Response({'detail': '娃娃不存在'}, status=status.HTTP_400_BAD_REQUEST)
+        if doll.username != request.user:
+            return Response({'detail': '你只能操作自己擁有的娃娃'}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             follow = Follow.objects.get(from_doll_id=from_doll_id, to_doll_id=to_doll_id)
