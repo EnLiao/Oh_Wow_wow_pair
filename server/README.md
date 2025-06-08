@@ -334,10 +334,10 @@ image=@momo.jpg    ← 這裡的 @ 表示本地檔案
 
 ```bash
 curl -X POST http://localhost:8000/post/posts/ \
-  -H "Authorization: Bearer <你的 token>" \
-  -F "doll_id=doll001" \
-  -F "content=這是我的第一篇文" \
-  -F "image=@momo.jpg"
+  -H "Authorization: Bearer eyJ..f4" \
+  -F "doll_id=tomorin" \
+  -F "content=第一篇文OuOb" \
+  -F "image=@media/avatars/螢幕擷取畫面_2025-05-21_160025_H7YZH9c.png"
 ```
 
 ---
@@ -693,14 +693,11 @@ curl -X POST http://127.0.0.1:8000/core/dolls/ \
 
 # 建立貼文
 curl -X POST http://localhost:8000/post/posts/ \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJ....Z7w" \
-  -d '{
-          "doll_id": "doll001",
-          "content": "第一篇文OuOb",
-          "image_url": "https://example.com/test-image.jpg"
-      }'
-# → {"id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d","doll_id":"doll001","content":"這是測試用的貼文內容","image_url":"https://example.com/test-image.jpg","created_at":"2025-05-05T13:59:54.4212}
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5Mzc2NDg0LCJpYXQiOjE3NDkzNzI4ODQsImp0aSI6Ijg5ZGE1YTVlOGE0YjQyMzE4MjI3NDUwYjk2NWFkMDliIiwidXNlcl9pZCI6InJva3UifQ.nMVSnFTWA7dAR2pTE4Qp48QPNsZkkuUfPCBhIV8Zxf4" \
+  -F "doll_id=tomorin" \
+  -F "content=第一篇文OuOb" \
+  -F "image=@media/avatars/螢幕擷取畫面_2025-05-21_160025_H7YZH9c.png"
+# → {"id":"6b5319e6-76f8-4fd0-91c7-f834ef7785c1","doll_id":"tomorin","content":"第一篇文OuOb","image":"/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_sr0PBMR.png","created_at":"2025-06-08T16:58:02.367721+08:00","like_count":0,"liked_by_me":false,"comment_count":0}
 
 # 確認可瀏覽的貼文
 curl -X GET "http://localhost:8000/post/feed/?doll_id=omuba"\
