@@ -111,7 +111,9 @@ class CommentListCreateView(generics.ListCreateAPIView):
         post_id = self.kwargs['post_id']
         post = get_object_or_404(Post, id=post_id)
         doll_id = self.request.data.get('doll_id')
-        doll = get_object_or_404(Doll, id=doll_id)
+        doll = Doll.objects.filter(id=doll_id, username=self.request.user).first()
+        if not doll:
+            raise PermissionDenied('你不能用不屬於你的娃娃留言！')
         serializer.save(post_id=post, doll_id=doll)
 
 class CustomLimitOffsetPagination(LimitOffsetPagination):
