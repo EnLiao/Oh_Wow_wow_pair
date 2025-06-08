@@ -114,4 +114,5 @@ class DollUpdateView(RetrieveUpdateAPIView):
         if doll.username != self.request.user:
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("只能編輯自己的娃娃")
-        serializer.save()
+        # 禁止更改 username
+        serializer.save(username=doll.username)
