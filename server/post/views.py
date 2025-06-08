@@ -79,7 +79,7 @@ class LikePostView(APIView):
         if not doll:
             raise PermissionDenied("你不能用不屬於你的娃娃按讚！")
         post = get_object_or_404(Post, id=post_id)
-        like, created = Likes.objects.get_or_create(doll_id=doll, post_id=post.id)
+        like, created = Likes.objects.get_or_create(doll_id=doll, post_id=post)
         serializer = PostSerializer(post, context={'request': request, 'doll_id': doll_id})
         if created:
             return Response({'message': 'Liked', 'post': serializer.data}, status=status.HTTP_201_CREATED)
@@ -92,7 +92,7 @@ class LikePostView(APIView):
         if not doll:
             raise PermissionDenied("你不能用不屬於你的娃娃取消讚！")
         post = get_object_or_404(Post, id=post_id)
-        deleted, _ = Likes.objects.filter(doll_id=doll, post_id=post.id).delete()
+        deleted, _ = Likes.objects.filter(doll_id=doll, post_id=post).delete()
         serializer = PostSerializer(post, context={'request': request, 'doll_id': doll_id})
         if deleted:
             return Response({'message': 'Unliked', 'post': serializer.data}, status=status.HTTP_200_OK)
