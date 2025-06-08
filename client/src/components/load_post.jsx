@@ -2,6 +2,9 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/auth_context';
 import { getPosts } from '../services/api';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
+import { FaRegCommentDots } from "react-icons/fa";
+import { FaRegHeart } from "react-icons/fa6";
+import { FaHeart } from "react-icons/fa6";
 
 export default function PostList({ mode = 'feed', profileDollId }) {
   const auth = useContext(AuthContext);
@@ -11,6 +14,32 @@ export default function PostList({ mode = 'feed', profileDollId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [likedPosts, setLikedPosts] = useState(new Set());
+  const [following, setFollowing] = useState(new Set());
+
+  const toggleLike = (postId) => {
+    setLikedPosts(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(postId)) {
+        newLiked.delete(postId);
+      } else {
+        newLiked.add(postId);
+      }
+      return newLiked;
+    });
+  };
+
+  const toggleFollowing = (postId) => {
+    setFollowing(prev => {
+      const newFollowing = new Set(prev);
+      if (newFollowing.has(postId)) {
+        newFollowing.delete(postId);
+      } else {
+        newFollowing.add(postId);
+      }
+      return newFollowing;
+    });
+  };
 
   // ➜ 依 mode / targetId 變動重新抓取
   console.log(viewerId, targetId, mode);
@@ -74,9 +103,8 @@ export default function PostList({ mode = 'feed', profileDollId }) {
         <Card key={p.id} className="mb-3">
           <CardBody>
             <div className="d-flex align-items-center mb-2">
-              {p.dollAvatar && (
                 <img
-                  src={p.dollAvatar}
+                  src={auth.doll_img}
                   alt={p.dollName}
                   style={{
                     width: 40,
@@ -84,24 +112,74 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                     borderRadius: '50%',
                     marginRight: 10,
                     objectFit: 'cover',
+                    userSelect: 'none', 
+                    cursor: 'pointer'
                   }}
                 />
-              )}
               <CardTitle tag="h5" className="mb-0">
                 {p.dollName}
               </CardTitle>
+              <p 
+                className="mb-0" 
+                style={{ 
+                  marginLeft: '15px', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  backgroundColor: following.has(p.id) ? '#ffd5fc' : '#f0f0f0',
+                  color: following.has(p.id) ? '#666666' : '#666666',
+                  padding: '2px 6px',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
+                onClick={() => toggleFollowing(p.id)}
+              >
+                {following.has(p.id) ? 'followed' : 'follow'}
+              </p>
             </div>
 
-            <CardText>{p.content}</CardText>
+            <CardText style={{marginBottom:10}}>{p.content}</CardText>
 
             {p.image && (
               <CardImg
                 bottom
                 src={p.image}
                 alt="貼文圖片"
-                style={{ borderRadius: '10px', marginTop: 10 }}
+                style={{ borderRadius: '10px', marginBottom:10, userSelect: 'none' }}
               />
             )}
+            {likedPosts.has(p.id) ? (
+              <FaHeart 
+                style={{
+                  marginRight: 15, 
+                  cursor: 'pointer',
+                  width: '1.2em',
+                  height: '1.2em',
+                  color: '#ffd5fc'
+                }}
+                onClick={() => toggleLike(p.id)}
+              />
+            ) : (
+              <FaRegHeart 
+                style={{
+                  marginRight: 15, 
+                  cursor: 'pointer',
+                  width: '1.2em',
+                  height: '1.2em'
+                }}
+                onClick={() => toggleLike(p.id)}
+              />
+            )}
+            <FaRegCommentDots 
+              style={{
+                marginRight:10, 
+                cursor: 'pointer',
+                width: '1.2em',
+                height: '1.2em'
+              }}
+            />
           </CardBody>
         </Card>
       ))}
