@@ -535,57 +535,128 @@ curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro" \
 
 ---
 
-- **路徑**：`POST /post/posts/<uuid:post_id>/like/`
-- **說明**：按讚貼文
-- **請求格式範例（JSON）（post id 在 api 裡了）**：
+* **路徑**：`POST /post/posts/<uuid:post_id>/like/`
+
+* **說明**：
+
+  * 替貼文按讚
+  * 只有登入者本人擁有的娃娃（doll）可以進行按讚，**無法冒用他人娃娃按讚**（已實作權限驗證）
+
+* **請求格式範例（JSON）**：
 
 ```json
 {
-  "doll_id": "doll001",
+  "doll_id": "tomorin"
 }
 ```
-- **成功回應格式範例（JSON）**：
+
+**Curl 範例：**
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <你的 token>" \
+  -H "Content-Type: application/json" \
+  -d '{"doll_id": "tomorin"}' \
+  http://localhost:8000/post/posts/6b5319e6-76f8-4fd0-91c7-f834ef7785c1/like/
+```
+
+* **成功回應格式範例（JSON）**：
 
 ```json
-{"message":"Liked"}
-{"message":"Already liked"}
+{
+  "message": "Liked",
+  "post": {
+    "id": "6b5319e6-76f8-4fd0-91c7-f834ef7785c1",
+    "doll_id": "tomorin",
+    "content": "第一篇文OuOb",
+    "image": "http://localhost:8000/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_sr0PBMR.png",
+    "created_at": "2025-06-08T16:58:02.367721+08:00",
+    "like_count": 1,
+    "liked_by_me": true,
+    "comment_count": 0
+  }
+}
 ```
+
+```json
+{
+  "message": "Already liked",
+  "post": {
+    ... // 同上
+  }
+}
+```
+
+---
 
 ### 取消按讚貼文
 
 ---
 
 * **路徑**：`DELETE /post/posts/<uuid:post_id>/like/`
-* **說明**：取消按讚指定貼文
 
-- **請求格式範例（Curl 指令）**：
+* **說明**：
+
+  * 取消按讚指定貼文
+  * 只有登入者本人擁有的娃娃（doll）可以進行取消按讚，**無法冒用他人娃娃操作**（已實作權限驗證）
+
+* **請求格式範例（Curl 指令）**：
 
 ```bash
 curl -X DELETE \
-  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Authorization: Bearer <你的 token>" \
   -H "Content-Type: application/json" \
-  -d '{"doll_id": "cheesetaro"}' \
-  http://localhost:8000/post/posts/e6666593-3d06-4563-8b38-67a411476c3c/like/
+  -d '{"doll_id": "tomorin"}' \
+  http://localhost:8000/post/posts/6b5319e6-76f8-4fd0-91c7-f834ef7785c1/like/
 ```
 
-- **成功回應格式範例（JSON）**：
+* **成功回應格式範例（JSON）**：
 
 ```json
-[
-  {
-    "message": "Unliked",
-    "post": {
-      "id": "e6666593-3d06-4563-8b38-67a411476c3c",
-      "doll_id": "omuba",
-      "content": "我是一條笨狗 汪汪汪 我叫歐姆嘎抓",
-      "image_url": "https://github.com/",
-      "created_at": "2025-05-08T15:12:00.939363+08:00",
-      "like_count": 0,
-      "liked_by_me": false
-    }
+{
+  "message": "Unliked",
+  "post": {
+    "id": "6b5319e6-76f8-4fd0-91c7-f834ef7785c1",
+    "doll_id": "tomorin",
+    "content": "第一篇文OuOb",
+    "image": "http://localhost:8000/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_sr0PBMR.png",
+    "created_at": "2025-06-08T16:58:02.367721+08:00",
+    "like_count": 0,
+    "liked_by_me": false,
+    "comment_count": 0
   }
-]
+}
 ```
+
+---
+
+#### **失敗時回應（JSON）**
+
+**權限錯誤（doll 不是自己的）：**
+
+```json
+{"detail": "你不能用不屬於你的娃娃按讚！"}
+```
+
+**已經沒按過讚：**
+
+```json
+{"message": "Not previously liked", "post": { ... }}
+```
+
+**未帶登入憑證（token）：**
+
+```json
+{"detail": "Authentication credentials were not provided."}
+```
+
+---
+
+#### **補充說明**
+
+* 只有自己擁有的娃娃 id 可以操作（權限驗證已上線）
+* 回傳內容會附帶該貼文的所有狀態欄位
+* 一律須帶 JWT token 驗證
 
 ---
 
