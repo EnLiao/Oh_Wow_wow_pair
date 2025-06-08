@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import RegisterView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import DollListCreateView, TagListView, DollDetailView, FollowersListView, FollowersToListView, UserDollListView, FollowView
+from .views import DollListCreateView, TagListView, DollDetailView, FollowersListView, FollowersToListView, UserDollListView, FollowView, DollUpdateView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
@@ -21,5 +21,6 @@ urlpatterns = [
     path('follow/', FollowView.as_view(), name='follow'),
     path('users/<str:username>/dolls/', UserDollListView.as_view(), name='user-dolls'),
     path('tags/', TagListView.as_view(), name='tag-list'),
+    path('dolls/<str:id>/edit/', DollUpdateView.as_view(), name='doll-update'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
