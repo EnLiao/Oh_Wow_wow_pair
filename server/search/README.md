@@ -5,16 +5,16 @@
 ### 路徑
 
 ```
-GET /search/doll-ids/?q=關鍵字
+GET /search/doll/?q=關鍵字
 ```
 
 ---
 
 ### 說明
 
-* 根據關鍵字**模糊搜尋**現有的娃娃 ID。
+* 根據關鍵字**模糊搜尋**現有的娃娃 ID 或名字。
 * 最多回傳 10 筆結果（支援 auto-complete 或下拉選單）。
-* 預設只會回傳娃娃的 `id` 欄位。
+* 每筆結果回傳娃娃的 `id`、`name` 以及 `avatar`（頭貼網址）。
 
 ---
 
@@ -23,7 +23,6 @@ GET /search/doll-ids/?q=關鍵字
 ```bash
 curl -X GET "http://localhost:8000/search/doll/?q=omuba" \
   -H "Authorization: Bearer <你的token>"
-
 ```
 
 ---
@@ -41,9 +40,16 @@ curl -X GET "http://localhost:8000/search/doll/?q=omuba" \
 ```json
 {
   "results": [
-    "omuba",
-    "oomuba",
-    "123omuba"
+    {
+      "id": "omuba",
+      "name": "小白",
+      "avatar": "http://localhost:8000/media/avatars/xxx.png"
+    },
+    {
+      "id": "oomuba",
+      "name": "大黑",
+      "avatar": null
+    }
   ]
 }
 ```
@@ -59,6 +65,13 @@ curl -X GET "http://localhost:8000/search/doll/?q=omuba" \
   "results": []
 }
 ```
+
+---
+
+### 備註
+
+* 若 `avatar` 欄位為 null，表示此娃娃尚未設定頭貼。
+* 此 API 支援 id/name 任何一項符合關鍵字皆可回傳。
 
 ---
 
