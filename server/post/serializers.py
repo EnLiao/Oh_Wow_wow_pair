@@ -15,10 +15,11 @@ class PostSerializer(serializers.ModelSerializer):
     liked_by_me = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     is_followed = serializers.SerializerMethodField()
+    doll_avatar = serializers.SerializerMethodField() 
 
     class Meta:
         model = Post
-        fields = ['id', 'doll_id', 'content', 'image', 'created_at', 'like_count', 'liked_by_me', 'comment_count', 'is_followed']
+        fields = ['id', 'doll_id', 'content', 'image', 'created_at', 'like_count', 'liked_by_me', 'comment_count', 'is_followed', 'doll_avatar']
         read_only_fields = ['id', 'created_at']
 
     def get_like_count(self, post_instance):
@@ -50,6 +51,15 @@ class PostSerializer(serializers.ModelSerializer):
             from_doll_id__id=viewer_doll_id, 
             to_doll_id=post_doll
         ).exists()
+    
+    def get_doll_avatar(self, post_instance):
+        doll = post_instance.doll_id
+        if doll.avatar_image:
+            request = self.context.get('request')
+            if request is not None:
+                return request.build_absolute_uri(doll.avatar_image.url)
+            return doll.avatar_image.url
+        return None
     
 class CommentSerializer(serializers.ModelSerializer):
     post_id = serializers.PrimaryKeyRelatedField(
