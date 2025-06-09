@@ -371,49 +371,154 @@ curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
 > username 欄位會被自動忽略，仍維持原本擁有者
 
 ### 建立新貼文
+
 ---
-- **路徑**：`POST /post/posts/`
-- **說明**：建立新貼文
-- **請求格式範例（JSON）**：
+
+* **路徑**：`POST /post/posts/`
+* **說明**：
+
+  * 建立新貼文
+  * **只能使用自己擁有的娃娃（doll）發文，否則會被拒絕**
+  * 圖片需用「檔案格式」上傳（`multipart/form-data`），欄位名稱為 `image`
+
+---
+
+#### **請求格式範例（multipart/form-data）：**
+
+```
+doll_id=doll001
+content=這是我的第一篇文
+image=@momo.jpg    ← 這裡的 @ 表示本地檔案
+```
+
+**curl 範例：**
+
+```bash
+curl -X POST http://localhost:8000/post/posts/ \
+  -H "Authorization: Bearer eyJ..f4" \
+  -F "doll_id=tomorin" \
+  -F "content=第一篇文OuOb" \
+  -F "image=@media/avatars/螢幕擷取畫面_2025-05-21_160025_H7YZH9c.png"
+```
+
+---
+
+#### **成功回應格式範例（JSON）：**
 
 ```json
 {
+  "id": "54005c5b-4d47-4b77-b6e5-d5448ec98f7d",
   "doll_id": "doll001",
-  "content": "這是我的第一篇文",
-  "image_url": "https://example.com/momo.jpg"
+  "content": "這是測試用的貼文內容",
+  "image": "/media/avatars/momo.jpg",
+  "created_at": "2025-05-05T13:59:54.4212",
+  "like_count": 0,
+  "liked_by_me": false,
+  "comment_count": 0
 }
 ```
-- **成功回應格式範例（JSON）**：
+
+> 注意：`image` 會是上傳後的檔案路徑（通常是 `/media/avatars/檔案名`）
+
+---
+
+#### **失敗時回應（JSON）：**
+
+**缺少 content：**
 
 ```json
-{
-  "id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d",
-  "doll_id":"doll001",
-  "content":"這是測試用的貼文內容",
-  "image_url":"https://example.com/test-image.jpg",
-  "created_at":"2025-05-05T13:59:54.4212"
-}
+{"content": ["此欄位不可為空白。"]}
 ```
-- **失敗時回應（JSON）**：
+
+**缺少 image：**
 
 ```json
-缺少content
-{"content":["此欄位不可為空白。"]}
-缺少image
-{"image_url":["此欄位不可為空白。"]}
+{"image": ["此欄位不可為空白。"]}
 ```
+
+**doll 不是自己的（權限錯誤）：**
+
+```json
+{"detail": "你不能用不屬於你的娃娃發文！"}
+```
+
+**圖片欄位不是檔案格式：**
+
+```json
+{"image": ["提交的資料並不是檔案格式，請確認表單的編碼類型。"]}
+```
+
+---
+
+#### **補充說明**
+
+* `doll_id` 必須是登入者本人所擁有的娃娃 id
+* `image` 欄位必須上傳檔案（支援 jpg、jpeg、png、gif），**不能用網址或文字**
+* 請用 `multipart/form-data` 傳送
+
 ### 瀏覽貼文
 
 ---
 
-- **路徑**：`POST /post/feed/?doll_id=cheesetaro/`
-- **說明**：瀏覽貼文
+* **路徑**：`GET /post/feed/?doll_id=cheesetaro`
+* **說明**：
 
-- **成功回應格式範例（總之就是回傳可以看到的貼文資料，一次五篇，從有追蹤的優先顯示）**：
+  * 瀏覽 feed 貼文（只能查詢自己擁有的娃娃）
+  * 回傳一次最多 5 篇，優先顯示有追蹤的娃娃的貼文
+  * 必須帶上登入 token
+
+---
+
+#### **請求範例：**
+
+```bash
+curl -X GET "http://localhost:8000/post/feed/?doll_id=cheesetaro" \
+  -H "Authorization: Bearer <你的 token>"
+```
+
+---
+
+#### **成功回應格式範例（JSON）：**
 
 ```json
-[{"id":"7f65e081-1724-4650-ab1d-0df3a93bc633","doll_id":"tomorin","content":"ffffe","image_url":"https://github.com/","created_at":"2025-05-08T01:51:13.196400+08:00"},{"id":"e2a6177d-5296-44fc-a08d-9c074d446ea5","doll_id":"omuba","content":"fff","image_url":"https://github.com/","created_at":"2025-05-08T01:51:03.587402+08:00"}]
+[
+  {
+    "id": "64ef2849-7f8c-43aa-b088-5c1b5e831448",
+    "doll_id": "tomorin",
+    "content": "第一篇文OuOb",
+    "image": "/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_BVV00yW.png",
+    "created_at": "2025-06-07T21:12:09.575028+08:00",
+    "like_count": 0,
+    "liked_by_me": false,
+    "comment_count": 0
+  }
+]
 ```
+
+---
+
+#### **失敗時回應（JSON）：**
+
+**未帶登入憑證（token）：**
+
+```json
+{"detail": "Authentication credentials were not provided."}
+```
+
+**doll\_id 不是自己的娃娃：**
+
+```json
+{"detail": "你不能查詢不是你的娃娃的貼文 feed"}
+```
+
+---
+
+#### **補充說明**
+
+* 這個 API 只允許查詢登入者本人的娃娃
+* 每個請求最多回傳 5 篇貼文，依據有追蹤的娃娃優先顯示
+* 若想看更多貼文，可以用 offset/分頁查詢
+
 ### 取得某隻娃娃的貼文（個人頁）
 
 ---
@@ -421,6 +526,7 @@ curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
 - **路徑**：`/post/profile_feed/`
 - **說明**：取得某隻娃娃的貼文（個人頁）
 - **請求格式**：URL 查詢參數 (query parameters)
+
 | 參數名              | 類型     | 是否必填 | 說明                          |
 | ---------------- | ------ | ---- | --------------------------- |
 | `doll_id`        | string | ✅ 是  | 要查詢哪隻娃娃的貼文                  |
@@ -439,7 +545,7 @@ curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
       "id": "42f94958-9abc-4df6-9ffe-cdb8d26a35ce",
       "doll_id": "tomorin",
       "content": "3",
-      "image_url": "https://github.com/",
+      "image": "/media/avatars/momo.jpg",
       "created_at": "2025-05-18T10:56:39.209232+08:00",
       "like_count": 0,
       "liked_by_me": false,
@@ -448,18 +554,7 @@ curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
     ...
   ]
 }
-```
-| 欄位名             | 類型       | 說明                             |
-| --------------- | -------- | ------------------------------ |
-| `id`            | UUID     | 貼文的唯一識別碼                       |
-| `doll_id`       | string   | 發文的娃娃 ID                       |
-| `content`       | string   | 文字內容                           |
-| `image_url`     | string   | 圖片網址                           |
-| `created_at`    | datetime | 發文時間（含時區）                      |
-| `like_count`    | int      | 按讚數                            |
-| `liked_by_me`   | bool     | 目前的 `viewer_doll_id` 是否有按讚這篇貼文 |
-| `comment_count` | int      | 留言數量                           |
-
+```                         
 ---
 
 ### 列出所有粉絲娃娃（追蹤我的人）
@@ -490,20 +585,186 @@ curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
 
 ---
 
-- **路徑**：`POST /post/posts/<uuid:post_id>/like/`
-- **說明**：按讚貼文
-- **請求格式範例（JSON）（post id 在 api 裡了）**：
+* **路徑**：`POST /post/posts/<uuid:post_id>/like/`
+
+* **說明**：
+
+  * 替貼文按讚
+  * 只有登入者本人擁有的娃娃（doll）可以進行按讚，**無法冒用他人娃娃按讚**（已實作權限驗證）
+
+* **請求格式範例（JSON）**：
 
 ```json
 {
-  "doll_id": "doll001",
+  "doll_id": "tomorin"
 }
 ```
+
+**Curl 範例：**
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <你的 token>" \
+  -H "Content-Type: application/json" \
+  -d '{"doll_id": "tomorin"}' \
+  http://localhost:8000/post/posts/6b5319e6-76f8-4fd0-91c7-f834ef7785c1/like/
+```
+
+* **成功回應格式範例（JSON）**：
+
+```json
+{
+  "message": "Liked",
+  "post": {
+    "id": "6b5319e6-76f8-4fd0-91c7-f834ef7785c1",
+    "doll_id": "tomorin",
+    "content": "第一篇文OuOb",
+    "image": "http://localhost:8000/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_sr0PBMR.png",
+    "created_at": "2025-06-08T16:58:02.367721+08:00",
+    "like_count": 1,
+    "liked_by_me": true,
+    "comment_count": 0
+  }
+}
+```
+
+```json
+{
+  "message": "Already liked",
+  "post": {
+    ... // 同上
+  }
+}
+```
+
+---
+
+### 取消按讚貼文
+
+---
+
+* **路徑**：`DELETE /post/posts/<uuid:post_id>/like/`
+
+* **說明**：
+
+  * 取消按讚指定貼文
+  * 只有登入者本人擁有的娃娃（doll）可以進行取消按讚，**無法冒用他人娃娃操作**（已實作權限驗證）
+
+* **請求格式範例（Curl 指令）**：
+
+```bash
+curl -X DELETE \
+  -H "Authorization: Bearer <你的 token>" \
+  -H "Content-Type: application/json" \
+  -d '{"doll_id": "tomorin"}' \
+  http://localhost:8000/post/posts/6b5319e6-76f8-4fd0-91c7-f834ef7785c1/like/
+```
+
+* **成功回應格式範例（JSON）**：
+
+```json
+{
+  "message": "Unliked",
+  "post": {
+    "id": "6b5319e6-76f8-4fd0-91c7-f834ef7785c1",
+    "doll_id": "tomorin",
+    "content": "第一篇文OuOb",
+    "image": "http://localhost:8000/media/avatars/%E8%9E%A2%E5%B9%95%E6%93%B7%E5%8F%96%E7%95%AB%E9%9D%A2_2025-05-21_160025_H7YZH9c_sr0PBMR.png",
+    "created_at": "2025-06-08T16:58:02.367721+08:00",
+    "like_count": 0,
+    "liked_by_me": false,
+    "comment_count": 0
+  }
+}
+```
+
+---
+
+#### **失敗時回應（JSON）**
+
+**權限錯誤（doll 不是自己的）：**
+
+```json
+{"detail": "你不能用不屬於你的娃娃按讚！"}
+```
+
+**已經沒按過讚：**
+
+```json
+{"message": "Not previously liked", "post": { ... }}
+```
+
+**未帶登入憑證（token）：**
+
+```json
+{"detail": "Authentication credentials were not provided."}
+```
+
+---
+
+#### **補充說明**
+
+* 只有自己擁有的娃娃 id 可以操作（權限驗證已上線）
+* 回傳內容會附帶該貼文的所有狀態欄位
+* 一律須帶 JWT token 驗證
+
+---
+
+### 留言貼文
+
+---
+
+* **路徑**：`POST /post/posts/<uuid:post_id>/comments/`
+* **說明**：對指定貼文留言
+
+- **請求格式範例（Curl 指令）**：
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "doll_id": "tomorin",
+        "content": "這是一則留言",
+        "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb"
+      }' \
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
+```
+
 - **成功回應格式範例（JSON）**：
 
 ```json
-{"message":"Liked"}
-{"message":"Already liked"}
+{
+  "local_id": 2,
+  "post_id": "5cd5473d-5eb4-417d-9ac9-361bc4f22acb",
+  "doll_id": "tomorin",
+  "content": "這是一則留言",
+  "created_at": "2025-05-08T22:38:21.862059+08:00"
+}
+```
+
+---
+#### **失敗時回應（JSON）**
+
+**權限錯誤（doll 不是自己的）：**
+
+```json
+{"detail": "你不能用不屬於你的娃娃留言！"}
+```
+
+### 取得貼文留言
+
+---
+
+* **路徑**：`GET /post/posts/<uuid:post_id>/comments/`
+* **說明**：取得指定貼文下所有留言
+
+- **請求格式範例（Curl 指令）**：
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <your_jwt_token>" \
+  http://localhost:8000/post/posts/5cd5473d-5eb4-417d-9ac9-361bc4f22acb/comments/
 ```
 ### 取得新 access token（refresh token 機制）
 

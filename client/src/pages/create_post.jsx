@@ -27,14 +27,14 @@ export default function CreatePost() {
             return
         }
 
-        const data = {
-            doll_id: dollId,
-            content: postContent,
-            img_file: imgFile
-        }
+        // 創建 FormData 對象
+        const formData = new FormData();
+        formData.append('doll_id', dollId);
+        formData.append('content', postContent);
+        formData.append('image', imgFile);
 
         try {
-            const res = await create_post(data) // axios 呼叫 createPost
+            const res = await create_post(formData) // axios 呼叫 createPost
             console.log('create post success', res.data)
             alert('create post success')
             navigate('/main_page')
