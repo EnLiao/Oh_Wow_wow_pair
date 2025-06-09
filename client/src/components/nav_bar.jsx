@@ -5,6 +5,7 @@ import { AuthContext } from '../services/auth_context';
 import default_doll_img from '../assets/windy.jpg';
 import { doll_list_view, getDollInfo } from '../services/api';
 import search_icon from '../assets/search.png';
+import Search from './search';
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -14,6 +15,25 @@ export default function NavBar() {
   const [dollList, setDollList] = useState([]);
   const dollImage = auth_context.doll_img;
   const currentDollId = auth_context.currentDollId;
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchKeyword(value);
+    
+    // 如果有輸入內容則顯示搜尋結果，否則隱藏
+    if (value.trim()) {
+      setShowSearch(true);
+    } else {
+      setShowSearch(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setShowSearch(false);
+    setSearchKeyword('');
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -91,6 +111,8 @@ export default function NavBar() {
           <input
             type="text"
             placeholder="Oh-Wow-wow-pair"
+            value={searchKeyword}
+            onChange={handleInputChange}
             style={{
               width: '100%',
               height: '100%',
@@ -101,6 +123,14 @@ export default function NavBar() {
               fontSize: 'inherit',
             }}
           />
+          {showSearch && (
+            <div style={{ 
+              padding: '20px',
+              backgroundColor: '#fff'
+            }}>
+              <Search keyword={searchKeyword} onResultClick={clearSearch} />
+            </div>
+          )}
           <img
             src={search_icon}
             alt="search_icon"
