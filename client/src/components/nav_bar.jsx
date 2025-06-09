@@ -18,13 +18,6 @@ export default function NavBar() {
   const [showSearch, setShowSearch] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
 
-  const handleSearch = (e) => {
-    if (e.key === 'Escape') {
-      setShowSearch(false);
-      setSearchKeyword('');
-    }
-  };
-
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchKeyword(value);
@@ -115,7 +108,6 @@ export default function NavBar() {
             placeholder="Oh-Wow-wow-pair"
             value={searchKeyword}
             onChange={handleInputChange}
-            onKeyDown={handleSearch}
             style={{
               width: '100%',
               height: '100%',
@@ -128,7 +120,6 @@ export default function NavBar() {
           />
           {showSearch && (
             <div style={{ 
-              marginTop: '50px', // 為導航欄留出空間
               padding: '20px',
               backgroundColor: '#fff'
             }}>
