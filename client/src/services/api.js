@@ -94,7 +94,11 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     
     // 檢查是否是 401 錯誤且不是重試過的請求
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/core/token/refresh/')
+    ) {
       originalRequest._retry = true;
       
       try {
