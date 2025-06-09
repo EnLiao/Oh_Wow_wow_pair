@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import PostCreateView, PostListView, LikePostView, CommentListCreateView, DollProfilePostListView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('posts/', PostCreateView.as_view(), name='post-create'),
@@ -8,3 +10,4 @@ urlpatterns = [
     path('posts/<uuid:post_id>/comments/', CommentListCreateView.as_view(), name='post-comments'),
     path('profile_feed/', DollProfilePostListView.as_view(), name='doll-profile-posts'),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

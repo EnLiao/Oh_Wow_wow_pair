@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import { getDollInfo } from '../services/api';
+import PostList from '../components/load_post';
 import { 
   Container, 
   Row, 
@@ -18,8 +19,8 @@ import {
 import doll_img from '../assets/windy.jpg'; // 預設圖片，可以作為載入中的替代
 
 export default function DollPage() {
-  const { id } = useParams(); // 從 URL 獲取娃娃 ID
-  const navigate = useNavigate();
+  const { doll_id } = useParams(); // 從 URL 獲取娃娃 ID
+  console.log(doll_id);
   const auth_context = React.useContext(AuthContext);
   
   const [doll, setDoll] = useState(null);
@@ -31,7 +32,7 @@ export default function DollPage() {
     const fetchDollData = async () => {
       try {
         setLoading(true);
-        const res = await getDollInfo(id || auth_context.currentDollId);
+        const res = await getDollInfo(doll_id || auth_context.currentDollId);
         console.log('doll info', res.data);
         setDoll(res.data);
       } catch (err) {
@@ -60,7 +61,7 @@ export default function DollPage() {
     };
     
     fetchDollData();
-  }, [id, auth_context.currentDollId]); // 當 ID 變化時重新獲取數據
+  }, [doll_id, auth_context.currentDollId]); // 當 ID 變化時重新獲取數據
   
   // 顯示載入中狀態
   if (loading) {
@@ -93,7 +94,7 @@ export default function DollPage() {
     username: '-',
     birthday: '-',
     bio: '-',
-    tag: '-'
+    tags: '-'
   };
   
   return (
@@ -133,7 +134,11 @@ export default function DollPage() {
                   <strong>Bio:</strong> {dollData.description}
                 </ListGroupItem>
                 <ListGroupItem>
-                  <strong>Tag:</strong> {dollData.tag}
+                  <strong>Tag:</strong> {
+                    Array.isArray(dollData.tags)
+                      ? dollData.tags.join(', ')
+                      : dollData.tags
+                  }
                 </ListGroupItem>
               </ListGroup>
             </CardBody>
@@ -146,16 +151,7 @@ export default function DollPage() {
               <CardTitle className="text-center h4">Recently Posts</CardTitle>
             </CardHeader>
             <CardBody>
-              {/* 這裡可以放置娃娃的貼文列表 */}
-              {dollData.posts && dollData.posts.length > 0 ? (
-                dollData.posts.map(post => (
-                  <Card key={post.id} className="mb-3">
-                    {/* 貼文內容 */}
-                  </Card>
-                ))
-              ) : (
-                <p className="text-center text-muted">尚無貼文</p>
-              )}
+                <PostList mode="profile" profileDollId={dollData.id} />
             </CardBody>
           </Card>
         </Col>
