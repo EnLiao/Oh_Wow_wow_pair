@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/auth_context';
-import { getPosts, follow, unfollow } from '../services/api';
+import { getPosts, follow, unfollow, likePost, unlikePost } from '../services/api';
 import PostComment from './post_comment';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
 import { FaRegCommentDots } from "react-icons/fa";
@@ -31,6 +31,45 @@ export default function PostList({ mode = 'feed', profileDollId }) {
     });
   };
 
+  const likeSubmit = async (postId) => {
+    const isLiked = likedPosts.has(postId);
+    const dollId = auth.currentDollId;
+    try {
+      if (isLiked) {
+        await unlikePost(postId, dollId);
+        console.log('已取消喜歡:', postId);
+        toggleLike(postId);
+
+        // 更新貼文的 like_count
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.id === postId 
+              ? { ...post, like_count: Math.max(0, post.like_count - 1) } 
+              : post
+          )
+        );
+
+      } else {
+        await likePost(postId, dollId);
+        console.log('已喜歡:', postId);
+        toggleLike(postId);
+
+        // 更新貼文的 like_count
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.id === postId 
+              ? { ...post, like_count: post.like_count + 1 } 
+              : post
+          )
+        );
+
+      }
+    } catch (err) {
+      console.error('喜歡/取消喜歡失敗:', err);
+      alert(err.response?.data?.detail || '操作失敗，請稍後再試');
+    }
+  };
+
   const toggleFollowing = (postId) => {
     setFollowing(prev => {
       const newFollowing = new Set(prev);
@@ -47,8 +86,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
     setCommentingPostId(prevId => prevId === postId ? null : postId);
   };
 
-  // 修改 handleSubmit 函數，使其可以接受一個 dollId 參數
-  const handleSubmit = async (dollId) => {
+  const followSubmit = async (dollId) => {
     // 檢查是否已經追蹤這個娃娃
     const isFollowing = following.has(dollId);
     
@@ -99,6 +137,14 @@ export default function PostList({ mode = 'feed', profileDollId }) {
         });
 
         setPosts(fetched);
+
+        const initialLikedPosts = new Set(
+          fetched
+            .filter(post => post.liked_by_me === true)
+            .map(post => post.id)
+        );
+        setLikedPosts(initialLikedPosts);
+
         console.log('已載入貼文:', fetched);
       } catch (err) {
         console.error(err);
@@ -174,7 +220,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                       transition: 'all 0.2s ease',
                       userSelect: 'none'
                     }}
-                    onClick={() => handleSubmit(p.doll_id)}
+                    onClick={() => followSubmit(p.doll_id)}
                   >
                     follow
                   </p>
@@ -191,37 +237,52 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                 style={{ borderRadius: '10px', marginBottom:10, userSelect: 'none' }}
               />
             )}
-            {likedPosts.has(p.id) ? (
-              <FaHeart 
+            <div style={{display: 'flex', alignItems: 'center'}}>
+              <div style={{
+                display: 'flex', 
+                alignItems: 'center', 
+                marginRight: 15
+              }}>
+                {likedPosts.has(p.id) ? (
+                  <FaHeart 
+                    style={{
+                      cursor: 'pointer',
+                      width: '1.2em',
+                      height: '1.2em',
+                      color: '#ffd5fc'
+                    }}
+                    onClick={() => likeSubmit(p.id)}
+                  />
+                ) : (
+                  <FaRegHeart 
+                    style={{
+                      cursor: 'pointer',
+                      width: '1.2em',
+                      height: '1.2em'
+                    }}
+                    onClick={() => likeSubmit(p.id)}
+                  />
+                )}
+                <p style={{
+                  margin: 0,
+                  marginRight: 5,
+                  marginLeft: 10,
+                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  {p.like_count}
+                </p>
+              </div>
+              <FaRegCommentDots 
                 style={{
-                  marginRight: 15, 
-                  cursor: 'pointer',
-                  width: '1.2em',
-                  height: '1.2em',
-                  color: '#ffd5fc'
-                }}
-                onClick={() => toggleLike(p.id)}
-              />
-            ) : (
-              <FaRegHeart 
-                style={{
-                  marginRight: 15, 
                   cursor: 'pointer',
                   width: '1.2em',
                   height: '1.2em'
                 }}
-                onClick={() => toggleLike(p.id)}
+                onClick={() => toggleComment(p.id)}
               />
-            )}
-            <FaRegCommentDots 
-              style={{
-                marginRight:10, 
-                cursor: 'pointer',
-                width: '1.2em',
-                height: '1.2em'
-              }}
-              onClick={() => toggleComment(p.id)}
-            />
+            </div>
             {commentingPostId === p.id && <PostComment postId={p.id} />}
           </CardBody>
         </Card>
