@@ -40,14 +40,28 @@ class CommentSerializer(serializers.ModelSerializer):
         queryset=Doll.objects.all(),
     )
 
+    doll_name = serializers.CharField(source='doll_id.name', read_only=True)
+    doll_avatar = serializers.SerializerMethodField()
+
+
     class Meta:
         model = Comment
-        fields = ['local_id', 'post_id', 'doll_id', 'content', 'created_at']
+        fields = ['local_id', 'post_id', 'doll_id','doll_avatar','content', 'created_at']
         read_only_fields = ['local_id', 'created_at']
 
+    def get_doll_avatar(self, obj):
+        if obj.doll_id and obj.doll_id.avatar_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.doll_id.avatar_image.url)
+            return obj.doll_id.avatar_image.url
+        return None
+    
     def create(self, validated_data):
         comment = Comment.objects.create(**validated_data)
         return comment
+    
+    
 
 class LikesSerializer(serializers.ModelSerializer):
     doll_id = serializers.PrimaryKeyRelatedField(queryset=Doll.objects.all())
