@@ -16,7 +16,6 @@ export default function PostList({ mode = 'feed', profileDollId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [likedPosts, setLikedPosts] = useState(new Set());
-  const [following, setFollowing] = useState(new Set());
   const [commentingPostId, setCommentingPostId] = useState(null);
 
   const toggleLike = (postId) => {
@@ -70,51 +69,55 @@ export default function PostList({ mode = 'feed', profileDollId }) {
     }
   };
 
-  const toggleFollowing = (postId) => {
-    setFollowing(prev => {
-      const newFollowing = new Set(prev);
-      if (newFollowing.has(postId)) {
-        newFollowing.delete(postId);
-      } else {
-        newFollowing.add(postId);
-      }
-      return newFollowing;
-    });
-  };
-
   const toggleComment = (postId) => {
     setCommentingPostId(prevId => prevId === postId ? null : postId);
   };
 
   const followSubmit = async (dollId) => {
+    // 找到當前貼文
+    const currentPost = posts.find(p => p.doll_id === dollId);
     // 檢查是否已經追蹤這個娃娃
-    const isFollowing = following.has(dollId);
+    const isFollowing = currentPost?.is_followed ?? false;
     
-    if (isFollowing) {
-      const unfollowData = {
-        from_doll_id: dollId,  // 使用傳入的 dollId
-        to_doll_id: viewerId,
-      };
-      try {
-        const response = await unfollow(unfollowData);
-        console.log('已取消追蹤:', response.data);
-        toggleFollowing(dollId);
-      } catch (err) {
-        console.error('取消追蹤失敗:', err);
+    try {
+      if (isFollowing) {
+        const unfollowData = {
+          from_doll_id: dollId,
+          to_doll_id: viewerId,
+        };
+        
+        await unfollow(unfollowData);
+        console.log('已取消追蹤:', dollId);
+        
+        // 直接更新貼文的 is_followed 屬性
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.doll_id === dollId 
+              ? { ...post, is_followed: false } 
+              : post
+          )
+        );
+      } else {
+        const followData = {
+          from_doll_id: dollId,
+          to_doll_id: viewerId,
+        };
+        
+        await follow(followData);
+        console.log('已追蹤:', dollId);
+        
+        // 直接更新貼文的 is_followed 屬性
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.doll_id === dollId 
+              ? { ...post, is_followed: true } 
+              : post
+          )
+        );
       }
-    } else {
-      const followData = {
-        from_doll_id: dollId,  // 使用傳入的 dollId
-        to_doll_id: viewerId,
-      };
-      console.log('追蹤:', followData);
-      try {
-        const response = await follow(followData);
-        console.log('已追蹤:', response.data);
-        toggleFollowing(dollId);
-      } catch (err) {
-        console.error('追蹤失敗:', err);
-      }
+    } catch (err) {
+      console.error('追蹤操作失敗:', err);
+      alert(err.response?.data?.detail || '操作失敗，請稍後再試');
     }
   };
 
@@ -204,7 +207,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
               <CardTitle tag="h5" className="mb-0">
                 {p.doll_id}
               </CardTitle>
-                {!following.has(p.doll_id) && (
+                {!p.is_followed && (
                   <p 
                     className="mb-0" 
                     style={{ 
