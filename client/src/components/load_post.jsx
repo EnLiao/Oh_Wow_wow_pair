@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/auth_context';
-import { getPosts } from '../services/api';
+import { getPosts, follow, unfollow } from '../services/api';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
 import { FaRegCommentDots } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa6";
@@ -39,6 +39,39 @@ export default function PostList({ mode = 'feed', profileDollId }) {
       }
       return newFollowing;
     });
+  };
+
+  // 修改 handleSubmit 函數，使其可以接受一個 dollId 參數
+  const handleSubmit = async (dollId) => {
+    // 檢查是否已經追蹤這個娃娃
+    const isFollowing = following.has(dollId);
+    
+    if (isFollowing) {
+      const unfollowData = {
+        from_doll_id: dollId,  // 使用傳入的 dollId
+        to_doll_id: viewerId,
+      };
+      try {
+        const response = await unfollow(unfollowData);
+        console.log('已取消追蹤:', response.data);
+        toggleFollowing(dollId);
+      } catch (err) {
+        console.error('取消追蹤失敗:', err);
+      }
+    } else {
+      const followData = {
+        from_doll_id: dollId,  // 使用傳入的 dollId
+        to_doll_id: viewerId,
+      };
+      console.log('追蹤:', followData);
+      try {
+        const response = await follow(followData);
+        console.log('已追蹤:', response.data);
+        toggleFollowing(dollId);
+      } catch (err) {
+        console.error('追蹤失敗:', err);
+      }
+    }
   };
 
   // ➜ 依 mode / targetId 變動重新抓取
@@ -119,25 +152,25 @@ export default function PostList({ mode = 'feed', profileDollId }) {
               <CardTitle tag="h5" className="mb-0">
                 {p.dollName}
               </CardTitle>
-              <p 
-                className="mb-0" 
-                style={{ 
-                  marginLeft: '15px', 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  backgroundColor: following.has(p.id) ? '#ffd5fc' : '#f0f0f0',
-                  color: following.has(p.id) ? '#666666' : '#666666',
-                  padding: '2px 6px',
-                  borderRadius: '3px',
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  transition: 'all 0.2s ease',
-                  userSelect: 'none'
-                }}
-                onClick={() => toggleFollowing(p.id)}
-              >
-                {following.has(p.id) ? 'followed' : 'follow'}
-              </p>
+                <p 
+                  className="mb-0" 
+                  style={{ 
+                    marginLeft: '15px', 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    backgroundColor: following.has(p.dollName) ? '#ffd5fc' : '#f0f0f0',  // 使用 authorId
+                    color: following.has(p.dollName) ? '#666666' : '#666666', 
+                    padding: '2px 6px',
+                    borderRadius: '3px',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    transition: 'all 0.2s ease',
+                    userSelect: 'none'
+                  }}
+                  onClick={() => handleSubmit(p.dollName)}  // 直接呼叫 handleSubmit 並傳入作者 ID
+                >
+                  {following.has(p.dollName) ? 'followed' : 'follow'} 
+                </p>
             </div>
 
             <CardText style={{marginBottom:10}}>{p.content}</CardText>

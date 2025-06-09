@@ -23,6 +23,8 @@ export const create_doll = (data) => api.post('/core/dolls/', data);
 export const create_post = (data) => api.post('/post/posts/', data);
 export const getDollInfo = (dollId) => api.get(`/core/dolls/${dollId}/`);
 export const get_tags = () => api.get('/core/tags/');
+export const follow = (data) => api.post('/core/follow/', data);
+export const unfollow = (data) => api.delete('/core/follow/', {data});
 export async function getPosts({
   mode,
   targetDollId,
