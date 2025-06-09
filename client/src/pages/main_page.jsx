@@ -35,7 +35,7 @@ export default function MainPage() {
           width: '20%',
           position: 'sticky', 
           top: 80,  
-          height: 'calc(100vh - 60px)',
+          height: 'calc(100vh - 80px)',
           overflowY: 'auto'
         }}
       >
