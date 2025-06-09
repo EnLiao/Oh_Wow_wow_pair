@@ -21,7 +21,7 @@ GET /search/doll-ids/?q=關鍵字
 ### 請求範例
 
 ```bash
-curl -X GET "http://localhost:8000/search/doll-ids/?q=omuba" \
+curl -X GET "http://localhost:8000/search/doll/?q=omuba" \
   -H "Authorization: Bearer <你的token>"
 
 ```
