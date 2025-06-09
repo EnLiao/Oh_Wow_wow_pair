@@ -64,7 +64,7 @@ class PostListView(ListAPIView):
                 Post.objects.filter(doll_id__in=followed_ids).order_by('?')[:5]
             )
 
-        serializer = self.get_serializer(posts, many=True, context={'doll_id': doll})
+        serializer = self.get_serializer(posts, many=True, context={'doll_id': str(doll.id)})
         data = serializer.data
 
         seen_objs = [PostSeen(doll_id=doll, post_id=post) for post in posts]

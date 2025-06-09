@@ -43,15 +43,14 @@ class PostSerializer(serializers.ModelSerializer):
         if not viewer_doll_id:
             return False
         
-        # 如果是同一個娃娃
         if str(post_doll.id) == str(viewer_doll_id):
             return True
         
-        # 查詢是否有關注關係
         return Follow.objects.filter(
             from_doll_id__id=viewer_doll_id, 
             to_doll_id=post_doll
         ).exists()
+    
 class CommentSerializer(serializers.ModelSerializer):
     post_id = serializers.PrimaryKeyRelatedField(
         queryset=Post.objects.all(),
@@ -62,7 +61,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     doll_name = serializers.CharField(source='doll_id.name', read_only=True)
     doll_avatar = serializers.SerializerMethodField()
-
 
     class Meta:
         model = Comment
