@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/auth_context';
 import { getPosts, follow, unfollow } from '../services/api';
+import PostComment from './post_comment';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
 import { FaRegCommentDots } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa6";
@@ -16,6 +17,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
   const [error, setError] = useState(null);
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [following, setFollowing] = useState(new Set());
+  const [commentingPostId, setCommentingPostId] = useState(null);
 
   const toggleLike = (postId) => {
     setLikedPosts(prev => {
@@ -39,6 +41,10 @@ export default function PostList({ mode = 'feed', profileDollId }) {
       }
       return newFollowing;
     });
+  };
+
+  const toggleComment = (postId) => {
+    setCommentingPostId(prevId => prevId === postId ? null : postId);
   };
 
   // 修改 handleSubmit 函數，使其可以接受一個 dollId 參數
@@ -214,7 +220,9 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                 width: '1.2em',
                 height: '1.2em'
               }}
+              onClick={() => toggleComment(p.id)}
             />
+            {commentingPostId === p.id && <PostComment postId={p.id} />}
           </CardBody>
         </Card>
       ))}
