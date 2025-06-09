@@ -49,19 +49,20 @@ export async function getPosts({
     raw = data; // 直接就是陣列
   }
 
-  // ➜ 統一轉成前端好用的格式
-  return raw.map((p) => ({
-    id: p.id,
-    dollId: p.doll_id,
-    dollName: p.doll_name ?? p.doll_id,
-    dollAvatar: p.doll_avatar ? addBaseUrl(p.doll_avatar) : null,
-    content: p.content,
-    image: p.image_url ? addBaseUrl(p.image_url) : p.image ? addBaseUrl(p.image) : null,
-    createdAt: p.created_at,
-    likeCount: p.like_count ?? 0,
-    likedByMe: p.liked_by_me ?? false,
-    commentCount: p.comment_count ?? 0,
-  }));
+  return raw.map((p) => {
+    // 處理圖片路徑
+    if (p.image) {
+      p.image = addBaseUrl(p.image);
+    }
+    if (p.image_url) {
+      p.image_url = addBaseUrl(p.image_url);
+    }
+    if (p.doll_avatar) {
+      p.doll_avatar = addBaseUrl(p.doll_avatar);
+    }
+    
+    return p;
+  });
 }
 
 function addBaseUrl(path) {

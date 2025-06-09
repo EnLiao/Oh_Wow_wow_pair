@@ -138,7 +138,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
             <div className="d-flex align-items-center mb-2">
                 <img
                   src={auth.doll_img}
-                  alt={p.dollName}
+                  alt={p.doll_id}
                   style={{
                     width: 40,
                     height: 40,
@@ -150,9 +150,9 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                   }}
                 />
               <CardTitle tag="h5" className="mb-0">
-                {p.dollName}
+                {p.doll_id}
               </CardTitle>
-                {!following.has(p.dollName) && (
+                {!following.has(p.doll_id) && (
                   <p 
                     className="mb-0" 
                     style={{ 
@@ -168,7 +168,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                       transition: 'all 0.2s ease',
                       userSelect: 'none'
                     }}
-                    onClick={() => handleSubmit(p.dollName)}
+                    onClick={() => handleSubmit(p.doll_id)}
                   >
                     follow
                   </p>
