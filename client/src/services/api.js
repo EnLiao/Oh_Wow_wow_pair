@@ -28,6 +28,7 @@ export const unfollow = (data) => api.delete('/core/follow/', {data});
 export const postComments = (postId, data) => api.post(`/post/posts/${postId}/comments/`, data);
 export const getComments = (postId) => api.get(`/post/posts/${postId}/comments/`);
 export const searchDolls = (keyword) => api.get(`/search/doll/?q=${keyword}`);
+export const edit_doll = (dollId, data) => api.patch(`/core/dolls/${dollId}/edit/`);
 export async function getPosts({
   mode,
   targetDollId,

@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import { getDollInfo } from '../services/api';
 import PostList from '../components/load_post';
+import { MdModeEditOutline } from "react-icons/md";
+import EditDoll from '../components/edit_doll';
 import { 
   Container, 
   Row, 
@@ -26,6 +28,11 @@ export default function DollPage() {
   const [doll, setDoll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const toggleEditModal = () => {
+    setIsEditModalOpen(!isEditModalOpen);
+  };
   
   // 使用 useEffect 在元件掛載時獲取數據
   useEffect(() => {
@@ -102,7 +109,19 @@ export default function DollPage() {
       <Row>
         <Col md={4}>
           <Card className="mb-4">
-            <CardHeader tag="h2">{dollData.id}</CardHeader>
+            <CardHeader className="d-flex align-items-center justify-content-between">
+              <h2 className="mb-0">{dollData.id}</h2>
+              <MdModeEditOutline 
+                style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
+                onClick={toggleEditModal}  
+              />
+              <EditDoll 
+                isOpen={isEditModalOpen} 
+                toggle={toggleEditModal} 
+                dollData={dollData} 
+                onDollUpdated={(updatedDoll) => setDoll(updatedDoll)}
+              />
+            </CardHeader>
             <CardBody>
               <CardImg 
                 src={typeof dollData.avatar_image === 'string' 
