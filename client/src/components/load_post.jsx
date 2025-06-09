@@ -1,7 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/auth_context';
-import { getPosts } from '../services/api';
+import { getPosts, follow, unfollow } from '../services/api';
+import PostComment from './post_comment';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
+import { FaRegCommentDots } from "react-icons/fa";
+import { FaRegHeart } from "react-icons/fa6";
+import { FaHeart } from "react-icons/fa6";
 
 export default function PostList({ mode = 'feed', profileDollId }) {
   const auth = useContext(AuthContext);
@@ -11,6 +15,70 @@ export default function PostList({ mode = 'feed', profileDollId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [likedPosts, setLikedPosts] = useState(new Set());
+  const [following, setFollowing] = useState(new Set());
+  const [commentingPostId, setCommentingPostId] = useState(null);
+
+  const toggleLike = (postId) => {
+    setLikedPosts(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(postId)) {
+        newLiked.delete(postId);
+      } else {
+        newLiked.add(postId);
+      }
+      return newLiked;
+    });
+  };
+
+  const toggleFollowing = (postId) => {
+    setFollowing(prev => {
+      const newFollowing = new Set(prev);
+      if (newFollowing.has(postId)) {
+        newFollowing.delete(postId);
+      } else {
+        newFollowing.add(postId);
+      }
+      return newFollowing;
+    });
+  };
+
+  const toggleComment = (postId) => {
+    setCommentingPostId(prevId => prevId === postId ? null : postId);
+  };
+
+  // 修改 handleSubmit 函數，使其可以接受一個 dollId 參數
+  const handleSubmit = async (dollId) => {
+    // 檢查是否已經追蹤這個娃娃
+    const isFollowing = following.has(dollId);
+    
+    if (isFollowing) {
+      const unfollowData = {
+        from_doll_id: dollId,  // 使用傳入的 dollId
+        to_doll_id: viewerId,
+      };
+      try {
+        const response = await unfollow(unfollowData);
+        console.log('已取消追蹤:', response.data);
+        toggleFollowing(dollId);
+      } catch (err) {
+        console.error('取消追蹤失敗:', err);
+      }
+    } else {
+      const followData = {
+        from_doll_id: dollId,  // 使用傳入的 dollId
+        to_doll_id: viewerId,
+      };
+      console.log('追蹤:', followData);
+      try {
+        const response = await follow(followData);
+        console.log('已追蹤:', response.data);
+        toggleFollowing(dollId);
+      } catch (err) {
+        console.error('追蹤失敗:', err);
+      }
+    }
+  };
 
   // ➜ 依 mode / targetId 變動重新抓取
   console.log(viewerId, targetId, mode);
@@ -74,34 +142,87 @@ export default function PostList({ mode = 'feed', profileDollId }) {
         <Card key={p.id} className="mb-3">
           <CardBody>
             <div className="d-flex align-items-center mb-2">
-              {p.dollAvatar && (
                 <img
-                  src={p.dollAvatar}
-                  alt={p.dollName}
+                  src={auth.doll_img}
+                  alt={p.doll_id}
                   style={{
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
                     marginRight: 10,
                     objectFit: 'cover',
+                    userSelect: 'none', 
+                    cursor: 'pointer'
                   }}
                 />
-              )}
               <CardTitle tag="h5" className="mb-0">
-                {p.dollName}
+                {p.doll_id}
               </CardTitle>
+                {!following.has(p.doll_id) && (
+                  <p 
+                    className="mb-0" 
+                    style={{ 
+                      marginLeft: '15px', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      backgroundColor: '#f0f0f0',
+                      color: '#666666', 
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      transition: 'all 0.2s ease',
+                      userSelect: 'none'
+                    }}
+                    onClick={() => handleSubmit(p.doll_id)}
+                  >
+                    follow
+                  </p>
+                )}
             </div>
 
-            <CardText>{p.content}</CardText>
+            <CardText style={{marginBottom:10}}>{p.content}</CardText>
 
             {p.image && (
               <CardImg
                 bottom
                 src={p.image}
                 alt="貼文圖片"
-                style={{ borderRadius: '10px', marginTop: 10 }}
+                style={{ borderRadius: '10px', marginBottom:10, userSelect: 'none' }}
               />
             )}
+            {likedPosts.has(p.id) ? (
+              <FaHeart 
+                style={{
+                  marginRight: 15, 
+                  cursor: 'pointer',
+                  width: '1.2em',
+                  height: '1.2em',
+                  color: '#ffd5fc'
+                }}
+                onClick={() => toggleLike(p.id)}
+              />
+            ) : (
+              <FaRegHeart 
+                style={{
+                  marginRight: 15, 
+                  cursor: 'pointer',
+                  width: '1.2em',
+                  height: '1.2em'
+                }}
+                onClick={() => toggleLike(p.id)}
+              />
+            )}
+            <FaRegCommentDots 
+              style={{
+                marginRight:10, 
+                cursor: 'pointer',
+                width: '1.2em',
+                height: '1.2em'
+              }}
+              onClick={() => toggleComment(p.id)}
+            />
+            {commentingPostId === p.id && <PostComment postId={p.id} />}
           </CardBody>
         </Card>
       ))}

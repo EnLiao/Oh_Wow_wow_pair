@@ -94,7 +94,7 @@ export default function DollPage() {
     username: '-',
     birthday: '-',
     bio: '-',
-    tag: '-'
+    tags: '-'
   };
   
   return (
@@ -134,7 +134,11 @@ export default function DollPage() {
                   <strong>Bio:</strong> {dollData.description}
                 </ListGroupItem>
                 <ListGroupItem>
-                  <strong>Tag:</strong> {dollData.tag}
+                  <strong>Tag:</strong> {
+                    Array.isArray(dollData.tags)
+                      ? dollData.tags.join(', ')
+                      : dollData.tags
+                  }
                 </ListGroupItem>
               </ListGroup>
             </CardBody>
