@@ -99,8 +99,8 @@ export default function PostList({ mode = 'feed', profileDollId }) {
         );
       } else {
         const followData = {
-          from_doll_id: dollId,
-          to_doll_id: viewerId,
+          from_doll_id: viewerId,
+          to_doll_id: dollId,
         };
         
         await follow(followData);
