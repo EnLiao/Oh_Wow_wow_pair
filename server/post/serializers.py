@@ -46,7 +46,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['local_id', 'post_id', 'doll_id', 'doll_avatar', 'content', 'created_at']
+        fields = ['local_id', 'post_id', 'doll_id', 'doll_name', 'doll_avatar','content', 'created_at']
         read_only_fields = ['local_id', 'created_at']
 
     def get_doll_avatar(self, obj):
