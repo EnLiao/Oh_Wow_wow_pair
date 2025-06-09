@@ -54,15 +54,23 @@ export async function getPosts({
     id: p.id,
     dollId: p.doll_id,
     dollName: p.doll_name ?? p.doll_id,
-    dollAvatar: p.doll_avatar ?? null,
+    dollAvatar: p.doll_avatar ? addBaseUrl(p.doll_avatar) : null,
     content: p.content,
-    image: p.image_url ?? p.image ?? null,
+    image: p.image_url ? addBaseUrl(p.image_url) : p.image ? addBaseUrl(p.image) : null,
     createdAt: p.created_at,
     likeCount: p.like_count ?? 0,
     likedByMe: p.liked_by_me ?? false,
     commentCount: p.comment_count ?? 0,
   }));
 }
+
+function addBaseUrl(path) {
+  // 如果已經是完整URL則直接返回
+  if (path.startsWith('http')) return path;
+  // 否則加上API基礎URL
+  return `http://localhost:8000${path}`;
+}
+
 export const getFollowing = (dollId) => api.get(`/core/dolls/${dollId}/follower_to/`);
 
 export default api;
