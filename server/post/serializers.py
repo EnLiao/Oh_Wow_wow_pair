@@ -28,20 +28,30 @@ class PostSerializer(serializers.ModelSerializer):
         requesting_doll_id = self.context.get('doll_id')
         if not requesting_doll_id:
             return False
-        return Likes.objects.filter(post_id=post_instance, doll_id=requesting_doll_id).exists()
+        return Likes.objects.filter(
+            post_id=post_instance, 
+            doll_id__id=requesting_doll_id
+        ).exists()
     
     def get_comment_count(self, post_instance):
         return post_instance.comments.count()
     
     def get_is_followed(self, post_instance):
-        viewer_doll = self.context.get('doll_id')
+        viewer_doll_id = self.context.get('doll_id')
         post_doll = post_instance.doll_id
-        if not viewer_doll:
+        
+        if not viewer_doll_id:
             return False
-        if str(post_doll.id) == str(viewer_doll.id):
+        
+        # 如果是同一個娃娃
+        if str(post_doll.id) == str(viewer_doll_id):
             return True
-        return Follow.objects.filter(from_doll_id=viewer_doll, to_doll_id=post_doll).exists()
-
+        
+        # 查詢是否有關注關係
+        return Follow.objects.filter(
+            from_doll_id__id=viewer_doll_id, 
+            to_doll_id=post_doll
+        ).exists()
 class CommentSerializer(serializers.ModelSerializer):
     post_id = serializers.PrimaryKeyRelatedField(
         queryset=Post.objects.all(),
