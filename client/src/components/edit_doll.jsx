@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import { get_tags, edit_doll } from '../services/api';
 import {
@@ -12,236 +11,279 @@ import {
   FormGroup,
   Label,
   Input,
-  Col,
+  FormText,
   Spinner,
-  Alert
+  Badge,
+  Alert,
+  Row,
+  Col
 } from 'reactstrap';
 
 export default function EditDoll({ isOpen, toggle, dollData, onDollUpdated }) {
   const auth_context = useContext(AuthContext);
-  const navigate = useNavigate();
+  
+  // 狀態
+  const [name, setName] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [description, setDescription] = useState('');
+  const [avatarImage, setAvatarImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState('');
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   
-  // 表單數據
-  const [dollName, setDollName] = useState('');
-  const [dollBirthday, setDollBirthday] = useState('');
-  const [dollDescription, setDollDescription] = useState('');
-  const [dollImage, setDollImage] = useState(null);
-  const [showTags, setShowTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-
-  // 載入標籤數據
+  // 當模態框開啟且有娃娃數據時，初始化表單
+  useEffect(() => {
+    if (isOpen && dollData) {
+      setName(dollData.name || '');
+      setBirthday(dollData.birthday || '');
+      setDescription(dollData.description || '');
+      setPreviewImage(dollData.avatar_image || '');
+      
+      // 如果有標籤數據，設置已選標籤
+      if (Array.isArray(dollData.tags)) {
+        const tagIds = dollData.tags.map(tag => typeof tag === 'object' ? tag.id : tag);
+        setSelectedTagIds(tagIds);
+      } else {
+        setSelectedTagIds([]);
+      }
+    }
+  }, [isOpen, dollData]);
+  
+  // 載入所有可用標籤
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const res = await get_tags();
-        setShowTags(res.data);
+        const response = await get_tags();
+        setAvailableTags(response.data);
       } catch (err) {
-        console.error('獲取標籤失敗:', err);
+        console.error('無法載入標籤:', err);
       }
     };
     
-    fetchTags();
-  }, []);
-
-  // 當 dollData 變化時更新表單數據
-  useEffect(() => {
-    if (dollData && isOpen) {
-      console.log('初始化表單數據:', dollData);
-      setDollName(dollData.name || '');
-      setDollBirthday(dollData.birthday || '');
-      setDollDescription(dollData.description || '');
+    if (isOpen) {
+      fetchTags();
+    }
+  }, [isOpen]);
+  
+  // 處理圖片選擇
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarImage(file);
       
-      // 處理標籤
-      if (Array.isArray(dollData.tags) && showTags.length > 0) {
-        const tagObjects = dollData.tags.map(tagName => {
-          return showTags.find(tag => tag.name === tagName) || { id: null, name: tagName };
-        }).filter(tag => tag.id !== null);
-        setSelectedTags(tagObjects);
-      }
+      // 創建預覽
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
-  }, [isOpen, dollData?.id, showTags]); // 只在 modal 開啟時或 dollId 變化時重置
-
-  // 標籤選擇切換
-  const handleTagToggle = (tag) => {
-    const isSelected = selectedTags.some(t => t.id === tag.id);
-    
-    if (isSelected) {
-      setSelectedTags(selectedTags.filter(t => t.id !== tag.id));
+  };
+  
+  // 處理標籤點擊
+  const handleTagClick = (tagId) => {
+    if (selectedTagIds.includes(tagId)) {
+      setSelectedTagIds(selectedTagIds.filter(id => id !== tagId));
     } else {
-      setSelectedTags([...selectedTags, tag]);
+      setSelectedTagIds([...selectedTagIds, tagId]);
     }
   };
 
-  const isTagSelected = (tag) => {
-    return selectedTags.some(t => t.id === tag.id);
+  const handleClick = () => {
+    setTimeout(handleSubmit, 0); // 等下一輪 event loop，state 已更新
   };
-
+  
   // 提交表單
   const handleSubmit = async () => {
-    console.log('提交時的表單值:', {
-      name: dollName,
-      birthday: dollBirthday,
-      description: dollDescription,
-      imageFile: dollImage ? dollImage.name : null,
-      tags: selectedTags.map(t => t.name)
-    });
-    
     setLoading(true);
     setError(null);
     setSuccess(false);
     
-    // 保存當前值到常數防止閉包問題
-    const currentName = dollName;
-    const currentBirthday = dollBirthday;
-    const currentDescription = dollDescription;
-    const currentImage = dollImage;
-    const currentTags = [...selectedTags];
-    
-    const formData = new FormData();
-    formData.append('name', currentName);
-    formData.append('birthday', currentBirthday);
-    formData.append('description', currentDescription);
-    
-    if (currentImage) {
-      formData.append('avatar_image', currentImage);
-    }
-    
-    if (currentTags.length > 0) {
-      currentTags.forEach(tag => {
-        formData.append('tag_ids', tag.id);
-      });
-    }
-    
     try {
-      const res = await edit_doll(dollData.id, formData);
-      console.log('更新娃娃成功', res.data);
+      // 創建 FormData 對象
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('birthday', birthday);
+      formData.append('description', description);
+      
+      // 如果有新圖片，添加到表單
+      if (avatarImage) {
+        formData.append('avatar_image', avatarImage);
+      }
+      
+      // 添加選擇的標籤
+      selectedTagIds.forEach(tagId => {
+        formData.append('tag_ids', tagId);
+      });
+      
+      // 發送請求
+      console.log('提交數據:', {
+        name,
+        birthday,
+        description,
+        selectedTagIds,
+        hasNewImage: !!avatarImage
+      });
+      
+      const response = await edit_doll(dollData.id, formData);
+      console.log('更新成功:', response.data);
+      
+      // 更新成功
       setSuccess(true);
       
-      // 如果是當前用戶的娃娃，更新全局數據
-      if (dollData.id === auth_context.currentDollId) {
-        auth_context.updateDollImg(res.data.avatar_image);
-        auth_context.updateDollName(res.data.name);
-      }
-      
-      // 回調通知父組件更新數據
+      // 通知父組件更新
       if (onDollUpdated) {
-        onDollUpdated(res.data);
+        onDollUpdated(response.data);
       }
       
-      // 2秒後關閉模態框
+      // 2秒後關閉對話框
       setTimeout(() => {
         toggle();
+        setSuccess(false);
       }, 2000);
+      
     } catch (err) {
-      console.error('更新娃娃失敗:', err);
-      setError(err.response?.data?.detail || '更新失敗，請稍後再試');
+      console.error('更新失敗:', err);
+      setError(err.response?.data?.detail || '更新娃娃資料失敗');
     } finally {
       setLoading(false);
     }
   };
   
+  // 取消編輯
+  const handleCancel = () => {
+    toggle();
+    setError(null);
+    setSuccess(false);
+  };
+  
   return (
-    <Modal isOpen={isOpen} toggle={toggle} size="lg">
-      <ModalHeader toggle={toggle}>編輯娃娃: {dollData?.id}</ModalHeader>
+    <Modal isOpen={isOpen} toggle={handleCancel} size="lg">
+      <ModalHeader toggle={handleCancel}>
+        編輯娃娃資料: {dollData?.id}
+      </ModalHeader>
+      
       <ModalBody>
         {error && (
-          <Alert color="danger">{error}</Alert>
+          <Alert color="danger" className="mb-4">
+            {error}
+          </Alert>
         )}
         
         {success && (
-          <Alert color="success">娃娃資料更新成功！</Alert>
+          <Alert color="success" className="mb-4">
+            娃娃資料更新成功！
+          </Alert>
         )}
         
         <Form>
-          <FormGroup row>
-            <Label for="dollName" sm={3}>娃娃名稱</Label>
-            <Col sm={9}>
-              <Input
-                id="dollName"
-                type="text"
-                placeholder="娃娃名稱"
-                value={dollName}
-                onChange={(e) => setDollName(e.target.value)}
-              />
+          <Row>
+            <Col md={8}>
+              <FormGroup>
+                <Label for="name">名稱</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="輸入娃娃名稱"
+                />
+              </FormGroup>
+              
+              <FormGroup>
+                <Label for="birthday">生日</Label>
+                <Input
+                  id="birthday"
+                  type="date"
+                  value={birthday}
+                  onChange={(e) => setBirthday(e.target.value)}
+                />
+              </FormGroup>
+              
+              <FormGroup>
+                <Label for="description">介紹</Label>
+                <Input
+                  id="description"
+                  type="textarea"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="關於這個娃娃的介紹..."
+                  rows={3}
+                />
+              </FormGroup>
             </Col>
-          </FormGroup>
+            
+            <Col md={4}>
+              <FormGroup>
+                <Label>頭像</Label>
+                <div className="text-center mb-2">
+                  <img
+                    src={previewImage}
+                    alt={name || '娃娃'}
+                    style={{ 
+                      width: '100%', 
+                      maxWidth: '150px',
+                      height: '150px',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      border: '1px solid #ddd'
+                    }}
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/150?text=No+Image';
+                    }}
+                  />
+                </div>
+                <Input
+                  id="avatarImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                <FormText color="muted">
+                  選擇一張新的頭像圖片
+                </FormText>
+              </FormGroup>
+            </Col>
+          </Row>
           
-          <FormGroup row>
-            <Label for="dollBirthday" sm={3}>生日</Label>
-            <Col sm={9}>
-              <Input
-                id="dollBirthday"
-                type="date"
-                value={dollBirthday}
-                onChange={(e) => setDollBirthday(e.target.value)}
-              />
-            </Col>
-          </FormGroup>
-          
-          <FormGroup row>
-            <Label for="dollDescription" sm={3}>描述</Label>
-            <Col sm={9}>
-              <Input
-                id="dollDescription"
-                type="textarea"
-                placeholder="描述娃娃的特點..."
-                value={dollDescription}
-                onChange={(e) => setDollDescription(e.target.value)}
-              />
-            </Col>
-          </FormGroup>
-          
-          <FormGroup row>
-            <Label for="dollImage" sm={3}>頭像圖片</Label>
-            <Col sm={9}>
-              <Input
-                id="dollImage"
-                type="file"
-                accept="image/png, image/jpeg, image/gif"
-                onChange={(e) => setDollImage(e.target.files[0])}
-              />
-              <small className="text-muted">留空表示不更改頭像</small>
-            </Col>
-          </FormGroup>
-          
-          <FormGroup row>
-            <Label for="dollTags" sm={3}>標籤</Label>
-            <Col sm={9}>
-              <div className="d-flex flex-wrap">
-                {showTags.map((tag) => (
-                  <Button
-                    key={tag.id}
-                    color={isTagSelected(tag) ? 'primary' : 'secondary'}
-                    onClick={() => handleTagToggle(tag)}
-                    className="me-1 mb-1"
-                    size="sm"
-                    style={isTagSelected(tag) ? {
-                      backgroundColor: '#ffd5fc',
-                      border: 'none',
-                      color: '#000'
-                    } : {}}
-                  >
-                    {tag.name}
-                  </Button>
-                ))}
-              </div>
-            </Col>
+          <FormGroup>
+            <Label>標籤</Label>
+            <div className="d-flex flex-wrap gap-2">
+              {availableTags.map(tag => (
+                <Badge
+                  key={tag.id}
+                  color={selectedTagIds.includes(tag.id) ? "primary" : "secondary"}
+                  style={{ 
+                    cursor: 'pointer',
+                    padding: '8px 12px',
+                    margin: '0 5px 5px 0',
+                    backgroundColor: selectedTagIds.includes(tag.id) ? '#ffd5fc' : '#e9ecef',
+                    color: selectedTagIds.includes(tag.id) ? '#000' : '#555',
+                    border: 'none'
+                  }}
+                  onClick={() => handleTagClick(tag.id)}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+              
+              {availableTags.length === 0 && (
+                <div className="text-muted">載入標籤中...</div>
+              )}
+            </div>
           </FormGroup>
         </Form>
       </ModalBody>
+      
       <ModalFooter>
-        <Button 
-          color="secondary" 
-          onClick={toggle}
-          disabled={loading}
-        >
+        <Button color="secondary" onClick={handleCancel} disabled={loading}>
           取消
         </Button>
-        <Button 
-          onClick={handleSubmit}
+        <Button
+          onClick={handleClick}
           disabled={loading}
           style={{
             backgroundColor: '#ffd5fc',
