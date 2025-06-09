@@ -1,15 +1,21 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'reactstrap';
-import { AuthContext } from '../services/auth_context';
 import { searchDolls } from '../services/api';
 
-export default function Search({ keyword }) {
+export default function Search({ keyword, onResultClick }) {
   const navigate = useNavigate();
-  const auth = useContext(AuthContext);
   const [dolls, setDolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleResultClick = (dollId) => {
+    // 先通知父組件關閉搜尋面板
+    if (onResultClick) {
+      onResultClick();
+    }
+    navigate(`/doll_page/${dollId}`);
+  };
 
   // 當關鍵字變更時執行搜尋
   useEffect(() => {
@@ -53,7 +59,7 @@ export default function Search({ keyword }) {
             <div 
               key={`doll-${doll.id || index}`}
               className="doll-list-item" 
-              onClick={() => navigate(`/doll_page/${doll.id}`)}
+              onClick={() => handleResultClick(doll.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -63,7 +69,7 @@ export default function Search({ keyword }) {
               }}
             >
               <img
-                src={doll.avatar_image}
+                src={doll.avatar}
                 alt={doll.name || '娃娃'}
                 style={{ 
                   width: 40, 

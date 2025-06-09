@@ -27,7 +27,7 @@ export const follow = (data) => api.post('/core/follow/', data);
 export const unfollow = (data) => api.delete('/core/follow/', {data});
 export const postComments = (postId, data) => api.post(`/post/posts/${postId}/comments/`, data);
 export const getComments = (postId) => api.get(`/post/posts/${postId}/comments/`);
-export const searchDolls = (keyword) => api.get(`/search/doll-ids/?q=${keyword}`);
+export const searchDolls = (keyword) => api.get(`/search/doll/?q=${keyword}`);
 export async function getPosts({
   mode,
   targetDollId,

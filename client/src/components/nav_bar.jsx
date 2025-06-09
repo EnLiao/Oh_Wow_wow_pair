@@ -30,6 +30,11 @@ export default function NavBar() {
     }
   };
 
+  const clearSearch = () => {
+    setShowSearch(false);
+    setSearchKeyword('');
+  };
+
   useEffect(() => {
     if (!open) return;
     const fetchDolls = async () => {
@@ -123,7 +128,7 @@ export default function NavBar() {
               padding: '20px',
               backgroundColor: '#fff'
             }}>
-              <Search keyword={searchKeyword} />
+              <Search keyword={searchKeyword} onResultClick={clearSearch} />
             </div>
           )}
           <img
