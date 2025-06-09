@@ -75,5 +75,10 @@ function addBaseUrl(path) {
 }
 
 export const getFollowing = (dollId) => api.get(`/core/dolls/${dollId}/follower_to/`);
+export const likePost = (postId, dollId) =>
+  api.post(`/post/posts/${postId}/like/`, { doll_id: dollId });
+
+export const unlikePost = (postId, dollId) =>
+  api.delete(`/post/posts/${postId}/like/`, { data: { doll_id: dollId } });
 
 export default api;
