@@ -181,9 +181,11 @@ export default function NavBar() {
               e.target.src = default_doll_img;
             }}
             style={{
-              width: 'clamp(15px,2vw,25px)',
-              height: 'clamp(15px,2vw,25px)',
+              width: 'clamp(15px,5vw,30px)',
+              height: 'clamp(15px,5vw,30px)',
               cursor: 'pointer',
+              borderRadius: '50%', // 添加這一行使圖片變成圓形
+              objectFit: 'cover',
             }}
           />
         </Button>
