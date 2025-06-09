@@ -152,25 +152,27 @@ export default function PostList({ mode = 'feed', profileDollId }) {
               <CardTitle tag="h5" className="mb-0">
                 {p.dollName}
               </CardTitle>
-                <p 
-                  className="mb-0" 
-                  style={{ 
-                    marginLeft: '15px', 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    backgroundColor: following.has(p.dollName) ? '#ffd5fc' : '#f0f0f0',  // 使用 authorId
-                    color: following.has(p.dollName) ? '#666666' : '#666666', 
-                    padding: '2px 6px',
-                    borderRadius: '3px',
-                    cursor: 'pointer',
-                    fontSize: '0.8rem',
-                    transition: 'all 0.2s ease',
-                    userSelect: 'none'
-                  }}
-                  onClick={() => handleSubmit(p.dollName)}  // 直接呼叫 handleSubmit 並傳入作者 ID
-                >
-                  {following.has(p.dollName) ? 'followed' : 'follow'} 
-                </p>
+                {!following.has(p.dollName) && (
+                  <p 
+                    className="mb-0" 
+                    style={{ 
+                      marginLeft: '15px', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      backgroundColor: '#f0f0f0',
+                      color: '#666666', 
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      transition: 'all 0.2s ease',
+                      userSelect: 'none'
+                    }}
+                    onClick={() => handleSubmit(p.dollName)}
+                  >
+                    follow
+                  </p>
+                )}
             </div>
 
             <CardText style={{marginBottom:10}}>{p.content}</CardText>
