@@ -41,9 +41,9 @@ curl -X POST http://localhost:8000/post/posts/ \
 # → {"id":"54005c5b-4d47-4b77-b6e5-d5448ec98f7d","doll_id":"doll001","content":"這是測試用的貼文內容","image_url":"https://example.com/test-image.jpg","created_at":"2025-05-05T13:59:54.4212}
 
 # 確認可瀏覽的貼文
-curl -X GET "http://localhost:8000/post/feed/?doll_id=omuba"\
--H "Authorization: Bearer eyJ0eX4hI"
-# → [{"id":"6f227e7d-538a-41e4-8af9-504ed6ac5ff5","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-16T19:55:46.062910+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"c24f464d-2edc-4685-8f2b-a5605178673a","doll_id":"tomorin","content":"1","image_url":"https://github.com/","created_at":"2025-05-16T19:55:37.751486+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"d0ebd4ea-b14b-4c89-b27b-dc0ad79a39c3","doll_id":"tomorin","content":"f","image_url":"https://github.com/","created_at":"2025-05-16T19:55:30.679483+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"6b367624-ec72-4789-a0de-715274998580","doll_id":"tomorin","content":"f","image_url":"https://github.com/","created_at":"2025-05-16T19:55:23.294855+08:00","like_count":0,"liked_by_me":false,"comment_count":0},{"id":"a0133140-274c-46ec-847c-23eeb8857ea6","doll_id":"tomorin","content":"8","image_url":"https://github.com/","created_at":"2025-05-16T19:55:17.096527+08:00","like_count":0,"liked_by_me":false,"comment_count":0}]
+curl -X GET "http://localhost:8000/post/feed/?doll_id=tomorin"\
+ -H "Authorization: Bearer eyJ..ux98"
+# → [{"id":"5ecc3bd9-0ecd-4b86-bd2f-bba081d327f8","doll_id":"abc","content":"蛤","image":"/media/avatars/%E8%9_145045.png","created_at":"2025-06-09T12:51:14.217824+08:00","like_count":0,"liked_by_me":false,"comment_count":0,"is_followed":false},{"id":"0501366d-f333-4122-9070-be6269f5d262","doll_id":"tomorin","content":"1234","image":"/media/avatars/%E8%%9D%A2_2025-05-27_201640.png","created_at":"2025-06-09T12:50:59.994595+08:00","like_count":0,"liked_by_me":false,"comment_count":0,"is_followed":true}]
 
 # 取得某隻 doll 的貼文
 curl "http://localhost:8000/post/profile_feed/?doll_id=tomorin&viewer_doll_id=cheesetaro" \

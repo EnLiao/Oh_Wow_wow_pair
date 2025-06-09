@@ -59,6 +59,11 @@ class PostListView(ListAPIView):
             reverse=True
         )
 
+        if not posts:
+            posts = list(
+                Post.objects.filter(doll_id__in=followed_ids).order_by('?')[:5]
+            )
+
         serializer = self.get_serializer(posts, many=True, context={'doll_id': doll})
         data = serializer.data
 
