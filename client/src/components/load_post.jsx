@@ -75,7 +75,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
 
   const followSubmit = async (dollId) => {
     // 找到當前貼文
-     const currentPost = postMap.get(dollId);
+    const currentPost = posts.find(p => p.doll_id === dollId);
     // 檢查是否已經追蹤這個娃娃
     const isFollowing = currentPost?.is_followed ?? false;
     
