@@ -505,3 +505,41 @@ curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
 {"message":"Liked"}
 {"message":"Already liked"}
 ```
+### 取得新 access token（refresh token 機制）
+
+* **路徑**：`POST /core/token/refresh/`
+* **說明**：當 access token 過期時，前端可用 refresh token 取得新的 access token。
+
+* **請求格式範例（JSON）**：
+
+```json
+{
+  "refresh": "<你的 refresh token>"
+}
+```
+
+* **curl 測試指令範例**：
+
+```bash
+curl -X POST http://127.0.0.1:8000/core/token/refresh/ \
+  -H "Content-Type: application/json" \
+  -d '{
+        "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ..."
+      }'
+```
+
+* **成功回應範例（JSON）**：
+
+```json
+{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ..."
+}
+```
+
+* **失敗時回應範例**：
+- refresh token 無效或過期：
+```json
+{"detail": "Token is invalid or expired", "code": "token_not_valid"}
+```
+
+> 前端請在 access token 過期時自動呼叫本 API，並將新的 access token 存回本地。
