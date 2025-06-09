@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from core.models import User, Doll, Tag
+from core.models import User, Doll, Tag, Follow
 from post.models import Post, Comment, Likes, Favorite, PostSeen
 from core.serializers import DollSerializer, RegisterSerializer
 
@@ -14,10 +14,11 @@ class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     liked_by_me = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    is_followed = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'doll_id', 'content', 'image', 'created_at', 'like_count', 'liked_by_me', 'comment_count']
+        fields = ['id', 'doll_id', 'content', 'image', 'created_at', 'like_count', 'liked_by_me', 'comment_count', 'is_followed']
         read_only_fields = ['id', 'created_at']
 
     def get_like_count(self, post_instance):
@@ -31,6 +32,15 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_comment_count(self, post_instance):
         return post_instance.comments.count()
+    
+    def get_is_followed(self, post_instance):
+        viewer_doll = self.context.get('doll_id')
+        post_doll = post_instance.doll_id
+        if not viewer_doll:
+            return False
+        if str(post_doll.id) == str(viewer_doll.id):
+            return True
+        return Follow.objects.filter(from_doll_id=viewer_doll, to_doll_id=post_doll).exists()
 
 class CommentSerializer(serializers.ModelSerializer):
     post_id = serializers.PrimaryKeyRelatedField(
