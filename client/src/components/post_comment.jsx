@@ -91,7 +91,7 @@ export default function PostComment({ postId }) {
       ) : comments.length > 0 ? (
         <ListGroup className="comment-list">
           {comments.map((c) => (
-            <ListGroupItem key={c.local_id} className="px-0 py-2 border-0">
+            <ListGroupItem key={c.id} className="px-0 py-2 border-0">
               <div className="d-flex align-items-center mb-1">
                 <img
                   src={c.doll_avatar}

@@ -53,11 +53,11 @@ export async function getPosts({
 
   return raw.map((p) => {
     // 處理圖片路徑
+    if (p.image_url && !p.image) {
+      p.image = p.image_url;
+    }
     if (p.image) {
       p.image = addBaseUrl(p.image);
-    }
-    if (p.image_url) {
-      p.image_url = addBaseUrl(p.image_url);
     }
     if (p.doll_avatar) {
       p.doll_avatar = addBaseUrl(p.doll_avatar);
