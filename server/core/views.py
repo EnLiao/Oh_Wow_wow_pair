@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView
 from .serializers import DollSerializer, TagSerializer
 from .serializers import RegisterSerializer, DollIdOnlySerializer, FollowSerializer
 from .models import Doll, Tag, Follow
@@ -103,3 +103,16 @@ class FollowView(APIView):
             return Response({'detail': '已取消追蹤'}, status=status.HTTP_204_NO_CONTENT)
         except Follow.DoesNotExist:
             return Response({'detail': '尚未追蹤，無法取消'}, status=status.HTTP_400_BAD_REQUEST)
+class DollUpdateView(RetrieveUpdateAPIView):
+    queryset = Doll.objects.all()
+    serializer_class = DollSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+
+    def perform_update(self, serializer):
+        doll = self.get_object()
+        if doll.username != self.request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("只能編輯自己的娃娃")
+        # 禁止更改 username
+        serializer.save(username=doll.username)

@@ -308,6 +308,67 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
 | 已經追蹤過     | 400      | 已經追蹤過了                           |
 | 要取消的關係不存在 | 400      | 尚未追蹤，無法取消                        |
 | 缺少必要欄位    | 400      | 缺少 from\_doll\_id 或 to\_doll\_id |
+#### 編輯娃娃（新版路徑 /core/dolls/<doll_id>/edit/）
+
+* **路徑**：`PATCH /core/dolls/<doll_id>/edit/`
+* **說明**：編輯指定娃娃的資訊（需帶 access token，僅娃娃擁有者可修改，username 欄位不可更動）
+
+* **請求格式範例（JSON）**：
+
+```json
+{
+  "name": "新名字",
+  "birthday": "2025-06-08",
+  "description": "新的介紹",
+  "avatar_image": "https://example.com/new_avatar.jpg",
+  "tag_ids": [1, 3]
+}
+```
+
+* **curl 測試指令範例**：
+
+```bash
+curl -X PATCH http://127.0.0.1:8000/core/dolls/good_doll_0925/edit/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+        "name": "新名字",
+        "birthday": "2025-06-08",
+        "description": "新的介紹",
+        "avatar_image": "https://example.com/new_avatar.jpg",
+        "tag_ids": [1, 3]
+      }'
+```
+
+* **成功回應範例（JSON）**：
+
+```json
+{
+  "id": "good_doll_0925",
+  "username": "abc",
+  "name": "新名字",
+  "birthday": "2025-06-08",
+  "description": "新的介紹",
+  "avatar_image": "/media/avatars/new_avatar.jpg",
+  "created_at": "2025-06-08T12:00:00Z",
+  "tags": [
+    {"id": 1, "name": "可愛"},
+    {"id": 3, "name": "溫柔"}
+  ]
+}
+```
+
+* **失敗時回應範例**：
+- 未登入：
+```json
+{"detail": "Authentication credentials were not provided."}
+```
+- 權限不足（非擁有者）：
+```json
+{"detail": "只能編輯自己的娃娃"}
+```
+- 嘗試更動 username 欄位：
+> username 欄位會被自動忽略，仍維持原本擁有者
 
 ### 建立新貼文
 
