@@ -47,11 +47,17 @@ class TagSerializer(serializers.ModelSerializer):
 class DollSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     tag_ids = serializers.ListField(write_only=True, child=serializers.IntegerField(), required=False)
+    avatar_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Doll
         fields = ['id', 'username', 'name', 'birthday', 'description', 'avatar_image', 'created_at', 'tags', 'tag_ids']
         read_only_fields = ['created_at', 'username']
+
+    def get_avatar_image(self, obj):
+        if obj.avatar_image:
+            return obj.avatar_image.url  # 這會回傳 /media/avatars/filename.jpg
+        return None
 
     def create(self, validated_data):
         tag_ids = validated_data.pop('tag_ids', [])
