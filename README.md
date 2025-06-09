@@ -22,3 +22,19 @@ cd server
 python manage.py runserver
 ```
 
+## Contributors
+
+| Name                                                   | Role                        | Responsibility            |
+|--------------------------------------------------------|-----------------------------|---------------------------|
+| [happylittle7](https://github.com/happylittle7)        | Project Manager & Deployment| Overall planning, deployment, schedule management               |
+| [cyucccx](https://github.com/cyucccx)                  | Frontend                    | UI/UX design, frontend development                              |
+| [noyapoyo](https://github.com/noyapoyo)                | Backend (core)              | Core APIs, related backend features, model design               |
+| [Rokusenn](https://github.com/EnLiao)                  | Backend (post & search)     | Post and search APIs, related backend features, model design    |
+
+### Special Thanks
+
+- [mrfish233](https://github.com/mrfish233) d(･o･)(･o･)(･o･)(･o･)b
+- [Omuba](https://www.instagram.com/good_doll_0925/)
+- Copid
+- Donut Music Classroom
+- Our dear dolls
