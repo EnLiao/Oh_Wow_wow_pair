@@ -57,6 +57,7 @@ class Tag(models.Model):
 class Follow(models.Model):
     from_doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='following')
     to_doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE, related_name='followers')
+    created_at = models.DateTimeField(auto_now_add=True)  # 添加這一行
 
     class Meta:
         unique_together = ('from_doll_id', 'to_doll_id')

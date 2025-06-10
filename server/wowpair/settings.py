@@ -37,7 +37,16 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
+UNFOLD = {
+    "SITE_TITLE": "喔哇哇配！管理後台",  # 瀏覽器標籤頁標題
+    "SITE_HEADER": "娃娃社交網站管理系統",      # 頁面頂部標題
+}
+
 INSTALLED_APPS = [
+    "unfold",
+    "unfold.contrib.filters",  # 可選
+    "unfold.contrib.forms",    # 可選
+    "unfold.contrib.inlines",  # 可選
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
