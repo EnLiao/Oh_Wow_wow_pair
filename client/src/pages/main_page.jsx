@@ -33,6 +33,10 @@ export default function MainPage() {
           marginTop: 10,
           paddingLeft: '1%',
           width: '20%',
+          position: 'sticky', 
+          top: 80,  
+          height: 'calc(100vh - 80px)',
+          overflowY: 'auto'
         }}
       >
         <p style={{ fontSize: 15 }}>Following</p>
@@ -92,7 +96,18 @@ export default function MainPage() {
         <PostList mode="feed" />
       </div>
       {/* right my area */}
-      <div style={{ width: '20%', textAlign:'center', marginTop: 20, marginRight:5, marginLeft: 5 }}>
+      <div style={{ 
+        width: '20%', 
+        textAlign:'center', 
+        marginTop: 20, 
+        marginRight:5, 
+        marginLeft: 5,
+        position: 'sticky', 
+        top: 60,  
+        height: 'calc(100vh - 60px)',
+        overflowY: 'auto'
+        }}
+      >
         <img
           src={auth_context.doll_img}
           alt={auth_context.doll_name}
@@ -105,7 +120,7 @@ export default function MainPage() {
             cursor: 'pointer',
           }}
         />
-        <p style={{ textAlign: 'center', fontSize: 12 }}>Good Morning, {auth_context.doll_name}!</p>
+        <p style={{ textAlign: 'center', fontSize: 12, marginTop:10 }}>Good Morning, {auth_context.doll_name}!</p>
       </div>
     </div>
   );

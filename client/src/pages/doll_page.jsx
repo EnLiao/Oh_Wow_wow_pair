@@ -147,6 +147,9 @@ export default function DollPage() {
                   <strong>User:</strong> {dollData.username}
                 </ListGroupItem>
                 <ListGroupItem>
+                  <strong>Name:</strong> {dollData.name}
+                </ListGroupItem>
+                <ListGroupItem>
                   <strong>Birthday:</strong> {dollData.birthday}
                 </ListGroupItem>
                 <ListGroupItem>
