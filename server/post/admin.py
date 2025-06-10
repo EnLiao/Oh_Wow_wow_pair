@@ -19,13 +19,13 @@ class PostAdmin(ModelAdmin):
     date_hierarchy = 'created_at'
     
     fieldsets = (
-        ("貼文信息", {
+        ("貼文資訊", {
             'fields': ('id', 'doll_id', 'content'),
         }),
         ("媒體", {
             'fields': ('image',),
         }),
-        ("時間信息", {
+        ("時間資訊", {
             'fields': ('created_at',),
         }),
     )
@@ -75,10 +75,10 @@ class CommentAdmin(ModelAdmin):
     date_hierarchy = 'created_at'
 
     fieldsets = (
-        ("評論信息", {
+        ("評論資訊", {
             'fields': ('local_id', 'post_id', 'doll_id', 'content'),
         }),
-        ("時間信息", {
+        ("時間資訊", {
             'fields': ('created_at',),
         }),
     )
@@ -109,10 +109,10 @@ class LikesAdmin(ModelAdmin):
     date_hierarchy = 'created_at'
 
     fieldsets = (
-        ("點讚信息", {
+        ("點讚資訊", {
             'fields': ('doll_id', 'post_id'),
         }),
-        ("時間信息", {
+        ("時間資訊", {
             'fields': ('created_at',),
         }),
     )
@@ -139,10 +139,10 @@ class FavoriteAdmin(ModelAdmin):
     date_hierarchy = 'created_at'
 
     fieldsets = (
-        ("收藏信息", {
+        ("收藏資訊", {
             'fields': ('doll_id', 'post_id'),
         }),
-        ("時間信息", {
+        ("時間資訊", {
             'fields': ('created_at',),
         }),
     )
@@ -172,7 +172,7 @@ class PostSeenAdmin(ModelAdmin):
         ("瀏覽記錄", {
             'fields': ('doll_id', 'post_id'),
         }),
-        ("時間信息", {
+        ("時間資訊", {
             'fields': ('seen_at',),
         }),
     )

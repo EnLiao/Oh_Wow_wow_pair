@@ -42,7 +42,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     
     # Unfold 樣式的詳細頁面布局
     fieldsets = (
-        ("基本信息", {
+        ("基本資訊", {
             'fields': ('username', 'nickname', 'email'),
             'classes': ('collapse',),
         }),
@@ -132,12 +132,12 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
             return super().get_fieldsets(request, obj)
         if obj is not None and obj.username == request.user.username:
             return (
-                ("基本信息", {
+                ("基本資訊", {
                     'fields': ('username', 'nickname', 'email', 'bio')
                 }),
             )
         return (
-            ("基本信息", {
+            ("基本資訊", {
                 'fields': ('username', 'nickname', 'email', 'bio')
             }),
         )
@@ -163,10 +163,10 @@ class DollAdmin(ModelAdmin):  # 改為繼承 ModelAdmin
     date_hierarchy = 'created_at'
     
     fieldsets = (
-        ("基本信息", {
+        ("基本資訊", {
             'fields': ('id', 'name', 'username'),
         }),
-        ("詳細信息", {
+        ("詳細資訊", {
             'fields': ('birthday', 'description', 'avatar_image'),
         }),
         ("標籤", {
