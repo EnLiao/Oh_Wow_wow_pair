@@ -8,3 +8,4 @@ djangorestframework-simplejwt>=5.3.0
 django-cors-headers
 # Backend global dependencies
 Pillow>=9.0.0
+django-unfold
