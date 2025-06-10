@@ -99,8 +99,8 @@ export default function PostList({ mode = 'feed', profileDollId }) {
         );
       } else {
         const followData = {
-          from_doll_id: dollId,
-          to_doll_id: viewerId,
+          from_doll_id: viewerId,
+          to_doll_id: dollId,
         };
         
         await follow(followData);
@@ -192,7 +192,7 @@ export default function PostList({ mode = 'feed', profileDollId }) {
           <CardBody>
             <div className="d-flex align-items-center mb-2">
                 <img
-                  src={auth.doll_img}
+                  src={p.doll_avatar}
                   alt={p.doll_id}
                   style={{
                     width: 40,
