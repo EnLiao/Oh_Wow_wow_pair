@@ -74,9 +74,12 @@ email格式不正確
 ```json
 {
   "username": "momo",
-  "password": "abc12345"
+  "password": "abc12345",
+  "recaptcha_token": "前端取得的token"
 }
 ```
+
+* **說明**：自 2025/06/11 起，登入 API 需帶 recaptcha_token，否則會回傳 400。
 
 * **成功時回應格式範例（JSON）**：
 
