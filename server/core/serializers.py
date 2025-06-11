@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Doll, Tag, Follow
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.crypto import get_random_string
+from django.core.cache import cache
 
 User = get_user_model()
 #我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_image 為可選欄位，但email 為必填欄位
@@ -63,6 +67,20 @@ class DollSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"tag_ids": [f"這個 tag id {tag_id} 不存在"]})
             doll.tag.add(tag)
         return doll
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if request and hasattr(instance, 'username') and instance.username != request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("只能編輯自己創建的娃娃")
+        # 更新標籤
+        tag_ids = validated_data.pop('tag_ids', None)
+        if tag_ids is not None:
+            instance.tag.set(Tag.objects.filter(id__in=tag_ids))
+        # 其他欄位
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
     def validate_avatar_image(self, value):
         limit = 2 * 1024 * 1024  # 2MB
         if value.size > limit:
