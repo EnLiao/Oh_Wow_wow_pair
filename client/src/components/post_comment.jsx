@@ -2,38 +2,41 @@ import { useState, useEffect, useContext } from "react";
 import { getComments, postComments } from "../services/api";
 import { AuthContext } from "../services/auth_context";
 import { Input, Button, ListGroup, ListGroupItem, Spinner } from "reactstrap";
-// import { getComments, createComment } from "../services/api";
+import { useNavigate } from "react-router-dom";
 import { IoMdSend } from "react-icons/io";
 
-export default function PostComment({ postId }) {
+export default function PostComment({ postId, onCommentAdded }) {
   const auth = useContext(AuthContext);
+  const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const fetchComments = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getComments(postId);
+      setComments(response.data);
+    } catch (err) {
+      console.error("載入評論失敗:", err);
+      setError(err.response?.data?.detail || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 載入評論
   useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await getComments(postId);
-        setComments(response.data);
-      } catch (err) {
-        console.error("載入評論失敗:", err);
-        setError(err.response?.data?.detail || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchComments();
   }, [postId]);
 
   // 提交評論
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+
     if (!comment.trim()) return;
 
     try {
@@ -47,6 +50,15 @@ export default function PostComment({ postId }) {
       const response = await postComments(postId, commentData);
       setComments(prevComments => [response.data, ...prevComments]);
       setComment("");
+
+      // 獲取新評論列表
+      fetchComments();
+
+      // 通知父組件評論已添加，更新計數
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
+
     } catch (err) {
       console.error("提交評論失敗:", err);
       alert(err.response?.data?.detail || "評論提交失敗，請重試");
@@ -104,6 +116,9 @@ export default function PostComment({ postId }) {
                     objectFit: 'cover',
                     userSelect: 'none',
                     cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    navigate(`/doll_page/${c.doll_id}`);
                   }}
                 />
                 <strong className="me-2">{c.doll_id}</strong>

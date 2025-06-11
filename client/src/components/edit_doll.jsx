@@ -115,9 +115,7 @@ export default function EditDoll({ isOpen, toggle, dollData, onDollUpdated }) {
       }
       
       // 添加選擇的標籤
-      selectedTagIds.forEach(tagId => {
-        formData.append('tag_ids', tagId);
-      });
+      formData.append('tag_ids', JSON.stringify(selectedTagIds));
       
       // 發送請求
       console.log('提交數據:', {
