@@ -13,16 +13,22 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import logging
+import environ
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 讀取 .env
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, 'server', '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5tm)%o@#bp(dxk48n2rpj#p7*m3%c@nze_d04+ud_9la8&i2g*'
-
+SECRET_KEY = env('SECRET_KEY')
+RECAPTCHA_SECRET_KEY = env('RECAPTCHA_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'username',  #告訴 SimpleJWT 你不是用 id，而是 username 當 primary key
@@ -66,6 +72,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '5/min',      # 每帳號每分鐘 5 次
+        'anon': '10/min',     # 每個 IP 每分鐘 10 次
+    }
 }
 AUTH_USER_MODEL = 'core.User' #自定義 User 模型
 '''

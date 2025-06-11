@@ -4,6 +4,23 @@
 
 ---
 
+---
+
+### reCAPTCHA 驗證（防機器人）
+
+1. 前端在註冊、登入等 API 請求時，需多帶一個 `recaptcha_token` 欄位，例如：
+   ```json
+   {
+     "username": "momo",
+     "password": "abc12345",
+     "recaptcha_token": "前端取得的token"
+   }
+   ```
+2. 後端會自動驗證 token，驗證失敗會回傳 400，訊息如「請通過人機驗證」。
+3. 請在 `.env` 設定 `RECAPTCHA_SECRET_KEY=key`。
+4. 若未帶 recaptcha_token 或驗證失敗，API 會拒絕請求。
+
+---
 ### 使用者註冊 API
 
 * **路徑**：`POST /core/register/`
@@ -198,7 +215,7 @@ curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
-* **成功時回應範例（JSON）**：
+* **成功時回應格式範例（JSON）**：
 
 ```json
 {

@@ -6,6 +6,8 @@ typing_extensions==4.13.2
 djangorestframework>=3.14.0
 djangorestframework-simplejwt>=5.3.0
 django-cors-headers
+django-environ
+requests
 # Backend global dependencies
 Pillow>=9.0.0
 django-unfold
