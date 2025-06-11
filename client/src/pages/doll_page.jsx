@@ -158,7 +158,7 @@ export default function DollPage() {
                 <ListGroupItem>
                   <strong>Tag:</strong> {
                     Array.isArray(dollData.tags)
-                      ? dollData.tags.join(', ')
+                      ? dollData.tags.map(tag => tag.name).join(', ')
                       : dollData.tags
                   }
                 </ListGroupItem>
