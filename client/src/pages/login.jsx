@@ -14,6 +14,7 @@ import {
   Col, 
   Label
 } from 'reactstrap';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -23,10 +24,16 @@ export default function Login() {
   const [nickname, setNickname] = useState('')
   const [avatarFile, setAvatarFile] = useState(null)
   const [bio, setBio] = useState('')
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   const navigate = useNavigate()
   const auth_context = useContext(AuthContext)
 
   const handleSubmit = async () => {
+    if (!recaptchaToken) {
+      alert('請先通過人機驗證');
+      return;
+    }
     if (isSignUp) {
       const data = {
         username,
@@ -34,7 +41,8 @@ export default function Login() {
         email,
         nickname,
         avatarFile,
-        bio
+        bio,
+        recaptcha_token: recaptchaToken
       };
   
       try {
@@ -73,7 +81,7 @@ export default function Login() {
       }
     } else {
       try {
-        const res = await login({ username, password }); // axios 呼叫 login
+        const res = await login({ username, password, recaptcha_token: recaptchaToken }); // axios 呼叫 login
         const { access, refresh } = res.data;
   
         auth_context.updateToken(access);
@@ -232,7 +240,14 @@ export default function Login() {
                 />
               </Col>
             </FormGroup>
-  
+            <FormGroup row>
+              <Col sm={{ size: 9, offset: 3 }}>
+                <ReCAPTCHA
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={token => setRecaptchaToken(token)}
+                />
+              </Col>
+            </FormGroup>
             <Button 
               block 
               onClick={handleSubmit}
