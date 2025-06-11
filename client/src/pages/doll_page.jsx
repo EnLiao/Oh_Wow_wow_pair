@@ -118,10 +118,12 @@ export default function DollPage() {
           <Card className="mb-4">
             <CardHeader className="d-flex align-items-center justify-content-between">
               <h2 className="mb-0">{dollData.id}</h2>
-              <MdModeEditOutline 
-                style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
-                onClick={toggleEditModal}  
-              />
+              { auth_context.currentDollId === dollData.id &&
+                <MdModeEditOutline 
+                  style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
+                  onClick={toggleEditModal}  
+                />
+              }
               <EditDoll 
                 isOpen={isEditModalOpen} 
                 toggle={toggleEditModal} 
