@@ -28,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate_avatar_image(self, value):
         limit = 3 * 1024 * 1024  # 3MB
         if value.size > limit:
-            raise serializers.ValidationError("圖片太大，不能超過 2MB")
+            raise serializers.ValidationError("圖片太大，不能超過 3MB")
         return value
     def validate(self, data):
         # Google reCAPTCHA 驗證
@@ -103,7 +103,7 @@ class DollSerializer(serializers.ModelSerializer):
     def validate_avatar_image(self, value):
         limit = 3 * 1024 * 1024  # 3MB
         if value.size > limit:
-            raise serializers.ValidationError("圖片太大，不能超過 2MB")
+            raise serializers.ValidationError("圖片太大，不能超過 3MB")
         return value
     def validate_tag_ids(self, value):
         for tag_id in value:
