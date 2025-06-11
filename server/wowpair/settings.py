@@ -19,9 +19,9 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 讀取 .env
+# 讀取 Oh_Wow_wow_pair/.env（專案根目錄）
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, 'server', '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR.parent, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -72,14 +72,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.UserRateThrottle',
-        'rest_framework.throttling.AnonRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'user': '5/min',      # 每帳號每分鐘 5 次
-        'anon': '10/min',     # 每個 IP 每分鐘 10 次
-    }
+    # 不全域啟用 throttle，僅在個別 view 設定
 }
 AUTH_USER_MODEL = 'core.User' #自定義 User 模型
 '''
