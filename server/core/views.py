@@ -11,6 +11,7 @@ from .serializers import RegisterSerializer, DollIdOnlySerializer, FollowSeriali
 from .models import Doll, Tag, Follow
 from rest_framework.throttling import UserRateThrottle
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .token_serializers import CustomTokenObtainPairWithRecaptchaSerializer
 
 User = get_user_model()
 
@@ -19,6 +20,7 @@ class LoginRateThrottle(UserRateThrottle):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     throttle_classes = [LoginRateThrottle]
+    serializer_class = CustomTokenObtainPairWithRecaptchaSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
