@@ -9,6 +9,7 @@ export default function MainPage() {
   const auth_context = useContext(AuthContext);
   console.log('auth_context', auth_context);
   const [following, setFollowing] = React.useState([]);
+  const [greeting, setGreeting] = React.useState('');
   useEffect(() => {
     const fetchFollowing = async () => {
       try {
@@ -22,6 +23,24 @@ export default function MainPage() {
     
     fetchFollowing();
   }, [auth_context.currentDollId]); // 添加空陣列作為依賴，確保只執行一次
+
+  useEffect(() => {
+    const greetings = [
+      `Hello, ${auth_context.doll_name}!`,
+      `Hi there, ${auth_context.doll_name}!`,
+      `Welcome back, ${auth_context.doll_name}!`,
+      `Nice to see you, ${auth_context.doll_name}!`,
+      `What's new, ${auth_context.doll_name}?`,
+      `How's it going, ${auth_context.doll_name}?`,
+      `Have a great day, ${auth_context.doll_name}!`,
+      `Let's explore, ${auth_context.doll_name}!`,
+      `Ready for fun, ${auth_context.doll_name}?`
+    ];
+    
+    // 隨機選擇一個打招呼語句
+    const randomIndex = Math.floor(Math.random() * greetings.length);
+    setGreeting(greetings[randomIndex]);
+  }, [auth_context.doll_name]);
 
   const handleNewFollow = async () => {
     // 直接調用 fetchFollowing 重新獲取最新追蹤列表
@@ -51,7 +70,7 @@ export default function MainPage() {
           overflowY: 'auto'
         }}
       >
-        <p style={{ fontSize: 15, marginBottom:'0rem' }}>Following</p>
+        <h6 style={{ marginBottom:'0rem' }}>Following</h6>
         {following.map(following_doll => (
           <div
             key={following_doll.id}
@@ -151,7 +170,9 @@ export default function MainPage() {
             cursor: 'pointer',
           }}
         />
-        <p style={{ textAlign: 'center', fontSize: 12, marginTop:10 }}>Good Morning, {auth_context.doll_name}!</p>
+        <p style={{ textAlign: 'center', fontSize: 13, marginTop: 10 }}>
+          {greeting}
+        </p>
       </div>
     </div>
   );
