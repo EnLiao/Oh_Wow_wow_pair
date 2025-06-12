@@ -1,7 +1,7 @@
 import PostList from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
-import React, { use, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { getFollowing } from '../services/api';
 
 export default function MainPage() {
@@ -51,7 +51,7 @@ export default function MainPage() {
           overflowY: 'auto'
         }}
       >
-        <p style={{ fontSize: 15 }}>Following</p>
+        <p style={{ fontSize: 15, marginBottom:'0rem' }}>Following</p>
         {following.map(following_doll => (
           <div
             key={following_doll.id}
@@ -84,16 +84,32 @@ export default function MainPage() {
                 }}
               />
             </div>
-            <p
-              style={{
-                cursor: 'pointer',
+
+            {/* 新增: 包裝文字的容器，設置為垂直排列 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              cursor: 'pointer'
+            }} onClick={() => {navigate(`/doll_page/${following_doll.id}`)}}>
+              <p style={{
+                margin: 0, // 移除預設邊距
+                padding: 0,
                 whiteSpace: 'nowrap',
                 fontSize: 14,
-              }}
-              onClick={() => {navigate(`/doll_page/${following_doll.id}`)}} // 點擊名字跳轉到 doll profile
-            >
-              {following_doll.name}
-            </p>
+                fontWeight: 'bold',
+              }}>
+                {following_doll.id}
+              </p>
+              <p style={{
+                margin: 0, // 移除預設邊距
+                padding: 0,
+                whiteSpace: 'nowrap',
+                fontSize: 14,
+                color: '#6c757d'
+              }}>
+                {following_doll.name}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -102,7 +118,7 @@ export default function MainPage() {
       <div style={{ 
         width: '60%',
         alignItems: 'center',
-        paddingTop: 20,
+        paddingTop: 40,
         }}
       >
         <PostList 
@@ -118,7 +134,7 @@ export default function MainPage() {
         marginRight:5, 
         marginLeft: 5,
         position: 'sticky', 
-        top: 60,  
+        top: 80,  
         height: 'calc(100vh - 60px)',
         overflowY: 'auto'
         }}
