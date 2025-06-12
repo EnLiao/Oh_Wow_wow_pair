@@ -22,6 +22,18 @@ export default function MainPage() {
     
     fetchFollowing();
   }, [auth_context.currentDollId]); // 添加空陣列作為依賴，確保只執行一次
+
+  const handleNewFollow = async () => {
+    // 直接調用 fetchFollowing 重新獲取最新追蹤列表
+    try {
+      const res = await getFollowing(auth_context.currentDollId);
+      setFollowing(res.data);
+      console.log('追蹤成功後刷新列表:', res.data); 
+    } catch (err) {
+      console.error('刷新追蹤列表失敗:', err);
+    }
+  };
+
   return (
     <div style={{ paddingLeft: '3%', paddingTop: 50, display: 'flex', flexDirection: 'flex-start'}}>
       {/* left following list */}
@@ -93,7 +105,10 @@ export default function MainPage() {
         paddingTop: 20,
         }}
       >
-        <PostList mode="feed" />
+        <PostList 
+          mode="feed" 
+          onFollowSuccess={handleNewFollow} 
+        />
       </div>
       {/* right my area */}
       <div style={{ 

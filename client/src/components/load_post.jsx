@@ -8,7 +8,7 @@ import { FaRegHeart } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
-export default function PostList({ mode = 'feed', profileDollId }) {
+export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess }) {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
   const viewerId = auth.currentDollId;          // 目前登入者
@@ -110,6 +110,9 @@ export default function PostList({ mode = 'feed', profileDollId }) {
               : post
           )
         );
+        if (onFollowSuccess) {
+          onFollowSuccess(); // 不需要傳參數，因為 handleNewFollow 會自己獲取資料
+        }
       } else {
         const followData = {
           from_doll_id: viewerId,
@@ -127,6 +130,11 @@ export default function PostList({ mode = 'feed', profileDollId }) {
               : post
           )
         );
+
+        if (onFollowSuccess) {
+          onFollowSuccess();
+        }
+
       }
     } catch (err) {
       console.error('追蹤操作失敗:', err);
