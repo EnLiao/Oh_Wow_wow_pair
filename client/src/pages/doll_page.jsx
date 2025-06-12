@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
-import { getDollInfo } from '../services/api';
+import { getDollInfo, unfollow } from '../services/api';
 import PostList from '../components/load_post';
 import { MdModeEditOutline } from "react-icons/md";
 import EditDoll from '../components/edit_doll';
+import { RiUserUnfollowFill } from "react-icons/ri";
 import { 
   Container, 
   Row, 
@@ -32,6 +33,30 @@ export default function DollPage() {
 
   const toggleEditModal = () => {
     setIsEditModalOpen(!isEditModalOpen);
+  };
+
+  const handleUnfollow = async () => {
+    // 使用 confirm 代替 alert，會返回 true 或 false
+    const isConfirmed = window.confirm('你確定要取消關注嗎？');
+    
+    // 只有當用戶點擊"確定"時才執行取消關注操作
+    if (isConfirmed) {
+      try {
+        const unfollowData = {
+          from_doll_id: auth_context.currentDollId,
+          to_doll_id: dollData.id
+        };
+        
+        await unfollow(unfollowData);
+        console.log('已取消關注:', dollData.id);
+        
+        // 可選：刷新頁面或更新狀態
+        // window.location.reload();
+        
+      } catch (err) {
+        console.error('取消關注失敗:', err);
+      }
+    }
   };
   
   // 使用 useEffect 在元件掛載時獲取數據
@@ -130,6 +155,12 @@ export default function DollPage() {
                 dollData={dollData} 
                 onDollUpdated={(updatedDoll) => setDoll(updatedDoll)}
               />
+              { auth_context.currentDollId !== dollData.id &&
+                <RiUserUnfollowFill
+                  style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
+                  onClick={handleUnfollow}
+                />
+              }
             </CardHeader>
             <CardBody>
               <CardImg 
