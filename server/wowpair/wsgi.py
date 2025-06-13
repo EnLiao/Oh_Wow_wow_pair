@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Oh_Wow_wow_pair.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wowpair.settings')
 
 application = get_wsgi_application()
