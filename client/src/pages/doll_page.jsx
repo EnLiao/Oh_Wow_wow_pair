@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
-import { getDollInfo, unfollow } from '../services/api';
+import { getDollInfo, unfollow, check_following, follow} from '../services/api';
 import PostList from '../components/load_post';
 import { MdModeEditOutline } from "react-icons/md";
 import EditDoll from '../components/edit_doll';
 import { RiUserUnfollowFill } from "react-icons/ri";
+import { RiUserFollowFill } from "react-icons/ri";
 import { 
   Container, 
   Row, 
@@ -30,6 +31,37 @@ export default function DollPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    const checkFollowingStatus = async () => {
+      if (!auth_context.currentDollId || !doll_id) return;
+      try {
+        const response = await check_following(auth_context.currentDollId, doll_id);
+        console.log('Following status:', response.data);
+        setIsFollowing(response.data.is_following);
+      } catch (err) {
+        console.error('檢查關注狀態失敗:', err);
+        setError('無法檢查關注狀態');
+      }
+    };
+    checkFollowingStatus();
+  }, [auth_context.currentDollId, doll_id]);
+
+  const handleFollow = async () => {
+    const followData = {
+      from_doll_id: auth_context.currentDollId,
+      to_doll_id: dollData.id
+    };
+    try {
+      await follow(followData);
+      console.log('已關注:', dollData.id);
+      setIsFollowing(true);
+    } catch (err) {
+      console.error('關注失敗:', err);
+      setError('關注失敗，請稍後再試');
+    }
+  };
 
   const toggleEditModal = () => {
     setIsEditModalOpen(!isEditModalOpen);
@@ -50,8 +82,7 @@ export default function DollPage() {
         await unfollow(unfollowData);
         console.log('已取消關注:', dollData.id);
         
-        // 可選：刷新頁面或更新狀態
-        // window.location.reload();
+        setIsFollowing(false);
         
       } catch (err) {
         console.error('取消關注失敗:', err);
@@ -155,10 +186,16 @@ export default function DollPage() {
                 dollData={dollData} 
                 onDollUpdated={(updatedDoll) => setDoll(updatedDoll)}
               />
-              { auth_context.currentDollId !== dollData.id &&
+              { isFollowing && auth_context.currentDollId !== dollData.id &&
                 <RiUserUnfollowFill
                   style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
                   onClick={handleUnfollow}
+                />
+              }
+              { !isFollowing && auth_context.currentDollId !== dollData.id &&
+                <RiUserFollowFill
+                  style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
+                  onClick={handleFollow}
                 />
               }
             </CardHeader>
