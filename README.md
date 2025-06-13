@@ -38,3 +38,7 @@ python manage.py runserver
 - Copid
 - Donut Music Classroom
 - Our dear dolls
+### Setting .env
+- SECRET_KEY=YOUR_DATA
+- RECAPTCHA_SECRET_KEY=YOUR_DATA
+- VITE_RECAPTCHA_SITE_KEY=YOUR_DATA

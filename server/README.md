@@ -4,6 +4,23 @@
 
 ---
 
+---
+
+### reCAPTCHA 驗證（防機器人）
+
+1. 前端在註冊、登入等 API 請求時，需多帶一個 `recaptcha_token` 欄位，例如：
+   ```json
+   {
+     "username": "momo",
+     "password": "abc12345",
+     "recaptcha_token": "前端取得的token"
+   }
+   ```
+2. 後端會自動驗證 token，驗證失敗會回傳 400，訊息如「請通過人機驗證」。
+3. 請在 `.env` 設定 `RECAPTCHA_SECRET_KEY=key`。
+4. 若未帶 recaptcha_token 或驗證失敗，API 會拒絕請求。
+
+---
 ### 使用者註冊 API
 
 * **路徑**：`POST /core/register/`
@@ -57,9 +74,12 @@ email格式不正確
 ```json
 {
   "username": "momo",
-  "password": "abc12345"
+  "password": "abc12345",
+  "recaptcha_token": "前端取得的token"
 }
 ```
+
+* **說明**：自 2025/06/11 起，登入 API 需帶 recaptcha_token，否則會回傳 400。
 
 * **成功時回應格式範例（JSON）**：
 
@@ -198,7 +218,7 @@ curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
-* **成功時回應範例（JSON）**：
+* **成功時回應格式範例（JSON）**：
 
 ```json
 {
@@ -300,6 +320,64 @@ curl -X DELETE http://127.0.0.1:8000/core/follow/ \
   -d '{"from_doll_id": "doll1", "to_doll_id": "doll2"}'
 ```
 
+---
+
+### 查詢追蹤狀態 API（check_following）
+
+* **路徑**：`GET /core/check_following/`
+* **說明**：查詢「自己擁有的某隻娃娃」是否有追蹤另一隻娃娃。
+* **權限**：必須登入，且只能查詢自己擁有的娃娃（from_doll_id 必須是自己的娃娃）。
+
+#### 請求格式（Query String）：
+
+| 參數           | 型別   | 是否必填 | 說明                 |
+| -------------- | ------ | ------ | -------------------- |
+| from_doll_id   | string | ✅ 是   | 查詢的發起娃娃 id（必須是自己擁有的） |
+| to_doll_id     | string | ✅ 是   | 查詢的目標娃娃 id         |
+
+#### 成功回應（JSON）：
+```json
+{
+  "is_following": true
+}
+```
+或
+```json
+{
+  "is_following": false
+}
+```
+
+#### 權限/錯誤回應（JSON）：
+- 查詢不是自己娃娃：
+```json
+{"detail": "你只能查詢自己擁有的娃娃"}
+```
+- 缺少參數：
+```json
+{"detail": "缺少 from_doll_id 或 to_doll_id", "is_following": false}
+```
+- from_doll_id 不存在：
+```json
+{"detail": "娃娃不存在", "is_following": false}
+```
+
+#### 測試 curl 指令：
+
+```bash
+# 查詢 doll1 是否有追蹤 doll2（doll1 必須是你自己的娃娃）
+curl -X GET "http://127.0.0.1:8000/core/check_following/?from_doll_id=doll1&to_doll_id=doll2" \
+  -H "Authorization: Bearer <你的 access_token>"
+```
+
+# 查詢不是自己娃娃會失敗
+curl -X GET "http://127.0.0.1:8000/core/check_following/?from_doll_id=not_my_doll&to_doll_id=doll2" \
+  -H "Authorization: Bearer <你的 access_token>"
+
+# 缺少參數會失敗
+curl -X GET "http://127.0.0.1:8000/core/check_following/?from_doll_id=doll1" \
+  -H "Authorization: Bearer <你的 access_token>"
+```
 ### 3. 錯誤處理情況
 
 | 錯誤情境      | HTTP 狀態碼 | 回應訊息                             |
