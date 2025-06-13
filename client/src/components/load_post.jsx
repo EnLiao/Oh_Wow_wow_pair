@@ -6,9 +6,11 @@ import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstra
 import { FaRegCommentDots } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa6";
+import { useNavigate } from 'react-router-dom';
 
 export default function PostList({ mode = 'feed', profileDollId }) {
   const auth = useContext(AuthContext);
+  const navigate = useNavigate();
   const viewerId = auth.currentDollId;          // 目前登入者
   const targetId = mode === 'profile' ? profileDollId : viewerId;
 
@@ -28,6 +30,17 @@ export default function PostList({ mode = 'feed', profileDollId }) {
       }
       return newLiked;
     });
+  };
+
+  const handleCommentAdded = (postId) => {
+    // 更新指定貼文的評論計數
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === postId 
+          ? { ...post, comment_count: post.comment_count + 1 } 
+          : post
+      )
+    );
   };
 
   const likeSubmit = async (postId) => {
@@ -203,6 +216,9 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                     userSelect: 'none', 
                     cursor: 'pointer'
                   }}
+                  onClick={() => {
+                    navigate(`/doll_page/${p.doll_id}`);
+                  }}
                 />
               <CardTitle tag="h5" className="mb-0">
                 {p.doll_id}
@@ -285,8 +301,23 @@ export default function PostList({ mode = 'feed', profileDollId }) {
                 }}
                 onClick={() => toggleComment(p.id)}
               />
+                <p style={{
+                  margin: 0,
+                  marginRight: 5,
+                  marginLeft: 10,
+                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  {p.comment_count}
+                </p>
             </div>
-            {commentingPostId === p.id && <PostComment postId={p.id} />}
+            {commentingPostId === p.id && (
+              <PostComment 
+                postId={p.id} 
+                onCommentAdded={() => handleCommentAdded(p.id)} 
+              />
+            )}
           </CardBody>
         </Card>
       ))}

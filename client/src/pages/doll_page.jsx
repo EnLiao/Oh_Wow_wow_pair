@@ -107,7 +107,14 @@ export default function DollPage() {
   return (
     <Container className="mt-5" style={{ paddingTop: 50 }}>
       <Row>
-        <Col md={4}>
+        <Col 
+          md={4}
+          style={{ 
+            position: 'sticky',    // 添加這一行使元素保持固定
+            top: 100,               // 距離頂部的距離，考慮導航欄的高度
+            alignSelf: 'flex-start', // 使其保持在頂部而不是拉伸
+            height: 'fit-content'  // 高度適應內容
+          }}>
           <Card className="mb-4">
             <CardHeader className="d-flex align-items-center justify-content-between">
               <h2 className="mb-0">{dollData.id}</h2>
@@ -158,7 +165,7 @@ export default function DollPage() {
                 <ListGroupItem>
                   <strong>Tag:</strong> {
                     Array.isArray(dollData.tags)
-                      ? dollData.tags.join(', ')
+                      ? dollData.tags.map(tag => tag.name).join(', ')
                       : dollData.tags
                   }
                 </ListGroupItem>
