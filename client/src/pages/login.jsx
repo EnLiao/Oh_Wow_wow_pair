@@ -128,14 +128,18 @@ export default function Login() {
                 .join('\n');
             }
           } else {
-            message = 'Account or password is incorrect';
+            message = '帳號或密碼錯了';
           }
       
+          // 特殊處理 refresh token 錯誤
+          if (message.includes('No refresh token available')) {
+            message = '帳號或密碼錯了';
+          }
           alert(`log in failed:\n${message}`);
         } else if (err.request) {
           alert('log in failed: No response from server');
-        } else {
-          alert(`log in failed: ${err.message}`);
+        } else if (err.message.includes('No refresh token available')) {
+          alert(`log in failed: 帳號或密碼錯了`);
         }
       }      
     }
