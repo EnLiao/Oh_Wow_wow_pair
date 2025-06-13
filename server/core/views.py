@@ -12,6 +12,8 @@ from .models import Doll, Tag, Follow
 from rest_framework.throttling import UserRateThrottle
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .token_serializers import CustomTokenObtainPairWithRecaptchaSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
@@ -126,3 +128,19 @@ class DollUpdateView(RetrieveUpdateAPIView):
             raise PermissionDenied("只能編輯自己的娃娃")
         # 禁止更改 username
         serializer.save(username=doll.username)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_following(request):
+    from_doll_id = request.query_params.get('from_doll_id')
+    to_doll_id = request.query_params.get('to_doll_id')
+    if not from_doll_id or not to_doll_id:
+        return Response({'detail': '缺少 from_doll_id 或 to_doll_id', 'is_following': False}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        doll = Doll.objects.get(id=from_doll_id)
+    except Doll.DoesNotExist:
+        return Response({'detail': '娃娃不存在', 'is_following': False}, status=status.HTTP_400_BAD_REQUEST)
+    if doll.username != request.user:
+        return Response({'detail': '你只能查詢自己擁有的娃娃'}, status=status.HTTP_403_FORBIDDEN)
+    is_following = Follow.objects.filter(from_doll_id=from_doll_id, to_doll_id=to_doll_id).exists()
+    return Response({'is_following': is_following})
