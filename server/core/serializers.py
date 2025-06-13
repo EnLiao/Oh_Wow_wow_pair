@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils.crypto import get_random_string
 from django.core.cache import cache
 import requests
+import re
 
 User = get_user_model()
 #我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_image 為可選欄位，但email 為必填欄位
@@ -118,10 +119,14 @@ class DollSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("每位使用者最多只能創建 10 個娃娃")
         return value
     def validate_id(self, value):
+        
         if len(value) > 64:
             raise serializers.ValidationError("娃娃 ID 長度不能超過 64 字元")
         if Doll.objects.filter(id=value).exists():
             raise serializers.ValidationError("娃娃 id 已存在")
+        # 檢查是否包含中文
+        if re.search(r'[\u4e00-\u9fff]', value):
+            raise serializers.ValidationError("娃娃 ID 不能包含中文字符")
         return value
     def validate_name(self, value):
         if len(value) > 100:
