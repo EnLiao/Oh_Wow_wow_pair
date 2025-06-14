@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../services/auth_context';
-import { getPosts, follow, unfollow, likePost, unlikePost } from '../services/api';
+import { getPosts, follow, likePost, unlikePost } from '../services/api';
 import PostComment from './post_comment';
 import { Card, CardBody, CardTitle, CardText, CardImg, Spinner } from 'reactstrap';
 import { FaRegCommentDots } from "react-icons/fa";
@@ -8,7 +8,7 @@ import { FaRegHeart } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
-export default function PostList({ mode = 'feed', profileDollId }) {
+export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess }) {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
   const viewerId = auth.currentDollId;          // 目前登入者
@@ -93,40 +93,25 @@ export default function PostList({ mode = 'feed', profileDollId }) {
     const isFollowing = currentPost?.is_followed ?? false;
     
     try {
-      if (isFollowing) {
-        const unfollowData = {
-          from_doll_id: dollId,
-          to_doll_id: viewerId,
-        };
+      const followData = {
+        from_doll_id: viewerId,
+        to_doll_id: dollId,
+      };
         
-        await unfollow(unfollowData);
-        console.log('已取消追蹤:', dollId);
+      await follow(followData);
+      console.log('已追蹤:', dollId);
         
-        // 直接更新貼文的 is_followed 屬性
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.doll_id === dollId 
-              ? { ...post, is_followed: false } 
-              : post
-          )
-        );
-      } else {
-        const followData = {
-          from_doll_id: viewerId,
-          to_doll_id: dollId,
-        };
-        
-        await follow(followData);
-        console.log('已追蹤:', dollId);
-        
-        // 直接更新貼文的 is_followed 屬性
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.doll_id === dollId 
-              ? { ...post, is_followed: true } 
-              : post
-          )
-        );
+      // 直接更新貼文的 is_followed 屬性
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.doll_id === dollId 
+            ? { ...post, is_followed: true } 
+            : post
+        )
+      );
+
+      if (onFollowSuccess) {
+        onFollowSuccess();
       }
     } catch (err) {
       console.error('追蹤操作失敗:', err);
