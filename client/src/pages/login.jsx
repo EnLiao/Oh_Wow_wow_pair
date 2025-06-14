@@ -14,6 +14,7 @@ import {
   Col, 
   Label
 } from 'reactstrap';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -23,10 +24,16 @@ export default function Login() {
   const [nickname, setNickname] = useState('')
   const [avatarFile, setAvatarFile] = useState(null)
   const [bio, setBio] = useState('')
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   const navigate = useNavigate()
   const auth_context = useContext(AuthContext)
 
   const handleSubmit = async () => {
+    if (!recaptchaToken) {
+      alert('請先通過人機驗證');
+      return;
+    }
     if (isSignUp) {
       const data = {
         username,
@@ -34,7 +41,8 @@ export default function Login() {
         email,
         nickname,
         avatarFile,
-        bio
+        bio,
+        recaptcha_token: recaptchaToken
       };
   
       try {
@@ -73,7 +81,7 @@ export default function Login() {
       }
     } else {
       try {
-        const res = await login({ username, password }); // axios 呼叫 login
+        const res = await login({ username, password, recaptcha_token: recaptchaToken }); // axios 呼叫 login
         const { access, refresh } = res.data;
   
         auth_context.updateToken(access);
@@ -120,14 +128,18 @@ export default function Login() {
                 .join('\n');
             }
           } else {
-            message = 'Account or password is incorrect';
+            message = '帳號或密碼錯了';
           }
       
+          // 特殊處理 refresh token 錯誤
+          if (message.includes('No refresh token available')) {
+            message = '帳號或密碼錯了';
+          }
           alert(`log in failed:\n${message}`);
         } else if (err.request) {
           alert('log in failed: No response from server');
-        } else {
-          alert(`log in failed: ${err.message}`);
+        } else if (err.message.includes('No refresh token available')) {
+          alert(`log in failed: 帳號或密碼錯了`);
         }
       }      
     }
@@ -232,7 +244,14 @@ export default function Login() {
                 />
               </Col>
             </FormGroup>
-  
+            <FormGroup row>
+              <Col sm={{ size: 9, offset: 3 }}>
+                <ReCAPTCHA
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={token => setRecaptchaToken(token)}
+                />
+              </Col>
+            </FormGroup>
             <Button 
               block 
               onClick={handleSubmit}
