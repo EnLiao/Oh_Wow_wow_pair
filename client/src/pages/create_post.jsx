@@ -27,20 +27,37 @@ export default function CreatePost() {
             return
         }
 
-        // 創建 FormData 對象
         const formData = new FormData();
         formData.append('doll_id', dollId);
         formData.append('content', postContent);
         formData.append('image', imgFile);
 
         try {
-            const res = await create_post(formData) // axios 呼叫 createPost
+            const res = await create_post(formData)
             console.log('create post success', res.data)
             alert('create post success')
             navigate('/main_page')
         } catch (err) {
             console.error(err)
-            alert('create post failed')
+            // 顯示後端回傳的錯誤訊息
+            let msg = 'create post failed';
+            if (err.response && err.response.data) {
+                const data = err.response.data;
+                if (typeof data === 'string') {
+                    msg = data;
+                } else if (typeof data === 'object') {
+                    if (data.detail) {
+                        msg = data.detail;
+                    } else if (data.non_field_errors) {
+                        msg = data.non_field_errors.join(', ');
+                    } else {
+                        msg = Object.entries(data)
+                            .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+                            .join('\n');
+                    }
+                }
+            }
+            alert(msg);
         }
     }
 

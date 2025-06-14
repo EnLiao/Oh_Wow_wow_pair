@@ -1,7 +1,7 @@
 import PostList from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
-import React, { use, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { getFollowing } from '../services/api';
 
 export default function MainPage() {
@@ -9,6 +9,7 @@ export default function MainPage() {
   const auth_context = useContext(AuthContext);
   console.log('auth_context', auth_context);
   const [following, setFollowing] = React.useState([]);
+  const [greeting, setGreeting] = React.useState('');
   useEffect(() => {
     const fetchFollowing = async () => {
       try {
@@ -22,6 +23,36 @@ export default function MainPage() {
     
     fetchFollowing();
   }, [auth_context.currentDollId]); // 添加空陣列作為依賴，確保只執行一次
+
+  useEffect(() => {
+    const greetings = [
+      `Hello, ${auth_context.doll_name}!`,
+      `Hi there, ${auth_context.doll_name}!`,
+      `Welcome back, ${auth_context.doll_name}!`,
+      `Nice to see you, ${auth_context.doll_name}!`,
+      `What's new, ${auth_context.doll_name}?`,
+      `How's it going, ${auth_context.doll_name}?`,
+      `Have a great day, ${auth_context.doll_name}!`,
+      `Let's explore, ${auth_context.doll_name}!`,
+      `Ready for fun, ${auth_context.doll_name}?`
+    ];
+    
+    // 隨機選擇一個打招呼語句
+    const randomIndex = Math.floor(Math.random() * greetings.length);
+    setGreeting(greetings[randomIndex]);
+  }, [auth_context.doll_name]);
+
+  const handleNewFollow = async () => {
+    // 直接調用 fetchFollowing 重新獲取最新追蹤列表
+    try {
+      const res = await getFollowing(auth_context.currentDollId);
+      setFollowing(res.data);
+      console.log('追蹤成功後刷新列表:', res.data); 
+    } catch (err) {
+      console.error('刷新追蹤列表失敗:', err);
+    }
+  };
+
   return (
     <div style={{ paddingLeft: '3%', paddingTop: 50, display: 'flex', flexDirection: 'flex-start'}}>
       {/* left following list */}
@@ -39,7 +70,7 @@ export default function MainPage() {
           overflowY: 'auto'
         }}
       >
-        <p style={{ fontSize: 15 }}>Following</p>
+        <h6 style={{ marginBottom:'0rem' }}>Following</h6>
         {following.map(following_doll => (
           <div
             key={following_doll.id}
@@ -72,16 +103,32 @@ export default function MainPage() {
                 }}
               />
             </div>
-            <p
-              style={{
-                cursor: 'pointer',
+
+            {/* 新增: 包裝文字的容器，設置為垂直排列 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              cursor: 'pointer'
+            }} onClick={() => {navigate(`/doll_page/${following_doll.id}`)}}>
+              <p style={{
+                margin: 0, // 移除預設邊距
+                padding: 0,
                 whiteSpace: 'nowrap',
                 fontSize: 14,
-              }}
-              onClick={() => {navigate(`/doll_page/${following_doll.id}`)}} // 點擊名字跳轉到 doll profile
-            >
-              {following_doll.name}
-            </p>
+                fontWeight: 'bold',
+              }}>
+                {following_doll.id}
+              </p>
+              <p style={{
+                margin: 0, // 移除預設邊距
+                padding: 0,
+                whiteSpace: 'nowrap',
+                fontSize: 14,
+                color: '#6c757d'
+              }}>
+                {following_doll.name}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -90,10 +137,13 @@ export default function MainPage() {
       <div style={{ 
         width: '60%',
         alignItems: 'center',
-        paddingTop: 20,
+        paddingTop: 40,
         }}
       >
-        <PostList mode="feed" />
+        <PostList 
+          mode="feed" 
+          onFollowSuccess={handleNewFollow} 
+        />
       </div>
       {/* right my area */}
       <div style={{ 
@@ -103,7 +153,7 @@ export default function MainPage() {
         marginRight:5, 
         marginLeft: 5,
         position: 'sticky', 
-        top: 60,  
+        top: 80,  
         height: 'calc(100vh - 60px)',
         overflowY: 'auto'
         }}
@@ -120,7 +170,9 @@ export default function MainPage() {
             cursor: 'pointer',
           }}
         />
-        <p style={{ textAlign: 'center', fontSize: 12, marginTop:10 }}>Good Morning, {auth_context.doll_name}!</p>
+        <p style={{ textAlign: 'center', fontSize: 13, marginTop: 10 }}>
+          {greeting}
+        </p>
       </div>
     </div>
   );

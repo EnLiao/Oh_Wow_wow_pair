@@ -29,6 +29,7 @@ export const postComments = (postId, data) => api.post(`/post/posts/${postId}/co
 export const getComments = (postId) => api.get(`/post/posts/${postId}/comments/`);
 export const searchDolls = (keyword) => api.get(`/search/doll/?q=${keyword}`);
 export const edit_doll = (dollId, data) => api.patch(`/core/dolls/${dollId}/edit/`, data);
+export const check_following = (fromDollId, toDollId) => api.get(`/core/check_following/?from_doll_id=${fromDollId}&to_doll_id=${toDollId}`);
 export async function getPosts({
   mode,
   targetDollId,
