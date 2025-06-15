@@ -255,7 +255,7 @@ export default function EditDoll({ isOpen, toggle, dollData, onDollUpdated }) {
               {availableTags.map(tag => (
                 <Badge
                   key={tag.id}
-                  color={selectedTagIds.includes(tag.id) ? "primary" : "secondary"}
+                  color={selectedTagIds.includes(tag.id) ? "#ffd5fc" : "#ffd5fc"}
                   style={{ 
                     cursor: 'pointer',
                     padding: '8px 12px',
@@ -279,7 +279,15 @@ export default function EditDoll({ isOpen, toggle, dollData, onDollUpdated }) {
       </ModalBody>
       
       <ModalFooter>
-        <Button color="secondary" onClick={handleCancel} disabled={loading}>
+        <Button 
+          onClick={handleCancel} 
+          disabled={loading}
+          style={{ 
+            backgroundColor: '#e9ecef', 
+            border: 'none', 
+            color: '#000' 
+          }}
+        >
           取消
         </Button>
         <Button
