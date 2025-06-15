@@ -31,7 +31,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     model = User
     
     # Unfold 樣式的列表顯示
-    list_display = ('username', 'nickname_display', 'email', 'avatar_preview', 'bio_preview', 'created_at', 'is_staff_display')
+    list_display = ('username', 'nickname_display', 'email', 'avatar_preview', 'bio_preview', 'created_at', 'is_staff_display', 'is_superuser_display')
     list_display_links = ('username',)
     search_fields = ('username', 'nickname', 'email', 'bio')
     list_filter = (
@@ -44,14 +44,14 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     fieldsets = (
         ("基本資訊", {
             'fields': ('username', 'nickname', 'email'),
-            'classes': ('collapse',),
+            # 'classes': ('collapse',),
         }),
         ("個人資料", {
             'fields': ('bio', 'avatar_image'),
         }),
         ("權限設置", {
-            'fields': ('is_staff', 'is_active'),
-            'classes': ('collapse',),
+            'fields': ('is_staff', 'is_superuser', 'is_active'),
+            # 'classes': ('collapse',),
         }),
     )
     
@@ -62,9 +62,9 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
         ),
     )
 
-    @display(description="昵稱", ordering="nickname")
+    @display(description="暱稱", ordering="nickname")
     def nickname_display(self, obj):
-        return obj.nickname or "未設置"
+        return obj.nickname or "未設定"
 
     @display(description="頭像")
     def avatar_preview(self, obj):
@@ -84,6 +84,10 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     @display(description="員工", boolean=True)
     def is_staff_display(self, obj):
         return obj.is_staff
+    
+    @display(description="超級管理員", boolean=True)
+    def is_superuser_display(self, obj):
+        return obj.is_superuser
 
     def save_model(self, request, obj, form, change):
         if not change:  # If creating a new user
