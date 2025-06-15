@@ -1,6 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Doll, Tag, Follow
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.crypto import get_random_string
+from django.core.cache import cache
+import requests
+import re
+from django.utils.crypto import get_random_string
+from django.conf import settings
+from django.core.cache import cache
 
 User = get_user_model()
 #我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_image 為可選欄位，但email 為必填欄位
