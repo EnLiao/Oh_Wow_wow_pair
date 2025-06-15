@@ -44,14 +44,14 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     fieldsets = (
         ("基本資訊", {
             'fields': ('username', 'nickname', 'email'),
-            'classes': ('collapse',),
+            # 'classes': ('collapse',),
         }),
         ("個人資料", {
             'fields': ('bio', 'avatar_image'),
         }),
         ("權限設置", {
-            'fields': ('is_staff', 'is_active'),
-            'classes': ('collapse',),
+            'fields': ('is_staff', 'is_superuser', 'is_active'),
+            # 'classes': ('collapse',),
         }),
     )
     
