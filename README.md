@@ -42,3 +42,11 @@ python manage.py runserver
 - SECRET_KEY=YOUR_DATA
 - RECAPTCHA_SECRET_KEY=YOUR_DATA
 - VITE_RECAPTCHA_SITE_KEY=YOUR_DATA
+- EMAIL_HOST=smtp.gmail.com
+- EMAIL_PORT=587
+- EMAIL_HOST_USER=你的Gmail帳號@gmail.com
+- EMAIL_HOST_PASSWORD_WOW=你的Gmail應用程式密碼（App Password）
+- EMAIL_USE_TLS=True
+- DEFAULT_FROM_EMAIL=你的Gmail帳號@gmail.com
+# 可選：前端與後端共用的 base URL（例如用來生成信箱驗證連結）
+- BASE_URL=http://localhost:8000
