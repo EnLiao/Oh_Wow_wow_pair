@@ -234,7 +234,12 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
                 )}
             </div>
 
-            <CardText style={{marginBottom:10}}>{p.content}</CardText>
+            <CardText style={{
+              marginBottom: 10,
+              whiteSpace: 'pre-wrap'  // 添加這個屬性來保留換行
+            }}>
+              {p.content}
+            </CardText>
 
             {p.image && (
               <CardImg
