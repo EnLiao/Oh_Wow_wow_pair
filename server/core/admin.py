@@ -64,7 +64,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
 
     @display(description="暱稱", ordering="nickname")
     def nickname_display(self, obj):
-        return obj.nickname or "為設定"
+        return obj.nickname or "未設定"
 
     @display(description="頭像")
     def avatar_preview(self, obj):
