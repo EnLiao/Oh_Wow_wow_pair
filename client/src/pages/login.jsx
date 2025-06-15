@@ -48,7 +48,7 @@ export default function Login() {
       try {
         const res = await register(data); // axios 呼叫 register
         console.log('sign up success', res.data);
-        alert('sign up success');
+        alert('已發送信件，請前往信箱點擊驗證連結啟用帳號，才能正常入喔！');
         setIsSignUp(false);
       } catch (err) {
         if (err.response) {
