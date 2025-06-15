@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Doll, Tag, Follow
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from django.core.cache import cache
@@ -10,6 +10,7 @@ import re
 from django.utils.crypto import get_random_string
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
 
 User = get_user_model()
 #我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_image 為可選欄位，但email 為必填欄位
@@ -52,26 +53,37 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
     def create(self, validated_data):
         validated_data.pop('recaptcha_token', None)
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email'),
-            password=validated_data['password'],
-            nickname=validated_data.get('nickname', ''),
-            bio=validated_data.get('bio', ''),
-            avatar_image=validated_data.get('avatar_image', ''),
-            is_active=False,  # 註冊時預設未啟用
-        )
-        # 產生驗證碼並寄信
-        code = get_random_string(32)
-        cache.set(f'verify_email_{user.username}', code, timeout=60*60)  # 1小時有效
-        verify_url = f"https://your-domain.com/core/verify_email/?username={user.username}&code={code}"
-        send_mail(
-            '請驗證您的信箱',
-            f'請點擊以下連結完成驗證：{verify_url}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )
+        with transaction.atomic():
+            try:
+                user = User.objects.create_user(
+                    username=validated_data['username'],
+                    email=validated_data.get('email'),
+                    password=validated_data['password'],
+                    nickname=validated_data.get('nickname', ''),
+                    bio=validated_data.get('bio', ''),
+                    avatar_image=validated_data.get('avatar_image', ''),
+                    is_active=False,  # 註冊時預設未啟用
+                )
+                # 產生驗證碼並寄信
+                code = get_random_string(32)
+                cache.set(f'verify_email_{user.username}', code, timeout=60*60)  # 1小時有效
+                # 用 settings 裡的 BASE_URL 來組合驗證網址
+                base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+                verify_url = f"{base_url}/core/verify_email/?username={user.username}&code={code}"
+                subject = '請驗證您的信箱'
+                body = f'請點擊以下連結完成驗證：{verify_url}'
+                from django.core.mail import EmailMultiAlternatives
+                email = EmailMultiAlternatives(
+                    subject=subject,
+                    body=body,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[user.email],
+                )
+                email.attach_alternative(body, "text/plain; charset=utf-8")
+                email.encoding = 'utf-8'
+                email.send(fail_silently=False)
+            except Exception as e:
+                raise serializers.ValidationError({'email': f'信箱驗證信寄送失敗，請稍後再試 ({str(e)})'})
         return user
 
 class TagSerializer(serializers.ModelSerializer):
