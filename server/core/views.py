@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django.core.cache import cache
 from django.contrib.auth import get_user_model
-from rest_framework.generics import RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView
+from rest_framework.decorators import api_view
 from .serializers import DollSerializer, TagSerializer
 from .serializers import RegisterSerializer, DollIdOnlySerializer, FollowSerializer
 from .models import Doll, Tag, Follow
@@ -14,6 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .token_serializers import CustomTokenObtainPairWithRecaptchaSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView
 
 User = get_user_model()
 

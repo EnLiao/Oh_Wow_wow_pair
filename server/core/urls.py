@@ -5,6 +5,7 @@ from .views import DollListCreateView, TagListView, DollDetailView, FollowersLis
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from .views import verify_email
 
 
 urlpatterns = [
@@ -23,5 +24,6 @@ urlpatterns = [
     path('tags/', TagListView.as_view(), name='tag-list'),
     path('dolls/<str:id>/edit/', DollUpdateView.as_view(), name='doll-update'),
     path('check_following/', check_following, name='check-following'),
+    path('verify_email/', verify_email, name='verify_email'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

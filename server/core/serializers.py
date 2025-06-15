@@ -1,12 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Doll, Tag, Follow
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils.crypto import get_random_string
-from django.core.cache import cache
-import requests
-import re
 
 User = get_user_model()
 #我設定了 username 為 primary key，這樣就不需要額外的 id 欄位了，且使nickname, bio, avatar_image 為可選欄位，但email 為必填欄位
@@ -56,6 +50,18 @@ class RegisterSerializer(serializers.ModelSerializer):
             nickname=validated_data.get('nickname', ''),
             bio=validated_data.get('bio', ''),
             avatar_image=validated_data.get('avatar_image', ''),
+            is_active=False,  # 註冊時預設未啟用
+        )
+        # 產生驗證碼並寄信
+        code = get_random_string(32)
+        cache.set(f'verify_email_{user.username}', code, timeout=60*60)  # 1小時有效
+        verify_url = f"https://your-domain.com/core/verify_email/?username={user.username}&code={code}"
+        send_mail(
+            '請驗證您的信箱',
+            f'請點擊以下連結完成驗證：{verify_url}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
         )
         return user
 
