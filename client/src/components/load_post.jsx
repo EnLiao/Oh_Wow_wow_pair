@@ -208,6 +208,9 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
               <CardTitle tag="h5" className="mb-0">
                 {p.doll_id}
               </CardTitle>
+              <small className="text-muted" style={{ marginLeft: '20px' }}>
+                {new Date(p.created_at).toLocaleString()}
+              </small>
                 {!p.is_followed && (
                   <p 
                     className="mb-0" 
@@ -231,7 +234,12 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
                 )}
             </div>
 
-            <CardText style={{marginBottom:10}}>{p.content}</CardText>
+            <CardText style={{
+              marginBottom: 10,
+              whiteSpace: 'pre-wrap'  // 添加這個屬性來保留換行
+            }}>
+              {p.content}
+            </CardText>
 
             {p.image && (
               <CardImg

@@ -6,7 +6,7 @@ import PostList from '../components/load_post';
 import { MdModeEditOutline } from "react-icons/md";
 import EditDoll from '../components/edit_doll';
 import { RiUserUnfollowFill } from "react-icons/ri";
-import { RiUserFollowFill } from "react-icons/ri";
+import { IoPersonAdd } from "react-icons/io5";
 import { 
   Container, 
   Row, 
@@ -193,7 +193,7 @@ export default function DollPage() {
                 />
               }
               { !isFollowing && auth_context.currentDollId !== dollData.id &&
-                <RiUserFollowFill
+                <IoPersonAdd
                   style={{ cursor: 'pointer', fontSize: '1.25rem' }} 
                   onClick={handleFollow}
                 />

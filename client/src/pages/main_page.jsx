@@ -154,7 +154,7 @@ export default function MainPage() {
         marginLeft: 5,
         position: 'sticky', 
         top: 80,  
-        height: 'calc(100vh - 60px)',
+        height: 'calc(100vh - 80px)',
         overflowY: 'auto'
         }}
       >
