@@ -36,6 +36,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     search_fields = ('username', 'nickname', 'email', 'bio')
     list_filter = (
         'is_staff',
+        'is_superuser',
         ('created_at', RangeDateFilter),
     )
     ordering = ('-created_at',)
@@ -85,7 +86,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
     def is_staff_display(self, obj):
         return obj.is_staff
     
-    @display(description="超級管理員", boolean=True)
+    @display(description="超級使用者", boolean=True)
     def is_superuser_display(self, obj):
         return obj.is_superuser
 
