@@ -26,6 +26,9 @@ class CustomUserChangeForm(UserChangeForm):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin):  # 繼承 ModelAdmin
+
+    list_filter_submit = True 
+
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = User
@@ -155,6 +158,9 @@ class DollTagInline(TabularInline):
 
 @admin.register(Doll)
 class DollAdmin(ModelAdmin):  # 改為繼承 ModelAdmin
+    
+    list_filter_submit = True 
+
     list_display = ('id', 'name', 'avatar_preview', 'username_link', 'birthday', 'tag_list', 'created_at')
     list_display_links = ('id', 'name')
     list_filter = (
