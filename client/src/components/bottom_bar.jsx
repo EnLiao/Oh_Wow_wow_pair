@@ -253,7 +253,10 @@ export default function BottomBar() {
                 <img
                   src={following_doll.avatar_image}
                   alt={following_doll.name}
-                  onClick={() => {navigate(`/doll_page/${following_doll.id}`)}}
+                  onClick={() => {
+                    setShowFollowing(false); 
+                    navigate(`/doll_page/${following_doll.id}`)
+                }}
                   style={{
                     width: '100%',
                     height: '100%',

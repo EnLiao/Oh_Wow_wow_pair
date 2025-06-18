@@ -394,7 +394,12 @@ export default function DollPage() {
             貼文
           </h5>
           
-          <PostList mode="profile" profileDollId={dollData.id} />
+          <div style={{ padding: '0 15px' }}>
+            <PostList 
+              mode="profile"
+              profileDollId={dollData.id}
+            />
+          </div>
         </div>
       </div>
     );
