@@ -338,7 +338,7 @@ export default function NavBar() {
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 100,
+        zIndex: 199,
         padding: isMobile ? '8px 4%' : '0 5%',
       }}
     >

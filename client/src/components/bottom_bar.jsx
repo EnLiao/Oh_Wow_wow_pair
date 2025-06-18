@@ -115,7 +115,7 @@ export default function BottomBar() {
         ref={searchOverlayRef}
         style={{
             position: 'fixed',
-            top: 40,
+            top: 0,
             left: 0,
             right: 0,
             bottom: 0,
@@ -123,7 +123,8 @@ export default function BottomBar() {
             zIndex: 100,
             display: 'flex',
             flexDirection: 'column',
-            padding: '15px',
+            padding: '12px',
+            paddingTop: '80px',
       }}>
         {/* 搜尋頂部欄 */}
         <div style={{ 
@@ -228,7 +229,7 @@ export default function BottomBar() {
             overflowY: 'auto'
           }}
         >
-          <h5 style={{ marginBottom:'0rem' }}>追蹤列表</h5>
+          <h5 style={{ marginBottom:'0rem', marginTop:'15px'}}>追蹤列表</h5>
           {following.map(following_doll => (
             <div
               key={following_doll.id}
@@ -237,6 +238,7 @@ export default function BottomBar() {
                 alignItems: 'center',
                 gap: '10px',
                 paddingLeft: '7%',
+                marginTop: '10px',
               }}
             >
               <div
