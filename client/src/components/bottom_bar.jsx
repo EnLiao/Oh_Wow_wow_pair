@@ -1,11 +1,78 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../services/auth_context';
+import Search from './search';
+import search_icon from '../assets/search.png';
+import { getFollowing } from '../services/api';
 
 export default function BottomBar() {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [following, setFollowing] = useState([]);
+  
+  // 添加ref來引用覆蓋層元素
+  const followingOverlayRef = useRef(null);
+  const searchOverlayRef = useRef(null);
+
+  const fetchFollowing = async () => {
+    try {
+      const res = await getFollowing(authContext.currentDollId);
+      setFollowing(res.data);
+    } catch (err) {
+      console.error('獲取關注列表失敗:', err);
+    }
+  };
+
+  // 監聽點擊外部事件
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 如果followingOverlay顯示中，且點擊事件不在覆蓋層內
+      if (
+        showFollowing &&
+        followingOverlayRef.current && 
+        !followingOverlayRef.current.contains(event.target) &&
+        // 確保不是點擊底部導航列的按鈕
+        !event.target.closest('.following-button')
+      ) {
+        setShowFollowing(false);
+      }
+    };
+
+    // 添加全局點擊事件監聽器
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // 清理函數
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showFollowing]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 如果followingOverlay顯示中，且點擊事件不在覆蓋層內
+      if (
+        showSearch &&
+        searchOverlayRef.current && 
+        !searchOverlayRef.current.contains(event.target) &&
+        // 確保不是點擊底部導航列的按鈕
+        !event.target.closest('.search-button')
+      ) {
+        setShowSearch(false);
+      }
+    };
+
+    // 添加全局點擊事件監聽器
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // 清理函數
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSearch]);
 
   useEffect(() => {
     // 監聽視窗大小變化
@@ -17,87 +84,301 @@ export default function BottomBar() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (showFollowing) {
+        fetchFollowing();
+    }
+    }, [showFollowing]);
+
+  // 處理搜尋輸入變化
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchKeyword(value);
+    
+    // 只有當輸入非空時才顯示結果
+    if (value.trim()) {
+      setShowSearch(true);
+    } else {
+      setShowSearch(false);
+    }
+  };
+  
+  // 搜尋覆蓋層
+  const SearchOverlay = () => {
+    return (
+      <div 
+        ref={searchOverlayRef}
+        style={{
+            position: 'fixed',
+            top: 50,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'white',
+            zIndex: 99,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '15px',
+      }}>
+        {/* 搜尋頂部欄 */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          marginBottom: '15px',
+          gap: '10px'
+        }}>
+          {/* 搜尋輸入框 */}
+          <div style={{ 
+            position: 'relative',
+            flex: 1,
+          }}>
+            <input
+              type="text"
+              placeholder="搜尋 Oh-Wow-wow-pair"
+              value={searchKeyword}
+              onChange={handleInputChange}
+              autoFocus
+              style={{
+                width: '100%',
+                height: '40px',
+                border: 'none',
+                borderRadius: '20px',
+                backgroundColor: '#f0f0f0',
+                paddingLeft: '35px',
+                fontSize: '16px',
+                outline: 'none',
+              }}
+            />
+            <img
+              src={search_icon || '🔍'}
+              alt="search"
+              style={{
+                width: '18px',
+                height: '18px',
+                position: 'absolute',
+                top: '50%',
+                left: '10px',
+                transform: 'translateY(-50%)',
+                opacity: '0.6',
+              }}
+            />
+          </div>
+        </div>
+        
+        {/* 搜尋結果區域 */}
+        <div style={{ 
+          flex: 1,
+          overflowY: 'auto'
+        }}>
+          {searchKeyword ? (
+            <Search 
+              keyword={searchKeyword} 
+              onResultClick={() => {
+                setSearchKeyword('');
+                setShowSearch(false);
+              }} 
+            />
+          ) : (
+            <div style={{ 
+              textAlign: 'center',
+              color: '#666',
+              marginTop: '30px'
+            }}>
+              <p>輸入關鍵詞開始搜尋</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const FollowingOverlay = () => {
+    return (
+      <div 
+        ref={followingOverlayRef}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'white',
+          zIndex: 99, 
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '15px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+            marginTop: 10,
+            paddingLeft: '1%',
+            width: '100%',
+            position: 'sticky', 
+            top: 80,  
+            height: 'calc(100vh - 80px)',
+            overflowY: 'auto'
+          }}
+        >
+          <h5 style={{ marginBottom:'0rem' }}>追蹤列表</h5>
+          {following.map(following_doll => (
+            <div
+              key={following_doll.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                paddingLeft: '7%',
+              }}
+            >
+              <div
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                }}
+              >
+                <img
+                  src={following_doll.avatar_image}
+                  alt={following_doll.name}
+                  onClick={() => {navigate(`/doll_page/${following_doll.id}`)}}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    cursor: 'pointer',
+                  }}
+                />
+              </div>
+
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer'
+              }} onClick={() => {navigate(`/doll_page/${following_doll.id}`)}}>
+                <p style={{
+                  margin: 0,
+                  padding: 0,
+                  whiteSpace: 'nowrap',
+                  fontSize: 17,
+                  fontWeight: 'bold',
+                }}>
+                  {following_doll.id}
+                </p>
+                <p style={{
+                  margin: 0,
+                  padding: 0,
+                  whiteSpace: 'nowrap',
+                  fontSize: 15,
+                  color: '#6c757d'
+                }}>
+                  {following_doll.name}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // 移動版底部導航欄 - 固定在底部
   const renderMobileBar = () => {
     return (
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#F5F5F5',
-        borderTop: '1px solid #E4E4E4',
-        zIndex: 100,
-        width: '100%',
-        boxShadow: '0 -2px 5px rgba(0,0,0,0.1)',
-      }}>
+      <>
+        {showSearch && <SearchOverlay />}
+        {showFollowing && <FollowingOverlay />}
+        
         <div style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: '#F5F5F5',
+          borderTop: '1px solid #E4E4E4',
+          zIndex: 100,
+          width: '100%',
+          boxShadow: '0 -2px 5px rgba(0,0,0,0.1)',
         }}>
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              padding: '5px 0',
-            }}
-            onClick={() => navigate('/main_page')}
-          >
-            <span style={{ fontSize: '25px' }}>🏠</span>
-          </div>
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              padding: '5px 0',
-            }}
-            // onClick={() => navigate('/search')}
-          >
-            <span style={{ fontSize: '25px' }}>🔍</span>
-          </div>
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              padding: '5px 0',
-            }}
-            onClick={() => navigate('/create_post')}
-          >
-            <span style={{ fontSize: '25px' }}>➕</span>
-          </div>
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              padding: '5px 0',
-            }}
-            // onClick={() => navigate('/following list')}
-          >
-            <span style={{ fontSize: '25px' }}>👥</span>
-          </div>
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              padding: '5px 0',
-            }}
-            onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}
-          >
-            <span style={{ fontSize: '25px' }}>👤</span>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}>
+            <div 
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: '5px 0',
+              }}
+              onClick={() => navigate('/main_page')}
+            >
+              <span style={{ fontSize: '25px' }}>🏠</span>
+            </div>
+            <div 
+              className="search-button"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: '5px 0',
+              }}
+              onClick={() => setShowSearch(true)}
+            >
+              <span style={{ fontSize: '25px' }}>🔍</span>
+            </div>
+            <div 
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: '5px 0',
+              }}
+              onClick={() => navigate('/create_post')}
+            >
+              <span style={{ fontSize: '25px' }}>➕</span>
+            </div>
+            <div 
+              className="following-button" // 添加className以識別此按鈕
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: '5px 0',
+              }}
+              onClick={(e) => {
+                e.stopPropagation(); // 防止事件冒泡
+                setShowFollowing(true);
+                setShowSearch(false); // 確保關閉其他覆蓋層
+              }}
+            >
+              <span style={{ fontSize: '25px' }}>👥</span>
+            </div>
+            <div 
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: '5px 0',
+              }}
+              onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}
+            >
+              <span style={{ fontSize: '25px' }}>👤</span>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   };
 
@@ -137,7 +418,7 @@ export default function BottomBar() {
             }}>
               <li style={{ cursor: 'pointer' }} onClick={() => navigate('/main_page')}>首頁</li>
               <li style={{ cursor: 'pointer' }} onClick={() => navigate('/create_post')}>發表貼文</li>
-              <li style={{ cursor: 'pointer' }} onClick={() => navigate(`/doll_page/${localStorage.getItem('currentDollId')}`)}>個人資料</li>
+              <li style={{ cursor: 'pointer' }} onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}>個人資料</li>
             </ul>
           </div>
           
