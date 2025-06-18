@@ -108,21 +108,6 @@ export default function NavBar() {
 
           {/* 手機版按鈕區域 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {/* 創建貼文按鈕 */}
-            <p
-              onMouseOver={(e) => { e.currentTarget.style.opacity = 0.5; }}
-              onMouseOut={(e) => { e.currentTarget.style.opacity = 1; }}
-              onClick={() => { navigate('/create_post'); }}
-              style={{
-                fontSize: '24px',
-                cursor: 'pointer',
-                userSelect: 'none',
-                margin: 0,
-              }}
-            >
-              +
-            </p>
-            
             {/* 使用者頭像 */}
             <Button
               id="mobileDollPopover"
@@ -151,89 +136,8 @@ export default function NavBar() {
                 }}
               />
             </Button>
-            
-            {/* 漢堡菜單按鈕 */}
-            <div 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              style={{ cursor: 'pointer', padding: '5px' }}
-            >
-              <div style={{
-                width: '25px',
-                height: '3px',
-                backgroundColor: '#333',
-                margin: '4px 0',
-                transition: 'all 0.3s',
-                transform: mobileMenuOpen ? 'rotate(-45deg) translate(-5px, 6px)' : 'none'
-              }}></div>
-              <div style={{
-                width: '25px',
-                height: '3px',
-                backgroundColor: '#333',
-                margin: '4px 0',
-                opacity: mobileMenuOpen ? 0 : 1,
-                transition: 'all 0.3s'
-              }}></div>
-              <div style={{
-                width: '25px',
-                height: '3px',
-                backgroundColor: '#333',
-                margin: '4px 0',
-                transition: 'all 0.3s',
-                transform: mobileMenuOpen ? 'rotate(45deg) translate(-5px, -6px)' : 'none'
-              }}></div>
-            </div>
           </div>
         </div>
-        
-        {/* 手機版展開菜單 */}
-        <Collapse isOpen={mobileMenuOpen} style={{ width: '100%' }}>
-          <div style={{ 
-            padding: '12px 0',
-            borderTop: '1px solid #e4e4e4',
-            marginTop: '8px'
-          }}>
-            <div style={{ position: 'relative', width: '100%', padding: '0 10px', marginBottom: '10px' }}>
-              <input
-                type="text"
-                placeholder="Oh-Wow-wow-pair"
-                value={searchKeyword}
-                onChange={handleInputChange}
-                style={{
-                  width: '100%',
-                  height: '30px',
-                  border: 'none',
-                  borderRadius: '5px',
-                  backgroundColor: '#E4E4E4',
-                  paddingLeft: 30,
-                  fontSize: '14px',
-                }}
-              />
-              <img
-                src={search_icon}
-                alt="search_icon"
-                style={{
-                  width: '18px',
-                  height: '18px',
-                  position: 'absolute',
-                  top: '50%',
-                  left: 15,
-                  transform: 'translateY(-50%)',
-                  userSelect: 'none',
-                }}
-              />
-            </div>
-            
-            {/* 手機版搜尋結果 */}
-            {showSearch && (
-              <div style={{ padding: '10px' }}>
-                <Search keyword={searchKeyword} onResultClick={() => {
-                  clearSearch();
-                  setMobileMenuOpen(false);
-                }} />
-              </div>
-            )}
-          </div>
-        </Collapse>
       </>
     );
   };
