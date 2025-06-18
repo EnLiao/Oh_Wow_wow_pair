@@ -68,8 +68,8 @@ export default function MainPage() {
       <div style={{ 
         width: '100%',
         padding: '0 10px',
-        marginTop: 10,
-        marginBottom: 70 // 為底部導航欄預留空間
+        marginTop: 30,
+        marginBottom: 80 // 為底部導航欄預留空間
       }}>
         <div style={{
           display: 'flex',

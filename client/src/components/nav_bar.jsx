@@ -87,6 +87,8 @@ export default function NavBar() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          paddingTop: '5px',
+          paddingBottom: '5px',
         }}>
           {/* 網站標題 */}
           <div style={{ flex: '1 1 auto', minWidth: '0' }}>

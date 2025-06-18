@@ -115,12 +115,12 @@ export default function BottomBar() {
         ref={searchOverlayRef}
         style={{
             position: 'fixed',
-            top: 50,
+            top: 40,
             left: 0,
             right: 0,
             bottom: 0,
             backgroundColor: 'white',
-            zIndex: 99,
+            zIndex: 100,
             display: 'flex',
             flexDirection: 'column',
             padding: '15px',
@@ -309,8 +309,8 @@ export default function BottomBar() {
           zIndex: 100,
           width: '100%',
           boxShadow: '0 -2px 5px rgba(0,0,0,0.1)',
-          paddingTop: '5px',
-          paddingBottom: '5px',
+          paddingTop: '10px',
+          paddingBottom: '10px',
         }}>
           <div style={{
             display: 'flex',
