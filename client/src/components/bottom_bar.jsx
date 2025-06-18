@@ -4,6 +4,11 @@ import { AuthContext } from '../services/auth_context';
 import Search from './search';
 import search_icon from '../assets/search.png';
 import { getFollowing } from '../services/api';
+import { IoMdHome } from "react-icons/io";
+import { IoSearch } from "react-icons/io5";
+import { IoMdAdd } from "react-icons/io";
+import { FaUserFriends } from "react-icons/fa";
+import { IoPerson } from "react-icons/io5";
 
 export default function BottomBar() {
   const navigate = useNavigate();
@@ -304,6 +309,8 @@ export default function BottomBar() {
           zIndex: 100,
           width: '100%',
           boxShadow: '0 -2px 5px rgba(0,0,0,0.1)',
+          paddingTop: '5px',
+          paddingBottom: '5px',
         }}>
           <div style={{
             display: 'flex',
@@ -320,7 +327,7 @@ export default function BottomBar() {
               }}
               onClick={() => navigate('/main_page')}
             >
-              <span style={{ fontSize: '25px' }}>🏠</span>
+              <IoMdHome size={25}/>
             </div>
             <div 
               className="search-button"
@@ -333,7 +340,7 @@ export default function BottomBar() {
               }}
               onClick={() => setShowSearch(true)}
             >
-              <span style={{ fontSize: '25px' }}>🔍</span>
+              <IoSearch size={25}/>
             </div>
             <div 
               style={{
@@ -345,7 +352,7 @@ export default function BottomBar() {
               }}
               onClick={() => navigate('/create_post')}
             >
-              <span style={{ fontSize: '25px' }}>➕</span>
+              <IoMdAdd size={25}/>
             </div>
             <div 
               className="following-button" // 添加className以識別此按鈕
@@ -362,7 +369,7 @@ export default function BottomBar() {
                 setShowSearch(false); // 確保關閉其他覆蓋層
               }}
             >
-              <span style={{ fontSize: '25px' }}>👥</span>
+              <FaUserFriends size={25}/>
             </div>
             <div 
               style={{
@@ -374,7 +381,7 @@ export default function BottomBar() {
               }}
               onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}
             >
-              <span style={{ fontSize: '25px' }}>👤</span>
+              <IoPerson size={25}/>
             </div>
           </div>
         </div>
