@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../services/auth_context';
 
 export default function BottomBar() {
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -25,7 +27,6 @@ export default function BottomBar() {
         right: 0,
         backgroundColor: '#F5F5F5',
         borderTop: '1px solid #E4E4E4',
-        padding: '10px 0',
         zIndex: 100,
         width: '100%',
         boxShadow: '0 -2px 5px rgba(0,0,0,0.1)',
@@ -45,8 +46,19 @@ export default function BottomBar() {
             }}
             onClick={() => navigate('/main_page')}
           >
-            <span style={{ fontSize: '22px' }}>🏠</span>
-            <span style={{ fontSize: '12px', marginTop: '2px' }}>首頁</span>
+            <span style={{ fontSize: '25px' }}>🏠</span>
+          </div>
+          <div 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+              padding: '5px 0',
+            }}
+            // onClick={() => navigate('/search')}
+          >
+            <span style={{ fontSize: '25px' }}>🔍</span>
           </div>
           <div 
             style={{
@@ -58,8 +70,7 @@ export default function BottomBar() {
             }}
             onClick={() => navigate('/create_post')}
           >
-            <span style={{ fontSize: '22px' }}>➕</span>
-            <span style={{ fontSize: '12px', marginTop: '2px' }}>發文</span>
+            <span style={{ fontSize: '25px' }}>➕</span>
           </div>
           <div 
             style={{
@@ -69,10 +80,21 @@ export default function BottomBar() {
               cursor: 'pointer',
               padding: '5px 0',
             }}
-            onClick={() => navigate(`/doll_page/${localStorage.getItem('currentDollId')}`)}
+            // onClick={() => navigate('/following list')}
           >
-            <span style={{ fontSize: '22px' }}>👤</span>
-            <span style={{ fontSize: '12px', marginTop: '2px' }}>個人</span>
+            <span style={{ fontSize: '25px' }}>👥</span>
+          </div>
+          <div 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+              padding: '5px 0',
+            }}
+            onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}
+          >
+            <span style={{ fontSize: '25px' }}>👤</span>
           </div>
         </div>
       </div>
@@ -125,7 +147,7 @@ export default function BottomBar() {
               聯絡我們: contact@ohwowwowpair.com
             </p>
             <p style={{ color: '#666', fontSize: '14px', margin: '5px 0' }}>
-              © 2023 Oh-Wow-wow-pair. 保留所有權利。
+              © 2025 Oh-Wow-wow-pair. 保留所有權利。
             </p>
           </div>
         </div>

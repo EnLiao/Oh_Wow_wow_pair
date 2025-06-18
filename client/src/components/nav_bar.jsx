@@ -246,6 +246,8 @@ export default function NavBar() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 10,
       }}>
         {/* 網站標題 */}
         <div style={{ flex: '1 1 30%', minWidth: '100px' }}>
@@ -419,7 +421,7 @@ export default function NavBar() {
   return (
     <div
       style={{
-        height: isMobile ? 'auto' : 50,
+        height: 'auto',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
