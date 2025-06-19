@@ -8,6 +8,7 @@ import CreatePost from './pages/create_post'
 import { AuthProvider } from './services/auth_context'
 import RequireAuth from './services/require_auth'
 import RequireDoll from './services/require_doll'
+import BottomBar from './components/bottom_bar'
 
 function AppLayout() {
   const location = useLocation()
@@ -29,6 +30,7 @@ function AppLayout() {
           </Route>
         </Route>
       </Routes>
+      {!NoNeedNavBar && <BottomBar />}
     </>
   )
 }
