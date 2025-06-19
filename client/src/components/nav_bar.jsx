@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Button, UncontrolledPopover, PopoverBody, Collapse, Navbar, NavbarToggler } from 'reactstrap';
+import { Button, UncontrolledPopover, PopoverBody} from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
 import default_doll_img from '../assets/windy.jpg';
