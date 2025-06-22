@@ -70,11 +70,12 @@ class TagSerializer(serializers.ModelSerializer):
 
 class DollSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
     tag_ids = serializers.ListField(write_only=True, child=serializers.IntegerField(), required=False)
 
     class Meta:
         model = Doll
-        fields = ['id', 'username', 'name', 'birthday', 'description', 'avatar_image', 'created_at', 'tags', 'tag_ids']
+        fields = ['id', 'username', 'name', 'birthday', 'description', 'avatar_image', 'created_at', 'tags', 'tag_ids', 'followers_count']
         read_only_fields = ['created_at', 'username']
 
     def create(self, validated_data):
@@ -137,6 +138,8 @@ class DollSerializer(serializers.ModelSerializer):
             obj.tag.all(),
             many=True
         ).data
+    def get_followers_count(self, obj):
+        return obj.followers.count()
 class DollIdOnlySerializer(serializers.ModelSerializer):
     class Meta:
         model = Doll
