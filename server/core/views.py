@@ -92,6 +92,16 @@ class FollowView(APIView):
                 return Response({'detail': '已經追蹤過了'}, status=status.HTTP_400_BAD_REQUEST)
 
             serializer.save()
+
+            # --- 聊天室自動建立邏輯 ---
+            # 如果對方也追蹤自己，則自動建立聊天室（如果還沒建立）
+            if Follow.objects.filter(from_doll_id=to_doll_id, to_doll_id=from_doll_id).exists():
+                from chat.models import ChatRoom
+                # 檢查聊天室是否已存在
+                if not ChatRoom.objects.filter(doll1=from_doll_id, doll2=to_doll_id).exists() and not ChatRoom.objects.filter(doll1=to_doll_id, doll2=from_doll_id).exists():
+                    ChatRoom.objects.create(doll1=from_doll_id, doll2=to_doll_id)
+            # --- 聊天室自動建立邏輯結束 ---
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,6 +122,24 @@ class FollowView(APIView):
         try:
             follow = Follow.objects.get(from_doll_id=from_doll_id, to_doll_id=to_doll_id)
             follow.delete()
+            
+            # --- 聊天室刪除邏輯 ---
+            # 只要其中一方不追蹤對方，聊天室就刪除
+            try:
+                from_doll = Doll.objects.get(id=from_doll_id)
+                to_doll = Doll.objects.get(id=to_doll_id)
+                
+                # 直接刪除聊天室，因為已經失去追蹤關係
+                from chat.models import ChatRoom
+                from django.db.models import Q
+                ChatRoom.objects.filter(
+                    Q(doll1=from_doll, doll2=to_doll) |
+                    Q(doll1=to_doll, doll2=from_doll)
+                ).delete()
+            except Doll.DoesNotExist:
+                pass
+            # --- 聊天室刪除邏輯結束 ---
+            
             return Response({'detail': '已取消追蹤'}, status=status.HTTP_204_NO_CONTENT)
         except Follow.DoesNotExist:
             return Response({'detail': '尚未追蹤，無法取消'}, status=status.HTTP_400_BAD_REQUEST)
