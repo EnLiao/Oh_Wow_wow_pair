@@ -229,6 +229,7 @@ curl -X GET http://127.0.0.1:8000/core/dolls/<doll_id>/ \
   "description": "這是我最喜歡的娃娃",
   "avatar_image": "https://example.com/doll.jpg",
   "created_at": "2025-05-05T00:30:42.075549+08:00",
+  "followers_count": 5,
   "tags": [
     {
       "id": 1,
