@@ -62,9 +62,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',  # CORS headers
+    'channels',  # WebSocket support
     'core',  #確保有加入core app
     'post',
     'search',
+    'chat'
 ]
 
 #每次 API 請求都會檢查 HTTP Header 裡的 token（Authorization: Bearer ...），用 SimpleJWT 驗證使用者身份。
@@ -177,6 +179,27 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Channels 設定
+ASGI_APPLICATION = 'wowpair.asgi.application'
+
+# Channels Layer 設定（開發階段使用 in-memory，生產環境建議用 Redis）
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
+
+# 如果要使用 Redis（生產環境建議）
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
