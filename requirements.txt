@@ -2,20 +2,30 @@ asgiref==3.8.1
 Django==4.2.20
 sqlparse==0.5.3
 typing_extensions==4.13.2
+
 # Core dependencies
 djangorestframework>=3.14.0
 djangorestframework-simplejwt>=5.3.0
-django-cors-headers
-django-environ
-requests
+django-cors-headers>=4.0.0
+django-environ>=0.10.0
+requests>=2.28.0
+
 # Backend global dependencies
 Pillow>=9.0.0
-django-unfold
+django-unfold>=0.18.0
+
 # --- 即時通訊/聊天功能相關 ---
-django-channels>=4.0
-channels-redis>=4.0
-daphne>=4.0
-djangorestframework-simplejwt>=5.2
-Pillow>=9.0
+channels>=4.0.0
+channels-redis>=4.0.0
+daphne>=4.0.0
+
 # 若有 WebSocket 測試腳本
-websocket-client>=1.5
+websocket-client>=1.5.0
+
+# 生產環境建議（Redis 支援）
+redis>=4.5.0
+hiredis>=2.2.0
+
+# 其他可能需要的套件
+gunicorn>=20.1.0  # 生產環境 WSGI 伺服器
+whitenoise>=6.4.0  # 靜態檔案服務
