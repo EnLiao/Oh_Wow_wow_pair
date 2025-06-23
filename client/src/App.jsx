@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import MainPage from './pages/main_page'
 import DollPage from './pages/doll_page'
+import ChatPage from './pages/chat_page'
 import NavBar from './components/nav_bar'
 import Login from './pages/login'
 import CreateDoll from './pages/create_doll'
@@ -22,6 +23,7 @@ function AppLayout() {
         <Route path='/' element={<Login />} />
         <Route element={<RequireAuth />}>
           <Route path='/create_doll' element={<CreateDoll />} />
+          <Route path='/chat' element={<ChatPage />} />
           <Route element={<RequireDoll />}>
             <Route path='/doll_page/:doll_id' element={<DollPage />} />
             <Route path="/main_page" element={<MainPage />} />
