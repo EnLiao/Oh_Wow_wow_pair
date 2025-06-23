@@ -11,3 +11,11 @@ requests
 # Backend global dependencies
 Pillow>=9.0.0
 django-unfold
+# --- 即時通訊/聊天功能相關 ---
+django-channels>=4.0
+channels-redis>=4.0
+daphne>=4.0
+djangorestframework-simplejwt>=5.2
+Pillow>=9.0
+# 若有 WebSocket 測試腳本
+websocket-client>=1.5

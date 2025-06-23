@@ -20,6 +20,7 @@ pip install -r requirements.txt
 ```
 cd server
 python manage.py runserver
+daphne -p 8001 wowpair.asgi:application
 ```
 
 ## Contributors
@@ -42,3 +43,25 @@ python manage.py runserver
 - SECRET_KEY=YOUR_DATA
 - RECAPTCHA_SECRET_KEY=YOUR_DATA
 - VITE_RECAPTCHA_SITE_KEY=YOUR_DATA
+
+## 即時通訊/聊天功能相關環境變數
+
+在 `.env` 或系統環境變數中建議設置：
+
+- `SECRET_KEY`  # Django 專案密鑰
+- `RECAPTCHA_SECRET_KEY`  # Google reCAPTCHA 驗證（如有開啟註冊/登入驗證）
+- `VITE_RECAPTCHA_SITE_KEY`  # 前端用於 reCAPTCHA（如有）
+- `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD_WOW`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`  # 郵件驗證
+- `MEDIA_ROOT`  # 媒體檔案存放路徑（如有圖片/貼圖上傳）
+- `MEDIA_URL`   # 媒體檔案 URL 前綴
+
+### Channels/ASGI 啟動建議
+
+若用 Daphne 啟動，建議設置：
+- `DJANGO_SETTINGS_MODULE=wowpair.settings`
+- `PYTHONPATH=.`  # (在 server 目錄下)
+
+### Redis (如需生產環境高併發)
+- `CHANNEL_LAYERS` 設定可用 Redis，需設置 Redis 連線資訊
+
+---
