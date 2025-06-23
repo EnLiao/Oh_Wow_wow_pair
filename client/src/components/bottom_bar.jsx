@@ -428,16 +428,16 @@ export default function BottomBar() {
               flexDirection: 'column',
               gap: '10px' 
             }}>
-              <li style={{ cursor: 'pointer' }} onClick={() => navigate('/main_page')}>首頁</li>
+              {/* <li style={{ cursor: 'pointer' }} onClick={() => navigate('/main_page')}>首頁</li>
               <li style={{ cursor: 'pointer' }} onClick={() => navigate('/create_post')}>發表貼文</li>
-              <li style={{ cursor: 'pointer' }} onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}>個人資料</li>
+              <li style={{ cursor: 'pointer' }} onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}>個人資料</li> */}
             </ul>
           </div>
           
           {/* 右側區域 - 聯絡資訊 */}
           <div style={{ flex: '0 0 30%', textAlign: 'right' }}>
             <p style={{ color: '#666', fontSize: '14px', margin: '5px 0' }}>
-              聯絡我們: contact@ohwowwowpair.com
+              聯絡我們: ohwowwowpair@gmail.com
             </p>
             <p style={{ color: '#666', fontSize: '14px', margin: '5px 0' }}>
               © 2025 Oh-Wow-wow-pair. 保留所有權利。
