@@ -159,6 +159,21 @@ export default function NavBar() {
         >
           +
         </p>
+        <p
+          onMouseOver={(e) => { e.currentTarget.style.opacity = 0.5; }}
+          onMouseOut={(e) => { e.currentTarget.style.opacity = 1; }}
+          onClick={() => { navigate('/chat'); }}
+          style={{
+            fontSize: 'clamp(16px, 2vw, 24px)',
+            cursor: 'pointer',
+            userSelect: 'none',
+            margin: 0,
+            marginBottom: 5,
+            marginLeft: 10,
+          }}
+        >
+          💬
+        </p>
       </div>
 
       <div style={{ flex: '1 1 20%', display: 'flex', justifyContent: 'flex-end' }}>
