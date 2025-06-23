@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { data } from 'react-router-dom';
+import { config } from '../config/config.js';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: config.API_BASE_URL,
 });
 
 api.interceptors.request.use(
@@ -132,5 +133,35 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Chat API 相關
+export const chatAPI = {
+  // 聊天室管理
+  getChatRooms: (dollId) => api.get(`/chat/rooms/?doll_id=${dollId}`),
+  createChatRoom: (doll1Id, doll2Id) => api.post('/chat/rooms/', { doll1_id: doll1Id, doll2_id: doll2Id }),
+  getChatRoomMessages: (roomId, dollId, page = 1) => api.get(`/chat/rooms/${roomId}/messages/?doll_id=${dollId}&page=${page}`),
+  markRoomRead: (roomId, dollId) => api.post(`/chat/rooms/${roomId}/mark_read/`, { doll_id: dollId }),
+
+  // 自訂表情符號
+  getCustomEmojis: () => api.get('/chat/emojis/'),
+  createCustomEmoji: (data) => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('image', data.image);
+    formData.append('is_public', data.is_public || false);
+    return api.post('/chat/emojis/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  deleteCustomEmoji: (id) => api.delete(`/chat/emojis/${id}/`),
+
+  // 貼圖
+  getStickers: (category = null) => {
+    const url = category ? `/chat/stickers/?category=${category}` : '/chat/stickers/';
+    return api.get(url);
+  },
+};
 
 export default api;
