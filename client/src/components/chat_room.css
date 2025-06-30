@@ -112,6 +112,16 @@
   padding: 0.5rem;
 }
 
+/* 貼圖和自定義表情符號圖片樣式 */
+.sticker-image,
+.custom-emoji-image {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: transparent;
+}
+
 .message-meta {
   margin-top: 0.4rem;
   font-size: 0.75rem;
@@ -403,6 +413,11 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
 }
 
 .sticker-item:hover,
@@ -410,6 +425,14 @@
   background: rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 貼圖選擇器中的預覽圖片 */
+.sticker-preview {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
 }
 
 .emoji-item img {
@@ -424,6 +447,195 @@
 .emoji-item span {
   font-size: 0.8em;
   color: #666;
+}
+
+/* 表情符號按鈕容器樣式 */
+.emoji-button-container {
+  position: relative;
+  display: inline-block;
+}
+
+.emoji-button-container button {
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  min-width: 40px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-button-container button:hover {
+  background-color: #f5f6f7;
+  border-color: #ffd5fc;
+}
+
+.emoji-button-container button:active {
+  background-color: #ffd5fc;
+}
+
+/* 訊息中的表情符號樣式 */
+.message-content {
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.message-content .emoji {
+  font-size: 1.2em;
+  margin: 0 2px;
+}
+
+/* 表情符號反應區域樣式增強 */
+.reactions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.reaction-group {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: white;
+}
+
+.reaction-group:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.reaction-group.my-reaction {
+  background: rgba(255, 213, 252, 0.3);
+  border-color: #ffd5fc;
+  color: #ffd5fc;
+}
+
+/* 輸入區域樣式增強 */
+.input-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.input-controls button {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: #333;
+}
+
+.input-controls button:hover {
+  background: white;
+  border-color: #ffd5fc;
+  transform: translateY(-1px);
+}
+
+/* 表情符號大文字訊息樣式 */
+.message-content.emoji-only {
+  font-size: 2.5em;
+  line-height: 1;
+  text-align: center;
+  padding: 8px;
+}
+
+/* 貼圖預覽樣式 - Line 風格 */
+.sticker-preview-container {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.sticker-preview-overlay {
+  position: relative;
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 15px;
+  padding: 10px;
+  margin: 5px 0;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  animation: fadeInPreview 0.3s ease-out;
+}
+
+@keyframes fadeInPreview {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sticker-preview-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+}
+
+.cancel-preview-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ff4757;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.cancel-preview-btn:hover {
+  background: #ff3742;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.6);
+}
+
+.cancel-preview-btn:active {
+  transform: scale(0.95);
+}
+
+/* 輸入框在預覽模式時的樣式 */
+.message-input input.with-sticker-preview {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.message-input input.with-sticker-preview::placeholder {
+  color: rgba(102, 126, 234, 0.7);
+  font-weight: 500;
 }
 
 /* 響應式設計 */
@@ -476,5 +688,29 @@
   .emoji-grid {
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
     gap: 0.5rem;
+  }
+  
+  .emoji-button-container {
+    position: static;
+  }
+  
+  .input-controls {
+    justify-content: space-between;
+  }
+  
+  .input-controls button {
+    flex: 1;
+    min-width: 60px;
+  }
+  
+  .sticker-preview-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .cancel-preview-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
   }
 }

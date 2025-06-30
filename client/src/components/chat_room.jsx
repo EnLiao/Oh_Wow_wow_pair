@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ChatService from '../services/chat_service.js';
 import chatNotificationService from '../services/chat_notification_service.js';
 import { chatAPI } from '../services/api.js';
+import { config } from '../config/config.js';
+import EmojiPicker from './emoji_picker.jsx';
 import './chat_room.css';
 
 const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, onMarkRoomAsRead }) => {
@@ -15,6 +17,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   const [showStickerPanel, setShowStickerPanel] = useState(false);
   const [showEmojiPanel, setShowEmojiPanel] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
+  const [previewSticker, setPreviewSticker] = useState(null); // 預覽貼圖
   
   const chatService = useRef(null);
   const messagesEndRef = useRef(null);
@@ -25,9 +28,22 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
 
   // 使用 useCallback 確保事件處理器的穩定性
   const handleNewMessage = useCallback((message) => {
-    console.log('[ChatRoom] 收到新訊息:', message);  // 調試日誌
-    console.log('[ChatRoom] 訊息類型:', message.message_type);  // 調試日誌
-    console.log('[ChatRoom] 圖片URL:', message.image_url);  // 調試日誌
+    console.log('[ChatRoom] 收到新訊息:', message);  
+    console.log('[ChatRoom] 訊息類型:', message.message_type);  
+    console.log('[ChatRoom] 圖片URL:', message.image_url);  
+    console.log('[ChatRoom] 貼圖信息:', message.sticker);  
+    console.log('[ChatRoom] 自定義表情符號信息:', message.custom_emoji);
+    
+    // 特別針對貼圖消息的詳細調試
+    if (message.message_type === 'sticker') {
+      console.log('[ChatRoom] 貼圖詳細信息:');
+      console.log('  - sticker.id:', message.sticker?.id);
+      console.log('  - sticker.name:', message.sticker?.name);
+      console.log('  - sticker.image:', message.sticker?.image);
+      console.log('  - 最終圖片URL:', message.sticker?.image?.startsWith('http') 
+        ? message.sticker.image 
+        : `${config.API_BASE_URL}${message.sticker.image}`);
+    }
     
     setMessages(prev => {
       // 检查消息是否已存在，避免重复添加
@@ -230,6 +246,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   const loadStickers = async () => {
     try {
       const response = await chatAPI.getStickers();
+      console.log('[ChatRoom] 載入的貼圖數據:', response.data);
       setStickers(response.data);
     } catch (error) {
       console.error('載入貼圖失敗:', error);
@@ -246,12 +263,22 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() && !selectedImageFile) return;
+    if (!newMessage.trim() && !selectedImageFile && !previewSticker) return;
 
     try {
       if (selectedImageFile) {
         await chatService.current.sendImageMessage(selectedImageFile, replyingTo?.id);
         setSelectedImageFile(null);
+      } else if (previewSticker) {
+        // 先發送貼圖
+        await chatService.current.sendSticker(previewSticker.id, replyingTo?.id);
+        
+        // 如果有文字，再發送文字訊息
+        if (newMessage.trim()) {
+          await chatService.current.sendTextMessage(newMessage, replyingTo?.id);
+        }
+        
+        setPreviewSticker(null);
       } else {
         await chatService.current.sendTextMessage(newMessage, replyingTo?.id);
       }
@@ -265,12 +292,32 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
 
   const sendSticker = async (stickerId) => {
     try {
+      console.log('[ChatRoom] 準備發送貼圖, ID:', stickerId);
+      console.log('[ChatRoom] chatService 狀態:', {
+        isConnected: chatService.current?.isConnected,
+        socket: !!chatService.current?.socket
+      });
+      
       await chatService.current.sendSticker(stickerId, replyingTo?.id);
+      console.log('[ChatRoom] 貼圖發送完成');
+      
       setShowStickerPanel(false);
       setReplyingTo(null);
     } catch (error) {
       console.error('發送貼圖失敗:', error);
     }
+  };
+
+  // 新增：貼圖預覽功能
+  const selectStickerForPreview = (sticker) => {
+    console.log('[ChatRoom] 選擇貼圖預覽:', sticker);
+    setPreviewSticker(sticker);
+    setShowStickerPanel(false);
+  };
+
+  // 新增：取消貼圖預覽
+  const cancelStickerPreview = () => {
+    setPreviewSticker(null);
   };
 
   const sendCustomEmoji = async (emojiId) => {
@@ -280,6 +327,33 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
       setReplyingTo(null);
     } catch (error) {
       console.error('發送自訂表情符號失敗:', error);
+    }
+  };
+
+  // 處理表情符號選擇
+  const handleEmojiSelect = async (emoji, type = 'standard') => {
+    try {
+      if (type === 'custom') {
+        // 自訂表情符號
+        await sendCustomEmoji(emoji.id);
+      } else {
+        // 標準 Unicode 表情符號，直接作為文字訊息發送
+        const emojiMessage = newMessage + emoji;
+        setNewMessage(emojiMessage);
+        setShowEmojiPanel(false);
+      }
+    } catch (error) {
+      console.error('處理表情符號失敗:', error);
+    }
+  };
+
+  // 發送標準表情符號作為文字
+  const sendEmojiAsText = async (emoji) => {
+    try {
+      await chatService.current.sendTextMessage(emoji, replyingTo?.id);
+      setReplyingTo(null);
+    } catch (error) {
+      console.error('發送表情符號失敗:', error);
     }
   };
 
@@ -376,12 +450,34 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
               )}
               {message.message_type === 'sticker' && (
                 <div className="message-sticker">
-                  貼圖: {message.sticker?.name}
+                  {message.sticker?.image ? (
+                    <img 
+                      src={message.sticker.image.startsWith('http') 
+                        ? message.sticker.image 
+                        : `${config.API_BASE_URL}${message.sticker.image}`}
+                      alt={message.sticker.name} 
+                      className="sticker-image"
+                      title={message.sticker.name}
+                    />
+                  ) : (
+                    <span>貼圖: {message.sticker?.name}</span>
+                  )}
                 </div>
               )}
               {message.message_type === 'emoji' && (
                 <div className="message-emoji">
-                  自訂表情: {message.custom_emoji?.name}
+                  {message.custom_emoji?.image ? (
+                    <img 
+                      src={message.custom_emoji.image.startsWith('http') 
+                        ? message.custom_emoji.image 
+                        : `${config.API_BASE_URL}${message.custom_emoji.image}`}
+                      alt={message.custom_emoji.name} 
+                      className="custom-emoji-image"
+                      title={message.custom_emoji.name}
+                    />
+                  ) : (
+                    <span>自訂表情: {message.custom_emoji?.name}</span>
+                  )}
                 </div>
               )}
             </div>
@@ -466,9 +562,18 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
           <button onClick={() => setShowStickerPanel(!showStickerPanel)}>
             貼圖
           </button>
-          <button onClick={() => setShowEmojiPanel(!showEmojiPanel)}>
-            表情
-          </button>
+          <div className="emoji-button-container" style={{ position: 'relative' }}>
+            <button onClick={() => setShowEmojiPanel(!showEmojiPanel)}>
+              😀
+            </button>
+            <EmojiPicker
+              isOpen={showEmojiPanel}
+              onEmojiSelect={handleEmojiSelect}
+              onClose={() => setShowEmojiPanel(false)}
+              position="bottom"
+              customEmojis={customEmojis}
+            />
+          </div>
           <input 
             type="file" 
             accept="image/*" 
@@ -482,13 +587,36 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
         </div>
         
         <div className="message-input">
+          {/* 貼圖預覽區域 */}
+          {previewSticker && (
+            <div className="sticker-preview-container">
+              <div className="sticker-preview-overlay">
+                <img 
+                  src={previewSticker.image.startsWith('http') 
+                    ? previewSticker.image 
+                    : `${config.API_BASE_URL}${previewSticker.image}`}
+                  alt={previewSticker.name}
+                  className="sticker-preview-image"
+                />
+                <button 
+                  className="cancel-preview-btn" 
+                  onClick={cancelStickerPreview}
+                  title="取消貼圖"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+          
           <input
             type="text"
             value={newMessage}
             onChange={handleInputChange}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="輸入訊息..."
+            placeholder={previewSticker ? "輸入文字與貼圖一起發送..." : "輸入訊息..."}
             disabled={!!selectedImageFile}
+            className={previewSticker ? 'with-sticker-preview' : ''}
           />
           <button onClick={sendMessage}>發送</button>
         </div>
@@ -502,27 +630,20 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
               <div 
                 key={sticker.id} 
                 className="sticker-item"
-                onClick={() => sendSticker(sticker.id)}
+                onClick={() => selectStickerForPreview(sticker)}
+                title={sticker.name}
               >
-                {sticker.name}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {showEmojiPanel && (
-        <div className="emoji-panel">
-          <h4>選擇自訂表情符號</h4>
-          <div className="emoji-grid">
-            {customEmojis.map(emoji => (
-              <div 
-                key={emoji.id} 
-                className="emoji-item"
-                onClick={() => sendCustomEmoji(emoji.id)}
-              >
-                <img src={emoji.image} alt={emoji.name} />
-                <span>{emoji.name}</span>
+                {sticker.image ? (
+                  <img 
+                    src={sticker.image.startsWith('http') 
+                      ? sticker.image 
+                      : `${config.API_BASE_URL}${sticker.image}`}
+                    alt={sticker.name}
+                    className="sticker-preview"
+                  />
+                ) : (
+                  <span>{sticker.name}</span>
+                )}
               </div>
             ))}
           </div>

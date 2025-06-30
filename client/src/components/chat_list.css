@@ -65,6 +65,38 @@
   font-size: 1.3rem;
 }
 
+/* 表情符號管理器按鈕樣式 */
+.chat-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.emoji-manager-btn {
+  background: linear-gradient(135deg, #ffd5fc, #f0b8f0);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(255, 213, 252, 0.3);
+}
+
+.emoji-manager-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 213, 252, 0.4);
+  background: linear-gradient(135deg, #f0b8f0, #ffd5fc);
+}
+
+.emoji-manager-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 213, 252, 0.3);
+}
+
 .new-chat-button {
   background: #007bff;
   color: white;

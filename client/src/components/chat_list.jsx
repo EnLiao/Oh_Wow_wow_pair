@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { chatAPI } from '../services/api.js';
 import ChatRoom from './chat_room.jsx';
+import CustomEmojiManager from './custom_emoji_manager.jsx';
 import chatNotificationService from '../services/chat_notification_service.js';
 import './chat_list.css';
 
@@ -8,6 +9,7 @@ const ChatList = ({ currentUser, currentDoll }) => {
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showEmojiManager, setShowEmojiManager] = useState(false);
   const chatRoomsRef = useRef([]);
 
   // 監聽全域聊天室更新
@@ -182,6 +184,13 @@ const ChatList = ({ currentUser, currentDoll }) => {
     <div className="chat-list-container">
       <div className="chat-list-header">
         <h2>聊天室</h2>
+        <button 
+          className="emoji-manager-btn"
+          onClick={() => setShowEmojiManager(true)}
+          title="管理自訂表情符號"
+        >
+          😀⚙️
+        </button>
       </div>
 
       <div className="chat-list">
@@ -226,6 +235,12 @@ const ChatList = ({ currentUser, currentDoll }) => {
           })
         )}
       </div>
+
+      {/* 自訂表情符號管理器 */}
+      <CustomEmojiManager
+        isOpen={showEmojiManager}
+        toggle={() => setShowEmojiManager(false)}
+      />
     </div>
   );
 };

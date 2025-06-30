@@ -1,0 +1,265 @@
+/* 表情符號選擇器樣式 */
+.emoji-picker {
+  position: absolute;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  height: 380px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.emoji-picker.bottom {
+  bottom: 100%;
+  margin-bottom: 8px;
+}
+
+.emoji-picker.top {
+  top: 100%;
+  margin-top: 8px;
+}
+
+/* 搜尋框區域 */
+.emoji-picker-header {
+  padding: 12px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.emoji-search {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.emoji-search:focus {
+  border-color: #ffd5fc;
+  box-shadow: 0 0 0 2px rgba(255, 213, 252, 0.2);
+}
+
+/* 分類標籤 */
+.category-tabs {
+  display: flex;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e1e5e9;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tab {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-tab:hover {
+  background-color: #f5f6f7;
+}
+
+.category-tab.active {
+  background-color: #ffd5fc;
+  color: #000;
+}
+
+/* 表情符號內容區域 */
+.emoji-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.emoji-section {
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #65676b;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+/* 表情符號網格 */
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.emoji-item {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+}
+
+.emoji-item:hover {
+  background-color: #f5f6f7;
+}
+
+.emoji-item:active {
+  background-color: #e4e6ea;
+}
+
+/* 自訂表情符號圖片 */
+.custom-emoji-image {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* 無結果提示 */
+.no-results {
+  text-align: center;
+  color: #65676b;
+  font-size: 14px;
+  padding: 20px;
+}
+
+/* 響應式設計 */
+@media (max-width: 480px) {
+  .emoji-picker {
+    width: 280px;
+    height: 320px;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+  
+  .emoji-item {
+    font-size: 18px;
+    height: 32px;
+    width: 32px;
+    padding: 6px;
+  }
+}
+
+/* 滾動條樣式 */
+.emoji-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.emoji-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.emoji-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.emoji-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 動畫效果 */
+.emoji-picker {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .emoji-picker {
+    background: #242526;
+    border-color: #3a3b3c;
+  }
+  
+  .emoji-picker-header {
+    border-bottom-color: #3a3b3c;
+  }
+  
+  .emoji-search {
+    background: #3a3b3c;
+    border-color: #3a3b3c;
+    color: #e4e6ea;
+  }
+  
+  .emoji-search:focus {
+    border-color: #ffd5fc;
+  }
+  
+  .category-tabs {
+    border-bottom-color: #3a3b3c;
+  }
+  
+  .category-tab:hover {
+    background-color: #3a3b3c;
+  }
+  
+  .category-tab.active {
+    background-color: #ffd5fc;
+    color: #000;
+  }
+  
+  .section-title {
+    color: #b0b3b8;
+  }
+  
+  .emoji-item:hover {
+    background-color: #3a3b3c;
+  }
+  
+  .emoji-item:active {
+    background-color: #4e4f50;
+  }
+  
+  .no-results {
+    color: #b0b3b8;
+  }
+  
+  .emoji-content::-webkit-scrollbar-track {
+    background: #3a3b3c;
+  }
+  
+  .emoji-content::-webkit-scrollbar-thumb {
+    background: #606770;
+  }
+  
+  .emoji-content::-webkit-scrollbar-thumb:hover {
+    background: #737a85;
+  }
+}
