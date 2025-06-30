@@ -148,14 +148,21 @@ class ChatService {
 
     // 發送貼圖
     sendSticker(stickerId, replyToId = null) {
-        if (!this.isConnected) return;
+        if (!this.isConnected) {
+            console.error('[ChatService] 無法發送貼圖：WebSocket 未連接');
+            return;
+        }
 
-        this.socket.send(JSON.stringify({
+        const messageData = {
             type: 'chat_message',
             message_type: 'sticker',
             sticker_id: stickerId,
             reply_to_id: replyToId
-        }));
+        };
+        
+        console.log('[ChatService] 發送貼圖數據:', messageData);
+        this.socket.send(JSON.stringify(messageData));
+        console.log('[ChatService] 貼圖數據已發送');
     }
 
     // 發送自訂表情符號
