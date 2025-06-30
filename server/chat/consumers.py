@@ -99,9 +99,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             data = json.loads(text_data)
             message_type = data.get('type')
             
-            print(f"[WebSocket] 收到消息: {data}")  
+            print(f"[WebSocket] 收到消息: {data}")
+            print(f"[WebSocket] 消息類型: {message_type}")
             
             if message_type == 'chat_message':
+                print(f"[WebSocket] 處理聊天消息，message_type: {data.get('message_type')}")
+                if data.get('message_type') == 'sticker':
+                    print(f"[WebSocket] 這是貼圖消息，sticker_id: {data.get('sticker_id')}")
                 await self.handle_chat_message(data)
             elif message_type == 'reaction':
                 await self.handle_reaction(data)
@@ -168,11 +172,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 
         elif data.get('message_type') == 'sticker' and data.get('sticker_id'):
             sticker = await self.get_sticker(data['sticker_id'])
-            message_data['sticker'] = sticker
+            if sticker:
+                message_data['sticker'] = sticker
+                message_data['encrypted_content'] = f'[貼圖: {sticker.name}]'
+                print(f"[WebSocket] 設置貼圖: {sticker.name}, ID: {sticker.id}")
+            else:
+                print(f"[WebSocket] 找不到貼圖 ID: {data['sticker_id']}")
+                return
             
         elif data.get('message_type') == 'emoji' and data.get('custom_emoji_id'):
             custom_emoji = await self.get_custom_emoji(data['custom_emoji_id'])
-            message_data['custom_emoji'] = custom_emoji
+            if custom_emoji:
+                message_data['custom_emoji'] = custom_emoji
+                message_data['encrypted_content'] = f'[自訂表情: {custom_emoji.name}]'
+                print(f"[WebSocket] 設置自訂表情: {custom_emoji.name}, ID: {custom_emoji.id}")
+            else:
+                print(f"[WebSocket] 找不到自訂表情 ID: {data['custom_emoji_id']}")
+                return
         
         message = await self.create_message(**message_data)
         print(f"[WebSocket] 消息已保存: ID={message.id}, 內容={message.encrypted_content}")  
@@ -338,8 +354,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_sticker(self, sticker_id):
         try:
-            return Sticker.objects.get(id=sticker_id)
+            print(f"[WebSocket] 正在查找貼圖 ID: {sticker_id}")
+            sticker = Sticker.objects.get(id=sticker_id)
+            print(f"[WebSocket] 找到貼圖: {sticker.name}, 圖片: {sticker.image}")
+            return sticker
         except Sticker.DoesNotExist:
+            print(f"[WebSocket] 貼圖不存在: {sticker_id}")
+            return None
+        except Exception as e:
+            print(f"[WebSocket] 查找貼圖時出錯: {e}")
             return None
 
     @database_sync_to_async
@@ -398,27 +421,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def serialize_message(self, message):
         """序列化訊息物件"""
-        print(f"[WebSocket] 序列化訊息 ID={message.id}, reply_to={message.reply_to}")  
+        print(f"[WebSocket] 開始序列化訊息 ID={message.id}, message_type={message.message_type}")
         
-        # 重新從數據庫載入訊息以確保關聯對象被正確載入
-        try:
-            message = Message.objects.select_related('reply_to', 'reply_to__sender').get(id=message.id)
-            print(f"[WebSocket] 重新載入後的 reply_to: {message.reply_to}")  
-        except Message.DoesNotExist:
-            print(f"[WebSocket] 無法重新載入訊息: {message.id}")  
+        # 直接使用傳入的 message 對象，不要重新載入
+        # 因為重新載入可能會丟失關聯對象
+        print(f"[WebSocket] 直接使用傳入的訊息對象")
+        print(f"[WebSocket] message.sticker: {message.sticker}")
+        print(f"[WebSocket] message.custom_emoji: {message.custom_emoji}")
         
         reply_to_data = None
         if message.reply_to:
-            print(f"[WebSocket] 處理回覆訊息: {message.reply_to.id}")  
-            # 包含完整的回覆訊息資訊
+            print(f"[WebSocket] 處理回覆訊息: {message.reply_to.id}")
             reply_to_data = {
                 'id': message.reply_to.id,
                 'sender_name': message.reply_to.sender.name,
                 'preview': message.reply_to.encrypted_content[:50] + '...' if len(message.reply_to.encrypted_content) > 50 else message.reply_to.encrypted_content,
-                'decrypted_content': message.reply_to.encrypted_content,  # 暫時用於測試
+                'decrypted_content': message.reply_to.encrypted_content,
                 'encrypted_content': message.reply_to.encrypted_content
             }
-            print(f"[WebSocket] reply_to_data: {reply_to_data}")  
         
         # 包含反應資訊
         reactions_data = []
@@ -433,32 +453,53 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # 調試：檢查圖片URL
         image_url = None
         if message.image:
-            # 構建完整的圖片URL（包含域名）
             from django.conf import settings
-            # 在開發環境中添加 localhost:8001
-            base_url = "http://localhost:8001" if settings.DEBUG else ""
+            base_url = "http://localhost:8000" if settings.DEBUG else ""
             image_url = f"{base_url}{settings.MEDIA_URL}{message.image.name}"
-            print(f"[WebSocket] 序列化時的圖片URL: {image_url}")  
-            print(f"[WebSocket] 圖片文件名: {message.image.name}")  
+            print(f"[WebSocket] 序列化時的圖片URL: {image_url}")
+        
+        # 包含貼圖和自定義表情符號的完整信息
+        sticker_data = None
+        if message.sticker:
+            print(f"[WebSocket] 序列化貼圖: ID={message.sticker.id}, name={message.sticker.name}")
+            print(f"[WebSocket] 貼圖圖片路徑: {message.sticker.image}")
+            sticker_data = {
+                'id': message.sticker.id,
+                'name': message.sticker.name,
+                'image': message.sticker.image.url if message.sticker.image else None,
+                'category': message.sticker.category,
+                'is_official': message.sticker.is_official
+            }
+            print(f"[WebSocket] 序列化後的貼圖數據: {sticker_data}")
         else:
-            print(f"[WebSocket] 消息沒有圖片")  
+            print(f"[WebSocket] 消息沒有貼圖")
+        
+        custom_emoji_data = None
+        if message.custom_emoji:
+            print(f"[WebSocket] 序列化自訂表情: ID={message.custom_emoji.id}, name={message.custom_emoji.name}")
+            custom_emoji_data = {
+                'id': message.custom_emoji.id,
+                'name': message.custom_emoji.name,
+                'image': message.custom_emoji.image.url if message.custom_emoji.image else None,
+                'is_public': message.custom_emoji.is_public
+            }
         
         serialized_data = {
             'id': message.id,
-            'sender_id': message.sender.id,  # 使用 doll.id
-            'sender_name': message.sender.name,  # 添加 doll 名稱
+            'sender_id': message.sender.id,
+            'sender_name': message.sender.name,
             'message_type': message.message_type,
             'encrypted_content': message.encrypted_content,
-            'decrypted_content': message.encrypted_content,  # 暫時用於測試（實際應該解密）
+            'decrypted_content': message.encrypted_content,
             'image_url': image_url,
-            'sticker_id': message.sticker.id if message.sticker else None,
-            'custom_emoji_id': message.custom_emoji.id if message.custom_emoji else None,
+            'sticker': sticker_data,  # 完整的貼圖信息
+            'custom_emoji': custom_emoji_data,  # 完整的自定義表情符號信息
             'reply_to_id': message.reply_to.id if message.reply_to else None,
-            'reply_to': reply_to_data,  # 添加完整的回覆訊息資訊
-            'reactions': reactions_data,  # 添加反應資訊
+            'reply_to': reply_to_data,
+            'reactions': reactions_data,
             'timestamp': message.timestamp.isoformat(),
             'is_read': message.is_read
         }
         
-        print(f"[WebSocket] 序列化完成的數據: {serialized_data}")  
+        print(f"[WebSocket] 序列化完成的數據: {serialized_data}")
         return serialized_data
