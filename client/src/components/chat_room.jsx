@@ -255,7 +255,9 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
 
   const loadCustomEmojis = async () => {
     try {
+      console.log('[ChatRoom] 開始載入自定義表情符號...');
       const response = await chatAPI.getCustomEmojis();
+      console.log('[ChatRoom] 自定義表情符號載入成功:', response.data);
       setCustomEmojis(response.data);
     } catch (error) {
       console.error('載入自訂表情符號失敗:', error);
@@ -275,12 +277,12 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
         
         // 如果有文字，再發送文字訊息
         if (newMessage.trim()) {
-          await chatService.current.sendTextMessage(newMessage, replyingTo?.id);
+          await processAndSendMessage(newMessage);
         }
         
         setPreviewSticker(null);
       } else {
-        await chatService.current.sendTextMessage(newMessage, replyingTo?.id);
+        await processAndSendMessage(newMessage);
       }
       
       setNewMessage('');
@@ -331,15 +333,16 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   };
 
   // 處理表情符號選擇
-  const handleEmojiSelect = async (emoji, type = 'standard') => {
+  const handleEmojiSelect = async (emoji, type = 'standard', customEmojiData = null) => {
     try {
       if (type === 'custom') {
-        // 自訂表情符號
-        await sendCustomEmoji(emoji.id);
+        // 自定義表情符號，插入到文字輸入框中
+        const customEmojiText = emoji; // 格式：:emoji_name:
+        setNewMessage(prev => prev + customEmojiText);
+        setShowEmojiPanel(false);
       } else {
-        // 標準 Unicode 表情符號，直接作為文字訊息發送
-        const emojiMessage = newMessage + emoji;
-        setNewMessage(emojiMessage);
+        // 標準 Unicode 表情符號，直接插入到文字輸入框
+        setNewMessage(prev => prev + emoji);
         setShowEmojiPanel(false);
       }
     } catch (error) {
@@ -409,6 +412,50 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // 處理並發送包含自定義表情符號的訊息
+  const processAndSendMessage = async (message) => {
+    // 檢查訊息中是否包含自定義表情符號標記（格式：:emoji_name:）
+    const customEmojiRegex = /:([^:]+):/g;
+    const matches = [...message.matchAll(customEmojiRegex)];
+    
+    if (matches.length > 0) {
+      // 分別處理文字和自定義表情符號
+      let lastIndex = 0;
+      
+      for (const match of matches) {
+        const [fullMatch, emojiName] = match;
+        const matchIndex = match.index;
+        
+        // 發送在自定義表情符號之前的文字
+        if (matchIndex > lastIndex) {
+          const textBefore = message.slice(lastIndex, matchIndex).trim();
+          if (textBefore) {
+            await chatService.current.sendTextMessage(textBefore, replyingTo?.id);
+          }
+        }
+        
+        // 發送自定義表情符號
+        const customEmoji = customEmojis.find(emoji => emoji.name === emojiName);
+        if (customEmoji) {
+          await chatService.current.sendCustomEmoji(customEmoji.id, replyingTo?.id);
+        }
+        
+        lastIndex = matchIndex + fullMatch.length;
+      }
+      
+      // 發送最後剩餘的文字
+      if (lastIndex < message.length) {
+        const textAfter = message.slice(lastIndex).trim();
+        if (textAfter) {
+          await chatService.current.sendTextMessage(textAfter, replyingTo?.id);
+        }
+      }
+    } else {
+      // 沒有自定義表情符號，直接發送文字
+      await chatService.current.sendTextMessage(message, replyingTo?.id);
+    }
   };
 
   return (

@@ -73,7 +73,8 @@ const EmojiPicker = ({
   };
 
   const handleCustomEmojiClick = (customEmoji) => {
-    onEmojiSelect(customEmoji, 'custom');
+    // 傳遞自定義表情符號的文本標記，格式：:emoji_name:
+    onEmojiSelect(`:${customEmoji.name}:`, 'custom', customEmoji);
   };
 
   const renderEmojiGrid = (emojis, isCustom = false) => {
@@ -87,13 +88,16 @@ const EmojiPicker = ({
             title={isCustom ? emoji.name : emoji}
           >
             {isCustom ? (
-              <img 
-                src={emoji.image.startsWith('http') 
-                  ? emoji.image 
-                  : `http://localhost:8001${emoji.image}`} 
-                alt={emoji.name} 
-                className="custom-emoji-image" 
-              />
+              <div className="custom-emoji-square">
+                <img 
+                  src={emoji.image.startsWith('http') 
+                    ? emoji.image 
+                    : `http://localhost:8001${emoji.image}`} 
+                  alt={emoji.name} 
+                  className="custom-emoji-image" 
+                />
+                <span className="custom-emoji-name">{emoji.name}</span>
+              </div>
             ) : (
               emoji
             )}
@@ -104,14 +108,15 @@ const EmojiPicker = ({
   };
 
   const renderCategoryTabs = () => {
-    const categories = ['recent', ...getAllCategories()];
-    if (customEmojis.length > 0) {
-      categories.push('custom');
-    }
+    // 確保自定義表情符號標籤在最前面
+    const categories = ['recent', 'custom', ...getAllCategories()];
+    
+    console.log('[EmojiPicker] 所有分類:', categories);
 
     return (
       <div className="category-tabs">
         {categories.map(category => {
+          console.log('[EmojiPicker] 渲染分類:', category);
           if (category === 'recent') {
             return (
               <button
@@ -186,6 +191,8 @@ const EmojiPicker = ({
     }
 
     if (activeCategory === 'custom') {
+      console.log('[EmojiPicker] 顯示自定義表情符號，數量:', customEmojis.length);
+      console.log('[EmojiPicker] 自定義表情符號數據:', customEmojis);
       return (
         <div className="emoji-content">
           <div className="emoji-section">
