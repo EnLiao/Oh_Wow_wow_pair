@@ -6,7 +6,7 @@ import { config } from '../config/config.js';
 import EmojiPicker from './emoji_picker.jsx';
 import './chat_room.css';
 
-const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, onMarkRoomAsRead }) => {
+const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, onMarkRoomAsRead, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -414,6 +414,9 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   return (
     <div className="chat-room">
       <div className="chat-header">
+        <button className="back-button-ig" onClick={onBack}>
+          &lt;
+        </button>
         <h3>與 {otherDoll.name} 的對話</h3>
       </div>
 

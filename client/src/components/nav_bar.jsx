@@ -66,6 +66,7 @@ export default function NavBar() {
 
   return (
     <div
+      className="nav-bar"
       style={{
         height: 50,
         display: 'flex',

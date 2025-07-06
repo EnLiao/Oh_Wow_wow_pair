@@ -49,6 +49,27 @@ const ChatList = ({ currentUser, currentDoll }) => {
     }
   }, [currentDoll]);
 
+  // 控制 NavBar 顯示/隱藏
+  useEffect(() => {
+    const navBar = document.querySelector('.nav-bar');
+    
+    if (navBar) {
+      if (selectedRoom) {
+        navBar.style.display = 'none';
+      } else {
+        navBar.style.display = 'flex'; // 恢復原本的 display 值
+      }
+    }
+    
+    // 清理函數，確保組件卸載時恢復 NavBar
+    return () => {
+      const navBar = document.querySelector('.nav-bar');
+      if (navBar) {
+        navBar.style.display = 'flex';
+      }
+    };
+  }, [selectedRoom]);
+
   const loadChatRooms = async () => {
     if (!currentDoll) return;
     
@@ -154,18 +175,6 @@ const ChatList = ({ currentUser, currentDoll }) => {
   if (selectedRoom) {
     return (
       <div className="chat-container">
-        <div className="chat-sidebar">
-          <button 
-            className="back-button"
-            onClick={() => {
-              setSelectedRoom(null);
-              // 重新載入聊天室列表以更新未讀計數
-              loadChatRooms();
-            }}
-          >
-            ← 返回聊天列表
-          </button>
-        </div>
         <ChatRoom 
           roomId={selectedRoom.id}
           currentUser={currentUser}
@@ -175,6 +184,11 @@ const ChatList = ({ currentUser, currentDoll }) => {
             updateChatRoomLastMessage(selectedRoom.id, message);
           }}
           onMarkRoomAsRead={() => clearUnreadCount(selectedRoom.id)}
+          onBack={() => {
+            setSelectedRoom(null);
+            // 重新載入聊天室列表以更新未讀計數
+            loadChatRooms();
+          }}
         />
       </div>
     );

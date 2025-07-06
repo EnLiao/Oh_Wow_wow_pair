@@ -37,6 +37,36 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* IG 風格的返回按鈕 */
+.back-button.ig-style {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.back-button.ig-style:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-button.ig-style:active {
+  transform: scale(0.95);
+}
+
 .chat-list-container {
   max-width: 500px;
   margin: 2rem auto;
