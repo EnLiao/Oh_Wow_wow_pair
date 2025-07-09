@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'core',  #確保有加入core app
     'post',
     'search',
+    'notifications',
 ]
 
 #每次 API 請求都會檢查 HTTP Header 裡的 token（Authorization: Bearer ...），用 SimpleJWT 驗證使用者身份。
