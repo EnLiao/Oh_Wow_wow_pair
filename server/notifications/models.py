@@ -9,8 +9,8 @@ class Notification(models.Model):
     ]
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
-    doll = models.ForeignKey('Doll', on_delete=models.CASCADE, related_name='notifications')  
-    actor = models.ForeignKey('Doll', on_delete=models.CASCADE, related_name='notifications_sent', null=True, blank=True) 
+    doll = models.ForeignKey(Doll, on_delete=models.CASCADE, related_name='notifications')
+    actor = models.ForeignKey(Doll, on_delete=models.CASCADE, related_name='notifications_sent', null=True, blank=True)
 
     target_id = models.CharField(max_length=100, blank=True)
     content = models.TextField(blank=True)
