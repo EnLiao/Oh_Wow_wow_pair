@@ -1,17 +1,31 @@
-# Python
+# Python cache & 編譯檔
 __pycache__/
 *.py[cod]
-.env
-*.sqlite3
-node_modules/
-.DS_Store 
-venv/
+*.pyc
+*.pyo
+*.pyd
 
-# 忽略 media 上傳檔案
+# 虛擬環境
+venv/
+env/
+
+# SQLite 資料庫
+*.sqlite3
+
+# 環境變數
+.env
+
+# 作業系統雜物
+.DS_Store
+
+# Node.js 前端
+node_modules/
+
+# 上傳檔案
 /media/
-=======
-server/post/migrations/*.py
-!server/post/migrations/__init__.py
-server/core/migrations/*.py
-!server/core/migrations/__init__.py
 server/media/
+
+# 忽略 migrations except __init__.py
+server/*/migrations/*.py
+!server/*/migrations/__init__.py
+server/*/migrations/*.pyc
