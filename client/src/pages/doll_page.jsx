@@ -169,7 +169,7 @@ export default function DollPage() {
   // 渲染電腦版畫面
   const renderDesktopVersion = () => {
     return (
-      <Container className="mt-5" style={{ paddingTop: 50 }}>
+      <Container className="mt-5" style={{ paddingTop: 30 }}>
         <Row>
           <Col 
             md={4}

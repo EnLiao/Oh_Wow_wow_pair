@@ -113,7 +113,8 @@ export default function MainPage() {
       <div style={{ 
         paddingLeft: '3%', 
         display: 'flex', 
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginTop: 20,
       }}>
         {/* 左側關注列表 */}
         <div
