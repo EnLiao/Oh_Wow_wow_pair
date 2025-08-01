@@ -400,8 +400,7 @@ export default function BottomBar() {
       <div style={{
         backgroundColor: '#F5F5F5', 
         borderTop: '1px solid #E4E4E4',
-        padding: '20px 0',
-        marginTop: '30px',
+        paddingTop: '20px',
       }}>
         <div style={{
           maxWidth: '1200px',
