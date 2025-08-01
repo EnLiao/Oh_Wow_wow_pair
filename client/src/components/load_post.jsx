@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { AuthContext } from '../services/auth_context';
 import { getPosts, follow, likePost, unlikePost } from '../services/api';
 import PostComment from './post_comment';
@@ -17,6 +17,9 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const offsetRef = useRef(0);
+  const [hasMore, setHasMore] = useState(true);   // 新增：是否還有更多貼文
+  const [loadingMore, setLoadingMore] = useState(false); // 新增：是否正在加載
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [commentingPostId, setCommentingPostId] = useState(null);
 
@@ -90,7 +93,7 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
     // 找到當前貼文
     const currentPost = posts.find(p => p.doll_id === dollId);
     // 檢查是否已經追蹤這個娃娃
-    const isFollowing = currentPost?.is_followed ?? false;
+    // const isFollowing = currentPost?.is_followed ?? false;
     
     try {
       const followData = {
@@ -121,13 +124,16 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
 
   // ➜ 依 mode / targetId 變動重新抓取
   console.log(viewerId, targetId, mode);
+  // 初始加載
   useEffect(() => {
     if (!viewerId || !targetId) return;
-
-    (async () => {
+    offsetRef.current = 0; // 重置 offset
+    
+    const loadPosts = async () => {
       try {
         setLoading(true);
         setError(null);
+        setHasMore(true); // 重設是否有更多
 
         const fetched = await getPosts({
           mode,
@@ -138,6 +144,7 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
         });
 
         setPosts(fetched);
+        setHasMore(fetched.length === 5); // 如果返回少於5篇，表示沒有更多了
 
         const initialLikedPosts = new Set(
           fetched
@@ -145,16 +152,79 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
             .map(post => post.id)
         );
         setLikedPosts(initialLikedPosts);
-
-        console.log('已載入貼文:', fetched);
       } catch (err) {
         console.error(err);
         setError(err.response?.data?.detail || err.message);
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    loadPosts();
   }, [mode, targetId, viewerId]);
+
+  const loadMorePosts = async () => {
+    if (!hasMore || loadingMore || isFetchingMore.current) return;
+
+    isFetchingMore.current = true;
+    setLoadingMore(true);
+
+    try {
+      const morePosts = await getPosts({
+        mode,
+        targetDollId: targetId,
+        viewerDollId: viewerId,
+        limit: 5,
+        offset: offsetRef.current,
+      });
+
+      const existingIds = new Set(posts.map(p => p.id));
+      const uniqueNewPosts = morePosts.filter(p => !existingIds.has(p.id));
+
+      if (uniqueNewPosts.length === 0) {
+        setHasMore(false);
+      } else {
+        setPosts(prev => {
+          const merged = [...prev, ...morePosts];
+          const deduplicated = Array.from(new Map(merged.map(p => [p.id, p])).values());
+          return deduplicated;
+        });
+        offsetRef.current += uniqueNewPosts.length; // 更新 offset
+        setHasMore(morePosts.length === 5); // 如果不是剛好5筆就認為沒有更多了
+      }
+
+      setLikedPosts(prevLiked => {
+        const newLiked = new Set(prevLiked);
+        morePosts
+          .filter(post => post.liked_by_me === true)
+          .forEach(post => newLiked.add(post.id));
+        return newLiked;
+      });
+    } catch (err) {
+      console.error("加載更多貼文失敗:", err);
+    } finally {
+      setLoadingMore(false);
+      isFetchingMore.current = false;
+    }
+  };
+
+  const observer = useRef();
+  const isFetchingMore = useRef(false);
+  const lastPostRef = useCallback(node => {
+    if (loading || loadingMore || isFetchingMore.current) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore && !isFetchingMore.current) {
+        console.log('滾動到底部，觸發 loadMorePosts()');
+        loadMorePosts();
+      }
+    }, {
+      rootMargin: '100px',
+    });
+
+    if (node) observer.current.observe(node);
+  }, [loading, loadingMore, hasMore]);
 
   if (loading)
     return (
@@ -185,8 +255,11 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
 
   return (
     <>
-      {posts.map((p) => (
-        <Card key={p.id} className="mb-3">
+      {posts.map((p, index) => (
+        <div key={p.id} ref={index === posts.length - 1 ? lastPostRef : null}>
+        <Card 
+          className="mb-3"
+        >
           <CardBody>
             <div className="d-flex align-items-center mb-2">
                 <img
@@ -313,7 +386,15 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
             )}
           </CardBody>
         </Card>
+        </div>
       ))}
+      
+      {loadingMore && (
+        <div className="text-center my-4">
+          <Spinner color="primary" size="sm" />
+          <p>載入更多...</p>
+        </div>
+      )}
     </>
   );
 }
