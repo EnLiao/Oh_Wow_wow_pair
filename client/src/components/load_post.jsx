@@ -145,6 +145,7 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
 
         setPosts(fetched);
         setHasMore(fetched.length === 5); // 如果返回少於5篇，表示沒有更多了
+        offsetRef.current = fetched.length; // 更新 offset
 
         const initialLikedPosts = new Set(
           fetched
@@ -177,6 +178,7 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
         limit: 5,
         offset: offsetRef.current,
       });
+      console.log(offsetRef.current);
 
       const existingIds = new Set(posts.map(p => p.id));
       const uniqueNewPosts = morePosts.filter(p => !existingIds.has(p.id));
