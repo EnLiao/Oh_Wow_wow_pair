@@ -247,7 +247,7 @@ export default function DollPage() {
           </Col>
             
           <Col md={8}>
-            <Card style={{top: 30, marginBottom: 30}}>
+            <Card style={{top: 30, marginBottom: 70}}>
               <CardHeader>
                 <CardTitle className="text-center h4">Recently Posts</CardTitle>
               </CardHeader>

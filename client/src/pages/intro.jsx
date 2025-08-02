@@ -25,25 +25,24 @@ export default function Intro() {
         這裡是專屬於娃娃的社群平台，<br />
         快來分享你心愛的娃娃的日常生活吧！
       </p>
-      <img 
+      {/* <img 
         src={IconImg}
         alt="icon" 
         style={{ width: 100, height: 100, marginBottom: '2rem', borderRadius: '50%' }}
-      />
+      /> */}
       <a 
         href="/login"
         style={{
           padding: '10px 30px',
-          background: '#007bff',
-          color: 'white',
+          background: '#ffd5fc',
+          color:'black',
           borderRadius: '25px',
           textDecoration: 'none',
           fontSize: '1rem',
-          fontWeight: 'bold',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          fontWeight: 'bold'
         }}
       >
-        開始使用
+        進入娃娃配
       </a>
     </div>
   );
