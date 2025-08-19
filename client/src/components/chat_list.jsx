@@ -198,13 +198,15 @@ const ChatList = ({ currentUser, currentDoll }) => {
     <div className="chat-list-container">
       <div className="chat-list-header">
         <h2>聊天室</h2>
+        {/*
         <button 
           className="emoji-manager-btn"
           onClick={() => setShowEmojiManager(true)}
-          title="管理自訂表情符號"
+          title="管理通用自訂表情符號"
         >
           😀⚙️
         </button>
+        */}
       </div>
 
       <div className="chat-list">
@@ -250,11 +252,13 @@ const ChatList = ({ currentUser, currentDoll }) => {
         )}
       </div>
 
-      {/* 自訂表情符號管理器 */}
+      {/* 全域自訂表情符號管理器 - 暫時停用
       <CustomEmojiManager
         isOpen={showEmojiManager}
         toggle={() => setShowEmojiManager(false)}
+        roomId={null} // 傳遞 null 表示管理通用表情符號
       />
+      */}
     </div>
   );
 };

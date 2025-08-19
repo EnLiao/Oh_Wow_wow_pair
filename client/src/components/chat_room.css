@@ -28,6 +28,21 @@
   font-size: 1.1rem;
 }
 
+.header-actions {
+  position: right;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.emoji-manager-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+}
+
 /* IG 風格的返回按鈕 */
 .back-button-ig {
   position: absolute;
@@ -333,28 +348,37 @@
 
 .input-controls {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
 .input-controls button {
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 10px 16px;
   cursor: pointer;
-  font-size: 0.9em;
-  color: #667eea;
-  font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .input-controls button:hover {
-  background: rgba(102, 126, 234, 0.1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: white;
+  border-color: #c5b4e3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.input-controls button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .message-input {
@@ -411,8 +435,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.sticker-panel,
-.emoji-panel {
+.sticker-panel {
   position: absolute;
   bottom: 140px;
   left: 1rem;
@@ -428,19 +451,132 @@
   z-index: 1000;
 }
 
-.sticker-panel h4,
-.emoji-panel h4 {
+/* EmojiPicker 樣式覆蓋 - 適應聊天室環境 */
+.chat-room .emoji-picker {
+  position: absolute;
+  bottom: 140px;
+  left: 1rem;
+  right: 1rem;
+  width: auto;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.sticker-panel h4 {
   margin: 0 0 1rem 0;
   color: #333;
   text-align: center;
   font-weight: 600;
 }
 
-.sticker-grid,
-.emoji-grid {
+/* EmojiPicker 內部樣式適應 */
+.chat-room .emoji-picker .emoji-picker-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1rem;
+}
+
+.chat-room .emoji-picker .emoji-search {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.chat-room .emoji-picker .category-tabs {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 1rem;
+}
+
+.chat-room .emoji-picker .category-tab {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.chat-room .emoji-picker .category-tab:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
+.chat-room .emoji-picker .category-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.chat-room .emoji-picker .emoji-content {
+  padding: 1rem;
+}
+
+.chat-room .emoji-picker .section-title {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.sticker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   gap: 0.75rem;
+}
+
+/* EmojiPicker 網格樣式適應 */
+.chat-room .emoji-picker .emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.5rem;
+}
+
+.chat-room .emoji-picker .emoji-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  font-size: 1.5rem;
+  width: auto;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-room .emoji-picker .emoji-item:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chat-room .emoji-picker .custom-emoji-square {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 0.5rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-room .emoji-picker .custom-emoji-square .custom-emoji-image {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 0.25rem;
+}
+
+.chat-room .emoji-picker .custom-emoji-name {
+  font-size: 0.7rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .sticker-item,
@@ -569,23 +705,34 @@
   gap: 8px;
   margin-bottom: 8px;
   flex-wrap: wrap;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
 .input-controls button {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   font-size: 14px;
+  font-weight: 500;
   color: #333;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .input-controls button:hover {
   background: white;
-  border-color: #ffd5fc;
-  transform: translateY(-1px);
+  border-color: #c5b4e3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.input-controls button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 /* 表情符號大文字訊息樣式 */
@@ -715,6 +862,27 @@
     flex: 1;
     min-width: calc(33.333% - 0.33rem);
   }
+  
+    .chat-room .emoji-picker {
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: 120px;
+      height: 350px;
+    }
+    
+    .chat-room .emoji-picker .emoji-content {
+      padding: 0.75rem;
+    }
+    
+    .chat-room .emoji-picker .emoji-grid {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.4rem;
+    }
+    
+    .chat-room .emoji-picker .emoji-item {
+      height: 45px;
+      font-size: 1.3rem;
+    }
   
   .sticker-panel,
   .emoji-panel {

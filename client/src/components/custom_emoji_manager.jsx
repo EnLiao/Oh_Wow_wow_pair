@@ -20,7 +20,7 @@ import {
 } from 'reactstrap';
 import './custom_emoji_manager.css';
 
-const CustomEmojiManager = ({ isOpen, toggle }) => {
+const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) => {
   const [customEmojis, setCustomEmojis] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -37,12 +37,12 @@ const CustomEmojiManager = ({ isOpen, toggle }) => {
     if (isOpen) {
       loadCustomEmojis();
     }
-  }, [isOpen]);
+  }, [isOpen, roomId]);
 
   const loadCustomEmojis = async () => {
     setLoading(true);
     try {
-      const response = await chatAPI.getCustomEmojis();
+      const response = await chatAPI.getCustomEmojis(roomId);
       setCustomEmojis(response.data);
     } catch (err) {
       console.error('載入自訂表情符號失敗:', err);
@@ -103,7 +103,8 @@ const CustomEmojiManager = ({ isOpen, toggle }) => {
       await chatAPI.createCustomEmoji({
         name: newEmojiName,
         image: newEmojiFile,
-        is_public: isPublic
+        is_public: isPublic,
+        room_id: roomId
       });
 
       setSuccess('表情符號上傳成功！');
@@ -116,6 +117,11 @@ const CustomEmojiManager = ({ isOpen, toggle }) => {
       
       // 重新載入列表
       loadCustomEmojis();
+
+      // 通知父層立即更新（讓選擇器立刻顯示新表情）
+      if (typeof onUploadSuccess === 'function') {
+        onUploadSuccess();
+      }
 
       // 3秒後清除成功訊息
       setTimeout(() => setSuccess(null), 3000);
@@ -139,6 +145,10 @@ const CustomEmojiManager = ({ isOpen, toggle }) => {
       await chatAPI.deleteCustomEmoji(emojiId);
       setSuccess('表情符號已刪除');
       loadCustomEmojis();
+      // 刪除後也同步刷新父層的清單
+      if (typeof onUploadSuccess === 'function') {
+        onUploadSuccess();
+      }
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('刪除表情符號失敗:', err);

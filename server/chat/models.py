@@ -23,6 +23,7 @@ class ChatRoom(models.Model):
 class CustomEmoji(models.Model):
     """自訂表情符號，類似 Discord"""
     name = models.CharField(max_length=50)  # 表情符號名稱，如 "mycat"
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='custom_emojis', null=True, blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custom_emojis')
     image = models.ImageField(
         upload_to='custom_emojis/', 
@@ -32,9 +33,11 @@ class CustomEmoji(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('name', 'owner')
+        unique_together = ('name', 'owner', 'room')
 
     def __str__(self):
+        if self.room:
+            return f':{self.name}: in Room {self.room.id} by {self.owner}'
         return f':{self.name}: by {self.owner}'
 
 

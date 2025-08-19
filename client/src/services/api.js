@@ -143,11 +143,17 @@ export const chatAPI = {
   markRoomRead: (roomId, dollId) => api.post(`/chat/rooms/${roomId}/mark_read/`, { doll_id: dollId }),
 
   // 自訂表情符號
-  getCustomEmojis: () => api.get('/chat/emojis/'),
+  getCustomEmojis: (roomId = null) => {
+    const url = roomId ? `/chat/emojis/?room_id=${roomId}` : '/chat/emojis/';
+    return api.get(url);
+  },
   createCustomEmoji: (data) => {
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('image', data.image);
+    if (data.room_id) {
+      formData.append('room_id', data.room_id);
+    }
     formData.append('is_public', data.is_public || false);
     return api.post('/chat/emojis/', formData, {
       headers: {

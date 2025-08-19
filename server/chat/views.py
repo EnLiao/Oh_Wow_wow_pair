@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
@@ -97,13 +97,28 @@ class CustomEmojiViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        # 回傳自己的表情符號 + 公開的表情符號
-        return CustomEmoji.objects.filter(
-            Q(owner=user) | Q(is_public=True)
-        ).order_by('-created_at')
-    
+        room_id = self.request.query_params.get('room_id')
+        
+        if room_id:
+            # 返回特定聊天室的表情符號
+            return CustomEmoji.objects.filter(room_id=room_id, owner=user)
+        
+        # 預設返回用戶的所有表情符號（無聊天室關聯）
+        return CustomEmoji.objects.filter(owner=user, room__isnull=True)
+
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        room_id = self.request.data.get('room_id')
+        room = None
+        if room_id:
+            try:
+                room = ChatRoom.objects.get(id=room_id)
+                # 驗證用戶是否是聊天室成員
+                if not (room.doll1.username == self.request.user or room.doll2.username == self.request.user):
+                    raise permissions.PermissionDenied("You are not a member of this chat room.")
+            except ChatRoom.DoesNotExist:
+                raise serializers.ValidationError("Invalid room_id")
+
+        serializer.save(owner=self.request.user, room=room)
 
 class StickerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Sticker.objects.all()

@@ -4,6 +4,7 @@ import chatNotificationService from '../services/chat_notification_service.js';
 import { chatAPI } from '../services/api.js';
 import { config } from '../config/config.js';
 import EmojiPicker from './emoji_picker.jsx';
+import CustomEmojiManager from './custom_emoji_manager.jsx';
 import './chat_room.css';
 
 const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, onMarkRoomAsRead, onBack }) => {
@@ -16,6 +17,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   const [customEmojis, setCustomEmojis] = useState([]);
   const [showStickerPanel, setShowStickerPanel] = useState(false);
   const [showEmojiPanel, setShowEmojiPanel] = useState(false);
+  const [showEmojiManager, setShowEmojiManager] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [previewSticker, setPreviewSticker] = useState(null); // 預覽貼圖
   
@@ -255,8 +257,8 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
 
   const loadCustomEmojis = async () => {
     try {
-      console.log('[ChatRoom] 開始載入自定義表情符號...');
-      const response = await chatAPI.getCustomEmojis();
+      console.log(`[ChatRoom] 開始載入聊天室 ${roomId} 的自定義表情符號...`);
+      const response = await chatAPI.getCustomEmojis(roomId);
       console.log('[ChatRoom] 自定義表情符號載入成功:', response.data);
       setCustomEmojis(response.data);
     } catch (error) {
@@ -464,6 +466,15 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
           &lt;
         </button>
         <h3>與 {otherDoll.name} 的對話</h3>
+        <div className="header-actions">
+          <button 
+            className="emoji-manager-btn"
+            onClick={() => setShowEmojiManager(true)}
+            title="管理此聊天室的自訂表情符號"
+          >
+            😀+
+          </button>
+        </div>
       </div>
 
       <div className="messages-container">
@@ -595,6 +606,21 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
         <div ref={messagesEndRef} />
       </div>
 
+      <CustomEmojiManager
+        isOpen={showEmojiManager}
+        toggle={() => setShowEmojiManager(false)}
+        roomId={roomId}
+        onUploadSuccess={loadCustomEmojis}
+      />
+
+      <EmojiPicker 
+        isOpen={showEmojiPanel}
+        onEmojiSelect={handleEmojiSelect}
+        customEmojis={customEmojis}
+        onClose={() => setShowEmojiPanel(false)}
+        position="bottom"
+      />
+
       {replyingTo && (
         <div className="reply-bar">
           <span>回覆: {replyingTo.decrypted_content || replyingTo.encrypted_content}</span>
@@ -618,25 +644,9 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
           <button onClick={() => setShowStickerPanel(!showStickerPanel)}>
             貼圖
           </button>
-          <div className="emoji-button-container" style={{ position: 'relative' }}>
-            <button onClick={() => setShowEmojiPanel(!showEmojiPanel)}>
-              😀
-            </button>
-            <EmojiPicker
-              isOpen={showEmojiPanel}
-              onEmojiSelect={handleEmojiSelect}
-              onClose={() => setShowEmojiPanel(false)}
-              position="bottom"
-              customEmojis={customEmojis}
-            />
-          </div>
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageSelect}
-            style={{ display: 'none' }}
-            id="image-input"
-          />
+          <button onClick={() => setShowEmojiPanel(true)}>
+            表情
+          </button>
           <button onClick={() => document.getElementById('image-input').click()}>
             圖片
           </button>
@@ -673,6 +683,13 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
             placeholder={previewSticker ? "輸入文字與貼圖一起發送..." : "輸入訊息..."}
             disabled={!!selectedImageFile}
             className={previewSticker ? 'with-sticker-preview' : ''}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            style={{ display: 'none' }}
+            id="image-input"
           />
           <button onClick={sendMessage}>發送</button>
         </div>
