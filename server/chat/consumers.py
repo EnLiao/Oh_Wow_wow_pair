@@ -302,6 +302,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'doll_id': event['doll_id']
         }))
 
+    async def emoji_update(self, event):
+        """處理表情符號更新事件"""
+        await self.send(text_data=json.dumps({
+            'type': 'emoji_update',
+            'action': event['action'],  # 'emoji_created' 或 'emoji_deleted'
+            'emoji': event['emoji'],
+            'room_id': event['room_id']
+        }))
+
     # 資料庫操作方法
     @database_sync_to_async
     def verify_room_access(self):

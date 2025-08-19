@@ -161,7 +161,10 @@ export const chatAPI = {
       },
     });
   },
-  deleteCustomEmoji: (id) => api.delete(`/chat/emojis/${id}/`),
+  deleteCustomEmoji: (id, roomId = null) => {
+    const params = roomId ? { room_id: roomId } : {};
+    return api.delete(`/chat/emojis/${id}/`, { params });
+  },
 
   // 貼圖
   getStickers: (category = null) => {

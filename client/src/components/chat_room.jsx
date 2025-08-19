@@ -125,9 +125,18 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     ));
   }, []);
 
+  const handleEmojiUpdate = useCallback((emojiData) => {
+    console.log('[ChatRoom] 收到表情符號更新:', emojiData);
+    
+    if (emojiData.room_id === roomId) {
+      // 重新載入自定義表情符號
+      loadCustomEmojis();
+    }
+  }, [roomId]);
+
   useEffect(() => {
     let isMounted = true;
-    let unsubscribeMessage, unsubscribeReaction, unsubscribeTyping, unsubscribeReadReceipt;
+    let unsubscribeMessage, unsubscribeReaction, unsubscribeTyping, unsubscribeReadReceipt, unsubscribeEmojiUpdate;
     
     // 防止重複初始化
     if (isInitialized) {
@@ -151,6 +160,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
       unsubscribeReaction = chatService.current.onReaction(handleReaction);
       unsubscribeTyping = chatService.current.onTyping(handleTyping);
       unsubscribeReadReceipt = chatService.current.onReadReceipt(handleReadReceipt);
+      unsubscribeEmojiUpdate = chatService.current.onEmojiUpdate(handleEmojiUpdate);
       
       // 然後連接 WebSocket
       chatService.current.connect(roomId, token, currentDoll.id);
@@ -184,6 +194,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
       if (unsubscribeReaction) unsubscribeReaction();
       if (unsubscribeTyping) unsubscribeTyping();
       if (unsubscribeReadReceipt) unsubscribeReadReceipt();
+      if (unsubscribeEmojiUpdate) unsubscribeEmojiUpdate();
       
       // 從全域通知服務取消註冊
       chatNotificationService.unregisterChatRoom(roomId);

@@ -14,6 +14,7 @@ class ChatService {
         this.reactionHandlers = new Set();
         this.typingHandlers = new Set();
         this.readReceiptHandlers = new Set();
+        this.emojiUpdateHandlers = new Set();
         this.globalMessageHandlers = new Set(); // 全域訊息監聽器
         this.currentRoomId = null;
         this.isConnected = false;
@@ -296,6 +297,16 @@ class ChatService {
                 });
                 window.dispatchEvent(readEvent);
                 break;
+
+            case 'emoji_update':  // 表情符號更新
+                this.emojiUpdateHandlers.forEach(handler => handler(data));
+                
+                // 觸發表情符號更新事件
+                const emojiEvent = new CustomEvent('emojiUpdateReceived', {
+                    detail: data
+                });
+                window.dispatchEvent(emojiEvent);
+                break;
                 
             default:
                 console.log('未知的消息類型:', data.type);
@@ -323,6 +334,11 @@ class ChatService {
         return () => this.readReceiptHandlers.delete(handler);
     }
 
+    onEmojiUpdate(handler) {
+        this.emojiUpdateHandlers.add(handler);
+        return () => this.emojiUpdateHandlers.delete(handler);
+    }
+
     // 工具方法：檔案轉 base64
     fileToBase64(file) {
         return new Promise((resolve, reject) => {
@@ -341,6 +357,7 @@ class ChatService {
         this.reactionHandlers.clear();
         this.typingHandlers.clear();
         this.readReceiptHandlers.clear();
+        this.emojiUpdateHandlers.clear();
         this.globalMessageHandlers.clear();
         
         // 清除重連計時器

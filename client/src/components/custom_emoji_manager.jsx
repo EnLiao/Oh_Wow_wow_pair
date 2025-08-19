@@ -139,7 +139,7 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
     }
 
     try {
-      await chatAPI.deleteCustomEmoji(emojiId);
+      await chatAPI.deleteCustomEmoji(emojiId, roomId);
       setSuccess('表情符號已刪除');
       loadCustomEmojis();
       // 刪除後也同步刷新父層的清單
