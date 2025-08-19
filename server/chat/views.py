@@ -100,8 +100,16 @@ class CustomEmojiViewSet(viewsets.ModelViewSet):
         room_id = self.request.query_params.get('room_id')
         
         if room_id:
-            # 返回特定聊天室的表情符號
-            return CustomEmoji.objects.filter(room_id=room_id, owner=user)
+            try:
+                # 驗證用戶是否是聊天室成員
+                room = ChatRoom.objects.get(id=room_id)
+                if not (room.doll1.username == user or room.doll2.username == user):
+                    raise permissions.PermissionDenied("You are not a member of this chat room.")
+                
+                # 返回該聊天室的所有表情符號（不限制owner）
+                return CustomEmoji.objects.filter(room_id=room_id)
+            except ChatRoom.DoesNotExist:
+                raise serializers.ValidationError("Invalid room_id")
         
         # 預設返回用戶的所有表情符號（無聊天室關聯）
         return CustomEmoji.objects.filter(owner=user, room__isnull=True)
@@ -118,7 +126,9 @@ class CustomEmojiViewSet(viewsets.ModelViewSet):
             except ChatRoom.DoesNotExist:
                 raise serializers.ValidationError("Invalid room_id")
 
-        serializer.save(owner=self.request.user, room=room)
+        # 在私人聊天室中，表情符號預設為公開（房間內所有成員可見）
+        is_public = bool(room) if room else False
+        serializer.save(owner=self.request.user, room=room, is_public=is_public)
 
 class StickerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Sticker.objects.all()

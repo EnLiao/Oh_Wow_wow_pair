@@ -470,7 +470,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
           <button 
             className="emoji-manager-btn"
             onClick={() => setShowEmojiManager(true)}
-            title="管理此聊天室的自訂表情符號"
+            title="管理此聊天室的共享表情符號"
           >
             😀+
           </button>

@@ -30,7 +30,6 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
   // 上傳表單狀態
   const [newEmojiName, setNewEmojiName] = useState('');
   const [newEmojiFile, setNewEmojiFile] = useState(null);
-  const [isPublic, setIsPublic] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
@@ -103,7 +102,6 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
       await chatAPI.createCustomEmoji({
         name: newEmojiName,
         image: newEmojiFile,
-        is_public: isPublic,
         room_id: roomId
       });
 
@@ -113,7 +111,6 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
       setNewEmojiName('');
       setNewEmojiFile(null);
       setPreviewUrl(null);
-      setIsPublic(false);
       
       // 重新載入列表
       loadCustomEmojis();
@@ -160,7 +157,6 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
     setNewEmojiName('');
     setNewEmojiFile(null);
     setPreviewUrl(null);
-    setIsPublic(false);
     setError(null);
     setSuccess(null);
   };
@@ -168,7 +164,7 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
   return (
     <Modal isOpen={isOpen} toggle={toggle} size="lg" className="custom-emoji-modal">
       <ModalHeader toggle={toggle}>
-        自訂表情符號管理
+        聊天室表情符號管理
       </ModalHeader>
       
       <ModalBody>
@@ -188,6 +184,7 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
         <Card className="mb-4">
           <CardBody>
             <h5>上傳新表情符號</h5>
+            <p className="text-muted mb-3">上傳到此聊天室的表情符號將被雙方用戶共享使用</p>
             <Form>
               <Row>
                 <Col md={8}>
@@ -217,17 +214,6 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
                     <small className="text-muted">
                       支援 PNG、JPG、GIF 格式，檔案大小不超過 5MB
                     </small>
-                  </FormGroup>
-                  
-                  <FormGroup check>
-                    <Input
-                      type="checkbox"
-                      checked={isPublic}
-                      onChange={(e) => setIsPublic(e.target.checked)}
-                    />
-                    <Label check>
-                      公開給其他用戶使用
-                    </Label>
                   </FormGroup>
                 </Col>
                 
@@ -259,7 +245,7 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
 
         {/* 現有表情符號列表 */}
         <div>
-          <h5>我的表情符號</h5>
+          <h5>聊天室表情符號</h5>
           {loading ? (
             <div className="text-center py-4">
               <Spinner color="primary" />
@@ -279,9 +265,6 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
                     <CardBody className="p-2">
                       <div className="emoji-info">
                         <div className="emoji-name">:{emoji.name}:</div>
-                        {emoji.is_public && (
-                          <small className="text-success">公開</small>
-                        )}
                       </div>
                       <Button
                         size="sm"
@@ -298,7 +281,7 @@ const CustomEmojiManager = ({ isOpen, toggle, roomId = null, onUploadSuccess }) 
             </Row>
           ) : (
             <div className="text-center text-muted py-4">
-              還沒有自訂表情符號，立即上傳一個吧！
+              這個聊天室還沒有表情符號，立即上傳一個吧！
             </div>
           )}
         </div>
