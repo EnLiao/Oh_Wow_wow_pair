@@ -2,12 +2,15 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
   max-width: 800px;
+  min-width: 400px;
   margin: 0 auto;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border-radius: 0;
+  box-sizing: border-box;
 }
 
 .chat-header {
@@ -19,6 +22,9 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .chat-header h3 {
@@ -26,13 +32,21 @@
   color: #333;
   font-weight: 600;
   font-size: 1.1rem;
+  text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 160px); /* 為左右按鈕留出空間 */
 }
 
 .header-actions {
-  position: right;
+  position: absolute;
+  right: 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .emoji-manager-btn {
@@ -859,11 +873,19 @@
 @media (max-width: 768px) {
   .chat-room {
     height: 100vh;
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 100vw;
     border-radius: 0;
+    margin: 0;
   }
   
   .chat-header {
     padding: 1rem;
+  }
+  
+  .chat-header h3 {
+    max-width: calc(100% - 120px);
   }
   
   .messages-container {
