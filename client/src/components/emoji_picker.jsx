@@ -23,6 +23,14 @@ const EmojiPicker = ({
   const [searchResults, setSearchResults] = useState([]);
   const pickerRef = useRef(null);
 
+  // 調試：監聽 customEmojis 變化
+  /*
+  useEffect(() => {
+    console.log('[EmojiPicker] customEmojis prop 變化:', customEmojis);
+    console.log('[EmojiPicker] customEmojis 數量:', customEmojis.length);
+    console.log('[EmojiPicker] customEmojis 詳情:', customEmojis.map(e => ({ id: e.id, name: e.name })));
+  }, [customEmojis]);
+  */
   useEffect(() => {
     // 載入最近使用的表情符號
     const savedRecentEmojis = localStorage.getItem('recentEmojis');

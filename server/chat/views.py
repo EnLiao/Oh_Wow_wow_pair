@@ -194,14 +194,16 @@ class CustomEmojiViewSet(viewsets.ModelViewSet):
                 'image': emoji_data.image.url if emoji_data.image else None,
             }
         
+        message_data = {
+            'type': 'emoji_update',
+            'action': action,  # 'emoji_created' 或 'emoji_deleted'
+            'emoji': emoji_data,
+            'room_id': room_id,
+        }
+        
         async_to_sync(channel_layer.group_send)(
             room_group_name,
-            {
-                'type': 'emoji_update',
-                'action': action,  # 'emoji_created' 或 'emoji_deleted'
-                'emoji': emoji_data,
-                'room_id': room_id,
-            }
+            message_data
         )
 
 class StickerViewSet(viewsets.ReadOnlyModelViewSet):

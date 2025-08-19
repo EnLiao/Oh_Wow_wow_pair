@@ -127,12 +127,18 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
 
   const handleEmojiUpdate = useCallback((emojiData) => {
     console.log('[ChatRoom] 收到表情符號更新:', emojiData);
+    console.log('[ChatRoom] 當前房間ID:', roomId);
+    console.log('[ChatRoom] 事件房間ID:', emojiData.room_id);
+    console.log('[ChatRoom] 更新前自定義表情符號數量:', customEmojis.length);
     
     if (emojiData.room_id === roomId) {
+      console.log('[ChatRoom] 房間ID匹配，開始重新載入表情符號...');
       // 重新載入自定義表情符號
       loadCustomEmojis();
+    } else {
+      console.log('[ChatRoom] 房間ID不匹配，忽略此更新');
     }
-  }, [roomId]);
+  }, [roomId, customEmojis.length]);
 
   useEffect(() => {
     let isMounted = true;
@@ -269,8 +275,10 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   const loadCustomEmojis = async () => {
     try {
       console.log(`[ChatRoom] 開始載入聊天室 ${roomId} 的自定義表情符號...`);
+      console.log('[ChatRoom] 載入前自定義表情符號數量:', customEmojis.length);
       const response = await chatAPI.getCustomEmojis(roomId);
       console.log('[ChatRoom] 自定義表情符號載入成功:', response.data);
+      console.log('[ChatRoom] 載入後自定義表情符號數量:', response.data.length);
       setCustomEmojis(response.data);
     } catch (error) {
       console.error('載入自訂表情符號失敗:', error);
@@ -655,7 +663,11 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
           <button onClick={() => setShowStickerPanel(!showStickerPanel)}>
             貼圖
           </button>
-          <button onClick={() => setShowEmojiPanel(true)}>
+          <button onClick={() => {
+            setShowEmojiPanel(true);
+            // 每次打開表情符號面板時重新載入表情符號
+            loadCustomEmojis();
+          }}>
             表情
           </button>
           <button onClick={() => document.getElementById('image-input').click()}>
