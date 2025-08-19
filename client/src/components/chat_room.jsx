@@ -83,7 +83,10 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     
     // 新訊息到達時，確保自動滾動並滾動到底部
     shouldAutoScroll.current = true;
-    setTimeout(scrollToBottom, 100);
+    // 使用 requestAnimationFrame 確保新訊息渲染後再滾動
+    requestAnimationFrame(() => {
+      setTimeout(scrollToBottom, 50);
+    });
   }, [currentDoll.id, onNewMessage]);
 
   const handleReaction = useCallback((reactionData) => {
@@ -201,8 +204,17 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
         if (isMounted) {
           loadMessages();
           setIsInitialized(true);
+          
+          // 額外確保滾動到底部
+          setTimeout(() => {
+            if (messagesContainerRef.current) {
+              requestAnimationFrame(() => {
+                scrollToBottom();
+              });
+            }
+          }, 200);
         }
-      }, 100);
+      }, 150);
     }
     
     // 清理
@@ -231,7 +243,10 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   useEffect(() => {
     // 只在應該自動滾動時才滾動到底部
     if (shouldAutoScroll.current) {
-      scrollToBottom();
+      // 使用 requestAnimationFrame 確保 DOM 更新後再滾動
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
     }
   }, [messages]);
 
@@ -261,10 +276,13 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     if (!messagesContainer) return;
 
     if (previousScrollHeight.current > 0) {
-      const newScrollHeight = messagesContainer.scrollHeight;
-      const scrollDiff = newScrollHeight - previousScrollHeight.current;
-      messagesContainer.scrollTop = scrollDiff;
-      previousScrollHeight.current = 0;
+      // 使用 requestAnimationFrame 確保 DOM 更新後再調整滾動位置
+      requestAnimationFrame(() => {
+        const newScrollHeight = messagesContainer.scrollHeight;
+        const scrollDiff = newScrollHeight - previousScrollHeight.current;
+        messagesContainer.scrollTop = scrollDiff;
+        previousScrollHeight.current = 0;
+      });
     }
   }, [messages]);
 
@@ -289,6 +307,13 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
         // 初始載入或重新載入時，直接設置訊息
         shouldAutoScroll.current = true; // 初始載入時允許自動滾動
         setMessages(loadedMessages);
+        
+        // 確保訊息渲染後滾動到底部
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            scrollToBottom();
+          });
+        }, 100);
         
         // 標記聊天室為已讀
         await markRoomAsRead();
@@ -510,7 +535,20 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const messagesContainer = messagesContainerRef.current;
+    const messagesEnd = messagesEndRef.current;
+    
+    if (messagesContainer && messagesEnd) {
+      // 先嘗試滾動到底部
+      messagesEnd.scrollIntoView({ behavior: 'smooth' });
+      
+      // 如果 smooth 滾動沒有正確工作，強制滾動到底部
+      setTimeout(() => {
+        if (messagesContainer.scrollHeight > messagesContainer.clientHeight) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+      }, 100);
+    }
   };
 
   const formatTimestamp = (timestamp) => {

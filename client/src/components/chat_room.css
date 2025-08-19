@@ -92,6 +92,9 @@
   background: transparent;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  min-height: 0; /* 確保 flexbox 正確計算高度 */
+  display: flex;
+  flex-direction: column;
 }
 
 .messages-container::-webkit-scrollbar {
