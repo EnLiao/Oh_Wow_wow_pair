@@ -84,6 +84,36 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* 載入更多訊息的樣式 */
+.load-more-indicator {
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.loading-spinner {
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.load-more-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
 .message {
   margin-bottom: 0.5rem;
   max-width: 75%;

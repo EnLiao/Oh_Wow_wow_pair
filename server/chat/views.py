@@ -56,13 +56,35 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         if not room:
             return Response({'error': 'Chat room not found or access denied'}, status=status.HTTP_404_NOT_FOUND)
         
-        messages = room.messages.all().order_by('timestamp')
+        # 分頁參數
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 20))  # 預設每頁 20 條訊息
         
-        # 不使用分頁，直接返回所有消息
-        serializer = MessageSerializer(messages, many=True)
+        # 獲取所有訊息，按時間倒序排列（最新的在前）
+        all_messages = room.messages.all().order_by('-timestamp')
+        
+        # 計算分頁
+        total_count = all_messages.count()
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        
+        # 獲取當前頁的訊息
+        page_messages = all_messages[start_index:end_index]
+        
+        # 將訊息轉為正序（舊的在前，新的在後）用於顯示
+        messages_list = list(page_messages)
+        messages_list.reverse()
+        
+        # 序列化訊息
+        serializer = MessageSerializer(messages_list, many=True)
+        
         return Response({
             'results': serializer.data,
-            'count': len(serializer.data)
+            'count': len(serializer.data),
+            'total_count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'has_more': end_index < total_count  # 是否還有更多訊息
         })
 
     @action(detail=True, methods=['post'])

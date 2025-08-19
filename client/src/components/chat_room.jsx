@@ -21,12 +21,22 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   const [replyingTo, setReplyingTo] = useState(null);
   const [previewSticker, setPreviewSticker] = useState(null); // 預覽貼圖
   
+  // 分頁相關狀態
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  
   const chatService = useRef(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const previousScrollHeight = useRef(0);
 
   // 添加載入狀態防止重複調用
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // 追蹤是否應該自動滾動到底部
+  const shouldAutoScroll = useRef(true);
 
   // 使用 useCallback 確保事件處理器的穩定性
   const handleNewMessage = useCallback((message) => {
@@ -70,6 +80,10 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     if (onNewMessage) {
       onNewMessage(message);
     }
+    
+    // 新訊息到達時，確保自動滾動並滾動到底部
+    shouldAutoScroll.current = true;
+    setTimeout(scrollToBottom, 100);
   }, [currentDoll.id, onNewMessage]);
 
   const handleReaction = useCallback((reactionData) => {
@@ -215,38 +229,109 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   }, [roomId]); // 只依賴 roomId，避免重複初始化
 
   useEffect(() => {
-    scrollToBottom();
+    // 只在應該自動滾動時才滾動到底部
+    if (shouldAutoScroll.current) {
+      scrollToBottom();
+    }
   }, [messages]);
 
-  const loadMessages = async () => {
+  // 處理滾動事件，檢測是否需要載入更多訊息
+  useEffect(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (!messagesContainer) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight } = messagesContainer;
+      
+      // 當滾動到接近頂部時載入更多訊息
+      if (scrollTop < 100 && hasMoreMessages && !loadingMessages) {
+        // 記錄當前滾動高度
+        previousScrollHeight.current = scrollHeight;
+        loadMoreMessages();
+      }
+    };
+
+    messagesContainer.addEventListener('scroll', handleScroll);
+    return () => messagesContainer.removeEventListener('scroll', handleScroll);
+  }, [hasMoreMessages, loadingMessages]);
+
+  // 載入更多訊息後維持滾動位置
+  useEffect(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (!messagesContainer) return;
+
+    if (previousScrollHeight.current > 0) {
+      const newScrollHeight = messagesContainer.scrollHeight;
+      const scrollDiff = newScrollHeight - previousScrollHeight.current;
+      messagesContainer.scrollTop = scrollDiff;
+      previousScrollHeight.current = 0;
+    }
+  }, [messages]);
+
+  const loadMessages = async (page = 1, append = false) => {
+    if (loadingMessages) return;
+    
     try {
-      const response = await chatAPI.getChatRoomMessages(roomId, currentDoll.id);
+      setLoadingMessages(true);
+      
+      // 載入歷史訊息時不自動滾動
+      if (append) {
+        shouldAutoScroll.current = false;
+      }
+      
+      const response = await chatAPI.getChatRoomMessages(roomId, currentDoll.id, page);
       const loadedMessages = response.data.results || [];
       
-      // 不進行解密處理，直接使用後端返回的 decrypted_content
-      // 因為後端的 MessageSerializer 已經提供了 decrypted_content 字段
-      setMessages(loadedMessages);
-      
-      // 標記聊天室為已讀
-      await markRoomAsRead();
-      
-      // 自動標記最新的未讀訊息為已讀
-      const unreadMessages = loadedMessages.filter(msg => 
-        !msg.is_read && msg.sender_id !== currentDoll.id
-      );
-      
-      if (unreadMessages.length > 0 && chatService.current) {
-        // 發送已讀回執給所有未讀訊息
-        unreadMessages.forEach(message => {
-          setTimeout(() => {
-            chatService.current.markMessageRead(message.id);
-          }, 500); // 延遲 0.5 秒後標記已讀
-        });
+      if (append) {
+        // 載入更多訊息時，將新訊息添加到現有訊息的前面
+        setMessages(prev => [...loadedMessages, ...prev]);
+      } else {
+        // 初始載入或重新載入時，直接設置訊息
+        shouldAutoScroll.current = true; // 初始載入時允許自動滾動
+        setMessages(loadedMessages);
+        
+        // 標記聊天室為已讀
+        await markRoomAsRead();
+        
+        // 自動標記最新的未讀訊息為已讀
+        const unreadMessages = loadedMessages.filter(msg => 
+          !msg.is_read && msg.sender_id !== currentDoll.id
+        );
+        
+        if (unreadMessages.length > 0 && chatService.current) {
+          // 發送已讀回執給所有未讀訊息
+          unreadMessages.forEach(message => {
+            setTimeout(() => {
+              chatService.current.markMessageRead(message.id);
+            }, 500); // 延遲 0.5 秒後標記已讀
+          });
+        }
       }
+      
+      // 更新分頁狀態
+      setHasMoreMessages(response.data.has_more || false);
+      setCurrentPage(page);
       
     } catch (error) {
       console.error('載入訊息失敗:', error);
+    } finally {
+      setLoadingMessages(false);
+      
+      // 載入歷史訊息完成後，重置自動滾動標誌
+      if (append) {
+        setTimeout(() => {
+          shouldAutoScroll.current = true;
+        }, 100);
+      }
     }
+  };
+
+  // 載入更多歷史訊息
+  const loadMoreMessages = async () => {
+    if (!hasMoreMessages || loadingMessages) return;
+    
+    const nextPage = currentPage + 1;
+    await loadMessages(nextPage, true);
   };
 
   const markRoomAsRead = async () => {
@@ -496,7 +581,23 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
         </div>
       </div>
 
-      <div className="messages-container">
+      <div className="messages-container" ref={messagesContainerRef}>
+        {/* 載入更多訊息的指示器 */}
+        {hasMoreMessages && (
+          <div className="load-more-indicator">
+            {loadingMessages ? (
+              <div className="loading-spinner">載入中...</div>
+            ) : (
+              <button 
+                className="load-more-btn"
+                onClick={loadMoreMessages}
+              >
+                載入更多訊息
+              </button>
+            )}
+          </div>
+        )}
+        
         {messages.map((message, index) => (
             <div 
               key={message.id} 
