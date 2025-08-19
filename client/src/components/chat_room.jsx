@@ -558,6 +558,56 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     });
   };
 
+  // 將 HTML 實體還原為可渲染的標籤（處理 &lt;img ...&gt; → <img ...>）
+  const decodeHtmlEntities = (str) => {
+    if (typeof str !== 'string') return '';
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = str;
+    return textarea.value;
+  };
+
+  // 渲染回覆訊息預覽的函數
+  const renderReplyPreview = (replyMessage) => {
+    if (!replyMessage) return '';
+
+    const content = replyMessage.preview || replyMessage.decrypted_content || replyMessage.encrypted_content || '';
+
+    // 判斷內容是否包含（或被轉義的）HTML 片段
+    const looksLikeHTML =
+      replyMessage.message_type === 'rich_text' ||
+      /<img|<span|<div|<p/i.test(content) ||
+      /&lt;(img|span|div|p)[^&]*&gt;/i.test(content) ||
+      /<\w+[^>]*>/i.test(content);
+
+    if (looksLikeHTML) {
+      // 若是轉義的 HTML，先解碼；否則直接使用
+      const hasEntities = /&lt;|&gt;|&amp;|&quot;|&#39;/.test(content);
+      const html = hasEntities ? decodeHtmlEntities(content) : content;
+      return (
+        <span
+          className="reply-html"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
+    }
+
+    // 非 HTML 類型，依類型輸出簡短文字
+    if (replyMessage.message_type === 'sticker') {
+      return <span>[貼圖: {replyMessage.sticker?.name || '未知'}]</span>;
+    }
+
+    if (replyMessage.message_type === 'emoji') {
+      return <span>[表情: {replyMessage.custom_emoji?.name || '未知'}]</span>;
+    }
+
+    if (replyMessage.message_type === 'image') {
+      return <span>[圖片]</span>;
+    }
+
+    const truncated = content.length > 50 ? content.slice(0, 50) + '…' : content;
+    return <span>{truncated}</span>;
+  };
+
   // 處理並發送包含自定義表情符號的訊息
   const processAndSendMessage = async (message) => {
     // 檢查訊息中是否包含自定義表情符號標記（格式：:emoji_name:）
@@ -643,7 +693,8 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
             >
               {message.reply_to && (
                 <div className="reply-preview">
-                  回覆: {message.reply_to.preview || message.reply_to.decrypted_content || message.reply_to.encrypted_content}
+                  <span>回覆: </span>
+                  {renderReplyPreview(message.reply_to)}
                 </div>
               )}
               
@@ -781,7 +832,8 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
 
       {replyingTo && (
         <div className="reply-bar">
-          <span>回覆: {replyingTo.decrypted_content || replyingTo.encrypted_content}</span>
+          <span>回覆: </span>
+          {renderReplyPreview(replyingTo)}
           <button onClick={() => setReplyingTo(null)}>取消</button>
         </div>
       )}

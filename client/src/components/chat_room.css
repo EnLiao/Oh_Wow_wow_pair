@@ -166,6 +166,16 @@
   font-size: 0.9em;
   color: rgba(255, 255, 255, 0.8);
   border-radius: 4px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reply-preview .custom-emoji-inline {
+  width: 16px !important;
+  height: 16px !important;
+  vertical-align: middle;
 }
 
 .message-content {
@@ -350,7 +360,7 @@
   border-radius: 15px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
 }
 
 .reply-bar button {
@@ -366,6 +376,12 @@
 
 .reply-bar button:hover {
   background: rgba(133, 100, 4, 0.1);
+}
+
+.reply-bar .custom-emoji-inline {
+  width: 16px !important;
+  height: 16px !important;
+  vertical-align: middle;
 }
 
 .image-preview {
