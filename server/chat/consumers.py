@@ -190,6 +190,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 print(f"[WebSocket] 找不到自訂表情 ID: {data['custom_emoji_id']}")
                 return
         
+        elif data.get('message_type') == 'rich_text':
+            # 處理富文本消息（包含HTML標籤的文字）
+            message_data['message_type'] = 'rich_text'
+            print(f"[WebSocket] 設置富文本消息")
+        
         message = await self.create_message(**message_data)
         print(f"[WebSocket] 消息已保存: ID={message.id}, 內容={message.encrypted_content}")  
         

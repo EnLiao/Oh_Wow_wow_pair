@@ -124,6 +124,20 @@ class ChatService {
         this.socket.send(JSON.stringify(messageData));
     }
 
+    // 發送富文本訊息（包含HTML標籤的文字）
+    async sendRichTextMessage(richText, replyToId = null) {
+        if (!this.isConnected || !richText.trim()) return;
+        
+        const messageData = {
+            type: 'chat_message',
+            message_type: 'rich_text',
+            encrypted_content: richText,
+            reply_to_id: replyToId
+        };
+        
+        this.socket.send(JSON.stringify(messageData));
+    }
+
     // 發送圖片訊息
     async sendImageMessage(imageFile, replyToId = null) {
         if (!this.isConnected) return;

@@ -421,37 +421,36 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     const matches = [...message.matchAll(customEmojiRegex)];
     
     if (matches.length > 0) {
-      // 分別處理文字和自定義表情符號
-      let lastIndex = 0;
+      // 創建處理後的消息內容，將自定義表情符號替換為HTML標籤
+      let processedMessage = message;
+      const replacements = [];
       
+      // 收集所有需要替換的表情符號
       for (const match of matches) {
         const [fullMatch, emojiName] = match;
-        const matchIndex = match.index;
-        
-        // 發送在自定義表情符號之前的文字
-        if (matchIndex > lastIndex) {
-          const textBefore = message.slice(lastIndex, matchIndex).trim();
-          if (textBefore) {
-            await chatService.current.sendTextMessage(textBefore, replyingTo?.id);
-          }
-        }
-        
-        // 發送自定義表情符號
         const customEmoji = customEmojis.find(emoji => emoji.name === emojiName);
         if (customEmoji) {
-          await chatService.current.sendCustomEmoji(customEmoji.id, replyingTo?.id);
+          replacements.push({
+            original: fullMatch,
+            replacement: `<img src="${customEmoji.image}" alt="${emojiName}" class="custom-emoji-inline" data-emoji-id="${customEmoji.id}" style="width: 24px; height: 24px; vertical-align: middle;">`
+          });
         }
-        
-        lastIndex = matchIndex + fullMatch.length;
       }
       
-      // 發送最後剩餘的文字
-      if (lastIndex < message.length) {
-        const textAfter = message.slice(lastIndex).trim();
-        if (textAfter) {
-          await chatService.current.sendTextMessage(textAfter, replyingTo?.id);
+      // 從後往前進行替換，避免位置偏移
+      for (let i = matches.length - 1; i >= 0; i--) {
+        const match = matches[i];
+        const [fullMatch, emojiName] = match;
+        const replacement = replacements.find(r => r.original === fullMatch);
+        if (replacement) {
+          const start = match.index;
+          const end = match.index + fullMatch.length;
+          processedMessage = processedMessage.substring(0, start) + replacement.replacement + processedMessage.substring(end);
         }
       }
+      
+      // 發送包含HTML標籤的消息作為富文本消息
+      await chatService.current.sendRichTextMessage(processedMessage, replyingTo?.id);
     } else {
       // 沒有自定義表情符號，直接發送文字
       await chatService.current.sendTextMessage(message, replyingTo?.id);
@@ -482,6 +481,13 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
               <div className="message-content">
               {message.message_type === 'text' && (
                 <span>{message.decrypted_content || message.encrypted_content || '[無內容]'}</span>
+              )}
+              {message.message_type === 'rich_text' && (
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: message.decrypted_content || message.encrypted_content || '[無內容]' 
+                  }}
+                />
               )}
               {message.message_type === 'image' && (
                 <>
