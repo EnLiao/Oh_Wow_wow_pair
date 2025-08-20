@@ -389,6 +389,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
       const response = await chatAPI.getCustomEmojis(roomId);
       console.log('[ChatRoom] 自定義表情符號載入成功:', response.data);
       console.log('[ChatRoom] 載入後自定義表情符號數量:', response.data.length);
+      console.log('[ChatRoom] 詳細表情符號數據:', JSON.stringify(response.data, null, 2));
       setCustomEmojis(response.data);
     } catch (error) {
       console.error('載入自訂表情符號失敗:', error);
@@ -570,17 +571,45 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
   const renderReplyPreview = (replyMessage) => {
     if (!replyMessage) return '';
 
+    console.log('[renderReplyPreview] 處理回覆訊息:', {
+      id: replyMessage.id,
+      message_type: replyMessage.message_type,
+      content: replyMessage.decrypted_content || replyMessage.encrypted_content || replyMessage.preview,
+      customEmojisLength: customEmojis.length,
+      customEmojis: customEmojis
+    });
+
+    // 如果 message_type 是 undefined，根據內容推斷類型
+    let messageType = replyMessage.message_type;
+    if (!messageType) {
+      // 根據內容推斷類型
+      const content = replyMessage.decrypted_content || replyMessage.encrypted_content || replyMessage.preview || '';
+      if (content.includes('<img')) {
+        messageType = 'rich_text';
+      } else {
+        messageType = 'text';
+      }
+      console.log('[renderReplyPreview] 推斷訊息類型:', messageType);
+    }
+
     // 對於富文本，優先使用完整內容以保留 <img> 等 HTML，而不是使用可能被截斷/純文字的 preview
-    const content = replyMessage.message_type === 'rich_text'
+    const content = messageType === 'rich_text'
       ? (replyMessage.decrypted_content || replyMessage.encrypted_content || replyMessage.preview || '')
       : (replyMessage.preview || replyMessage.decrypted_content || replyMessage.encrypted_content || '');
 
     // 判斷內容是否包含（或被轉義的）HTML 片段
     const looksLikeHTML =
-      replyMessage.message_type === 'rich_text' ||
+      messageType === 'rich_text' ||
       /<img|<span|<div|<p/i.test(content) ||
       /&lt;(img|span|div|p)[^&]*&gt;/i.test(content) ||
       /<\w+[^>]*>/i.test(content);
+
+    console.log('[renderReplyPreview] 內容分析:', {
+      content,
+      looksLikeHTML,
+      messageType,
+      originalMessageType: replyMessage.message_type
+    });
 
     if (looksLikeHTML) {
       // 若是轉義的 HTML，先解碼；否則直接使用
@@ -594,8 +623,45 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
       );
     }
 
+    // 檢查是否為包含自定義表情符號的文字訊息（格式：:emoji_name:）
+    const customEmojiRegex = /:([^:]+):/g;
+    const hasCustomEmojis = customEmojiRegex.test(content);
+    
+    if (hasCustomEmojis && customEmojis.length > 0) {
+      // 重置 regex 的 lastIndex
+      customEmojiRegex.lastIndex = 0;
+      
+      // 將文字中的 :emoji_name: 替換為 HTML img 標籤
+      let processedContent = content;
+      const matches = [...content.matchAll(/:([^:]+):/g)];
+      
+      // 從後往前替換，避免位置偏移
+      for (let i = matches.length - 1; i >= 0; i--) {
+        const match = matches[i];
+        const [fullMatch, emojiName] = match;
+        const customEmoji = customEmojis.find(emoji => emoji.name === emojiName);
+        
+        if (customEmoji) {
+          const imgTag = `<img src="${customEmoji.image}" alt="${emojiName}" class="custom-emoji-inline" style="width: 20px; height: 20px; vertical-align: middle;">`;
+          const start = match.index;
+          const end = match.index + fullMatch.length;
+          processedContent = processedContent.substring(0, start) + imgTag + processedContent.substring(end);
+        }
+      }
+      
+      // 如果內容發生了變化（有表情符號被替換），使用 HTML 渲染
+      if (processedContent !== content) {
+        return (
+          <span
+            className="reply-html"
+            dangerouslySetInnerHTML={{ __html: processedContent }}
+          />
+        );
+      }
+    }
+
     // 自訂表情符號訊息：直接顯示小圖
-    if (replyMessage.message_type === 'emoji') {
+    if (messageType === 'emoji') {
       const src = replyMessage.custom_emoji?.image
         ? (replyMessage.custom_emoji.image.startsWith('http')
             ? replyMessage.custom_emoji.image
@@ -609,12 +675,23 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
     }
 
     // 貼圖訊息：維持文字提示（或可改顯示縮圖）
-    if (replyMessage.message_type === 'sticker') {
+    if (messageType === 'sticker') {
       return <span>[貼圖: {replyMessage.sticker?.name || '未知'}]</span>;
     }
 
-    if (replyMessage.message_type === 'image') {
+    if (messageType === 'image') {
       return <span>[圖片]</span>;
+    }
+
+    // 對於普通文字，如果太長則截斷，但要小心不要截斷HTML標籤
+    if (content.includes('<img') || content.includes('<span')) {
+      // 如果內容包含HTML標籤，不要截斷，直接渲染
+      return (
+        <span
+          className="reply-html"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
     }
 
     const truncated = content.length > 50 ? content.slice(0, 50) + '…' : content;
@@ -718,7 +795,7 @@ const ChatRoom = ({ roomId, currentUser, currentDoll, otherDoll, onNewMessage, o
               {message.message_type === 'rich_text' && (
                 <div 
                   dangerouslySetInnerHTML={{ 
-                    __html: message.decrypted_content || message.encrypted_content || '[無內容]' 
+                    __html: message.decrypted_content || message.encrypted_content || '不明的內容' 
                   }}
                 />
               )}
