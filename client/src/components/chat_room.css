@@ -170,9 +170,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* 新增：強制回覆區塊內文靠左，不受父層 .message.own 影響 */
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.reply-preview .custom-emoji-inline {
+/* 無論是自己或對方訊息，回覆預覽都靠左顯示 */
+.message.own .reply-preview,
+.message.other .reply-preview {
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* 回覆預覽中的自訂表情符號大小與對齊 */
+.reply-preview .custom-emoji-inline,
+.reply-preview img.custom-emoji-inline {
   width: 16px !important;
   height: 16px !important;
   vertical-align: middle;
@@ -360,7 +374,15 @@
   border-radius: 15px;
   display: flex;
   justify-content: space-between;
-  align-items: left;
+  align-items: center;
+  text-align: left; /* 新增：整個回覆列靠左 */
+}
+
+.reply-bar .reply-label { margin-right: 6px; }
+
+.reply-bar .reply-content {
+  flex: 1 1 auto;
+  text-align: left; /* 新增：內容靠左 */
 }
 
 .reply-bar button {
@@ -886,6 +908,29 @@
 .message-input input.with-sticker-preview::placeholder {
   color: rgba(102, 126, 234, 0.7);
   font-weight: 500;
+}
+
+/* 調整回覆區塊的文字與內容排列，支援換行並保持靠左 */
+.reply-preview .reply-label,
+.reply-bar .reply-label {
+  color: rgba(255, 255, 255, 0.9);
+  flex: 0 0 auto;
+}
+
+.reply-preview .reply-content,
+.reply-bar .reply-content {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal; /* 允許換行，避免被單行省略 */
+  overflow: visible;
+}
+
+/* 透明回覆氣泡內的 HTML 也要正常顯示 emoji */
+.reply-preview .reply-html img.custom-emoji-inline,
+.reply-bar .reply-html img.custom-emoji-inline {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
 }
 
 /* 響應式設計 */
