@@ -394,59 +394,7 @@ export default function BottomBar() {
     );
   };
 
-  // 桌面版底部導航欄 - 正常流佈局
-  const renderDesktopBar = () => {
-    return (
-      <div style={{
-        backgroundColor: '#F5F5F5', 
-        borderTop: '1px solid #E4E4E4',
-        paddingTop: '20px',
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '0 20px',
-        }}>
-          {/* 左側區域 - 網站資訊 */}
-          <div style={{ flex: '0 0 30%' }}>
-            <h3 style={{ marginBottom: '10px' }}>Oh-Wow-wow-pair</h3>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              連結玩具娃娃愛好者的社交平台
-            </p>
-          </div>
-          
-          {/* 中間區域 - 導航連結 */}
-          <div style={{ flex: '0 0 30%', display: 'flex', justifyContent: 'center' }}>
-            <ul style={{ 
-              listStyle: 'none', 
-              padding: 0, 
-              margin: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px' 
-            }}>
-              {/* <li style={{ cursor: 'pointer' }} onClick={() => navigate('/main_page')}>首頁</li>
-              <li style={{ cursor: 'pointer' }} onClick={() => navigate('/create_post')}>發表貼文</li>
-              <li style={{ cursor: 'pointer' }} onClick={() => navigate(`/doll_page/${authContext.currentDollId}`)}>個人資料</li> */}
-            </ul>
-          </div>
-          
-          {/* 右側區域 - 聯絡資訊 */}
-          <div style={{ flex: '0 0 30%', textAlign: 'right' }}>
-            <p style={{ color: '#666', fontSize: '14px', margin: '5px 0' }}>
-              聯絡我們: ohwowwowpair@gmail.com
-            </p>
-            <p style={{ color: '#666', fontSize: '14px', margin: '5px 0' }}>
-              © 2025 Oh-Wow-wow-pair. 保留所有權利。
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // 根據裝置類型渲染對應的底部導航欄
-  return isMobile ? renderMobileBar() : renderDesktopBar();
+  if (!isMobile) return null;
+  return renderMobileBar();
 }
