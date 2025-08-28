@@ -180,20 +180,12 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
       });
       console.log(offsetRef.current);
 
-      const existingIds = new Set(posts.map(p => p.id));
-      const uniqueNewPosts = morePosts.filter(p => !existingIds.has(p.id));
+      setPosts(prev => {
+        const merged = [...prev, ...morePosts]; // 只合併，不去重
+        return merged;
+      });
 
-      if (uniqueNewPosts.length === 0) {
-        setHasMore(false);
-      } else {
-        setPosts(prev => {
-          const merged = [...prev, ...morePosts];
-          const deduplicated = Array.from(new Map(merged.map(p => [p.id, p])).values());
-          return deduplicated;
-        });
-        offsetRef.current += uniqueNewPosts.length; // 更新 offset
-        setHasMore(morePosts.length === 5); // 如果不是剛好5筆就認為沒有更多了
-      }
+      offsetRef.current += 5; // 更新 offset
 
       setLikedPosts(prevLiked => {
         const newLiked = new Set(prevLiked);
@@ -258,7 +250,7 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
   return (
     <>
       {posts.map((p, index) => (
-        <div key={p.id} ref={index === posts.length - 1 ? lastPostRef : null}>
+        <div key={index} ref={index === posts.length - 1 ? lastPostRef : null}>
         <Card 
           className="mb-3"
         >
