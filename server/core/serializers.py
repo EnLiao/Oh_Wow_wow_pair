@@ -26,6 +26,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         if len(value) > 100:
             raise serializers.ValidationError("暱稱長度不能超過 100 字元")
         return value
+    
+    def validate_bio(self, value):
+        if len(value) > 500:
+            raise serializers.ValidationError("個人簡介不能超過 500 字元")
+        return value
     def validate_avatar_image(self, value):
         limit = 5 * 1024 * 1024  # 5MB
         if value.size > limit:
@@ -105,6 +110,11 @@ class DollSerializer(serializers.ModelSerializer):
         limit = 5 * 1024 * 1024  # 5MB
         if value.size > limit:
             raise serializers.ValidationError("圖片太大，不能超過 5MB")
+        return value
+    
+    def validate_description(self, value):
+        if len(value) > 1000:
+            raise serializers.ValidationError("娃娃描述不能超過 1000 字元")
         return value
     def validate_tag_ids(self, value):
         for tag_id in value:

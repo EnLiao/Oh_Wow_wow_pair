@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.core.validators import FileExtensionValidator
 import uuid
 from core.models import User, Doll, Tag
 from django.db.models import Max
@@ -9,7 +10,12 @@ class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     doll_id = models.ForeignKey(Doll, to_field='id', on_delete=models.CASCADE)
     content = models.TextField()
-    image = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    image = models.ImageField(
+        upload_to='avatars/', 
+        null=True, 
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):
