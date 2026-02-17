@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { data } from 'react-router-dom';
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: API_BASE_URL,
 });
 
 api.interceptors.request.use(
@@ -74,7 +76,7 @@ function addBaseUrl(path) {
   // 如果已經是完整URL則直接返回
   if (path.startsWith('http')) return path;
   // 否則加上API基礎URL
-  return `http://localhost:8000${path}`;
+  return `${API_BASE_URL}${path}`;
 }
 
 export const getFollowing = (dollId) => api.get(`/core/dolls/${dollId}/follower_to/`);
@@ -91,7 +93,7 @@ export const refreshToken = async () => {
     throw new Error('No refresh token available');
   }
   
-  const response = await axios.post('/core/token/refresh/', { refresh });
+  const response = await axios.post(`${API_BASE_URL}/core/token/refresh/`, { refresh });
   return response.data;
 };
 
