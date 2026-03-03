@@ -169,13 +169,13 @@ export default function DollPage() {
   // 渲染電腦版畫面
   const renderDesktopVersion = () => {
     return (
-      <Container className="mt-5" style={{ paddingTop: 50 }}>
+      <Container className="mt-5">
         <Row>
           <Col 
             md={4}
             style={{ 
               position: 'sticky',    
-              top: 100,               
+              top: 80,               
               alignSelf: 'flex-start', 
               height: 'fit-content'  
             }}>
@@ -247,7 +247,7 @@ export default function DollPage() {
           </Col>
             
           <Col md={8}>
-            <Card>
+            <Card style={{top: 30, marginBottom: 70}}>
               <CardHeader>
                 <CardTitle className="text-center h4">Recently Posts</CardTitle>
               </CardHeader>

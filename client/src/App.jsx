@@ -9,18 +9,21 @@ import { AuthProvider } from './services/auth_context'
 import RequireAuth from './services/require_auth'
 import RequireDoll from './services/require_doll'
 import BottomBar from './components/bottom_bar'
+import Intro from './pages/intro'
 
 function AppLayout() {
   const location = useLocation()
   const NoNeedNavBar = 
     location.pathname === '/' ||
+    location.pathname === '/login' ||
     location.pathname === '/create_doll'
 
   return (
     <>
       {!NoNeedNavBar && <NavBar />}
       <Routes>
-        <Route path='/' element={<Login />} />
+        <Route path='/' element={<Intro />} />
+        <Route path='/login' element={<Login />} />
         <Route element={<RequireAuth />}>
           <Route path='/create_doll' element={<CreateDoll />} />
           <Route element={<RequireDoll />}>

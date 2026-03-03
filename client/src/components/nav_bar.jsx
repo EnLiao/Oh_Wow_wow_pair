@@ -6,6 +6,7 @@ import default_doll_img from '../assets/windy.jpg';
 import { doll_list_view, getDollInfo } from '../services/api';
 import search_icon from '../assets/search.png';
 import Search from './search';
+import { IoSettingsSharp } from "react-icons/io5";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -152,8 +153,8 @@ export default function NavBar() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 10,
+        marginTop: 3,
+        marginBottom: 3,
       }}>
         {/* 網站標題 */}
         <div style={{ flex: '1 1 30%', minWidth: '100px' }}>
@@ -244,7 +245,16 @@ export default function NavBar() {
         </div>
         
         {/* 桌面版使用者頭像 */}
-        <div style={{ flex: '1 1 20%', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ flex: '1 1 20%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}}>
+          <IoSettingsSharp 
+            style={{
+              width: 'clamp(20px, 2vw, 25px)',
+              height: 'clamp(20px, 2vw, 25px)',
+              marginRight: 15,
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate('/settings')}
+          />
           <Button
             id="desktopDollPopover"
             color="link"

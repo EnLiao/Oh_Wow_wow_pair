@@ -1,7 +1,7 @@
 import PostList from '../components/load_post';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../services/auth_context';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { getFollowing } from '../services/api';
 
 export default function MainPage() {
@@ -113,7 +113,8 @@ export default function MainPage() {
       <div style={{ 
         paddingLeft: '3%', 
         display: 'flex', 
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginTop: 20,
       }}>
         {/* 左側關注列表 */}
         <div
@@ -195,7 +196,7 @@ export default function MainPage() {
         <div style={{ 
           width: '60%',
           alignItems: 'center',
-          paddingTop: 40,
+          paddingTop: 20,
         }}>
           <PostList 
             mode="feed" 
