@@ -37,10 +37,10 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
 
   const handleCommentAdded = (postId) => {
     // 更新指定貼文的評論計數
-    setPosts(prevPosts => 
-      prevPosts.map(post => 
-        post.id === postId 
-          ? { ...post, comment_count: post.comment_count + 1 } 
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.id === postId
+          ? { ...post, comment_count: post.comment_count + 1 }
           : post
       )
     );
@@ -56,10 +56,10 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
         toggleLike(postId);
 
         // 更新貼文的 like_count
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.id === postId 
-              ? { ...post, like_count: Math.max(0, post.like_count - 1) } 
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.id === postId
+              ? { ...post, like_count: Math.max(0, post.like_count - 1) }
               : post
           )
         );
@@ -70,10 +70,10 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
         toggleLike(postId);
 
         // 更新貼文的 like_count
-        setPosts(prevPosts => 
-          prevPosts.map(post => 
-            post.id === postId 
-              ? { ...post, like_count: post.like_count + 1 } 
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post.id === postId
+              ? { ...post, like_count: post.like_count + 1 }
               : post
           )
         );
@@ -94,21 +94,21 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
     const currentPost = posts.find(p => p.doll_id === dollId);
     // 檢查是否已經追蹤這個娃娃
     // const isFollowing = currentPost?.is_followed ?? false;
-    
+
     try {
       const followData = {
         from_doll_id: viewerId,
         to_doll_id: dollId,
       };
-        
+
       await follow(followData);
       console.log('已追蹤:', dollId);
-        
+
       // 直接更新貼文的 is_followed 屬性
-      setPosts(prevPosts => 
-        prevPosts.map(post => 
-          post.doll_id === dollId 
-            ? { ...post, is_followed: true } 
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.doll_id === dollId
+            ? { ...post, is_followed: true }
             : post
         )
       );
@@ -128,7 +128,7 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
   useEffect(() => {
     if (!viewerId || !targetId) return;
     offsetRef.current = 0; // 重置 offset
-    
+
     const loadPosts = async () => {
       try {
         setLoading(true);
@@ -250,12 +250,12 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
   return (
     <>
       {posts.map((p, index) => (
-        <div key={index} ref={index === posts.length - 1 ? lastPostRef : null}>
-        <Card 
-          className="mb-3"
-        >
-          <CardBody>
-            <div className="d-flex align-items-center mb-2">
+        <div key={p.id} ref={index === posts.length - 1 ? lastPostRef : null}>
+          <Card
+            className="mb-3"
+          >
+            <CardBody>
+              <div className="d-flex align-items-center mb-2">
                 <img
                   src={p.doll_avatar}
                   alt={p.doll_id}
@@ -265,28 +265,28 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
                     borderRadius: '50%',
                     marginRight: 10,
                     objectFit: 'cover',
-                    userSelect: 'none', 
+                    userSelect: 'none',
                     cursor: 'pointer'
                   }}
                   onClick={() => {
                     navigate(`/doll_page/${p.doll_id}`);
                   }}
                 />
-              <CardTitle tag="h5" className="mb-0">
-                {p.doll_id}
-              </CardTitle>
-              <small className="text-muted" style={{ marginLeft: '20px' }}>
-                {new Date(p.created_at).toLocaleString()}
-              </small>
+                <CardTitle tag="h5" className="mb-0">
+                  {p.doll_id}
+                </CardTitle>
+                <small className="text-muted" style={{ marginLeft: '20px' }}>
+                  {new Date(p.created_at).toLocaleString()}
+                </small>
                 {!p.is_followed && (
-                  <p 
-                    className="mb-0" 
-                    style={{ 
-                      marginLeft: '15px', 
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
+                  <p
+                    className="mb-0"
+                    style={{
+                      marginLeft: '15px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
                       backgroundColor: '#f0f0f0',
-                      color: '#666666', 
+                      color: '#666666',
                       padding: '2px 6px',
                       borderRadius: '3px',
                       cursor: 'pointer',
@@ -299,68 +299,68 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
                     follow
                   </p>
                 )}
-            </div>
-
-            <CardText style={{
-              marginBottom: 10,
-              whiteSpace: 'pre-wrap'  // 添加這個屬性來保留換行
-            }}>
-              {p.content}
-            </CardText>
-
-            {p.image && (
-              <CardImg
-                bottom
-                src={p.image}
-                alt="貼文圖片"
-                style={{ borderRadius: '10px', marginBottom:10, userSelect: 'none' }}
-              />
-            )}
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              <div style={{
-                display: 'flex', 
-                alignItems: 'center', 
-                marginRight: 15
-              }}>
-                {likedPosts.has(p.id) ? (
-                  <FaHeart 
-                    style={{
-                      cursor: 'pointer',
-                      width: '1.2em',
-                      height: '1.2em',
-                      color: '#ffd5fc'
-                    }}
-                    onClick={() => likeSubmit(p.id)}
-                  />
-                ) : (
-                  <FaRegHeart 
-                    style={{
-                      cursor: 'pointer',
-                      width: '1.2em',
-                      height: '1.2em'
-                    }}
-                    onClick={() => likeSubmit(p.id)}
-                  />
-                )}
-                <p style={{
-                  margin: 0,
-                  marginRight: 5,
-                  marginLeft: 10,
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  {p.like_count}
-                </p>
               </div>
-              <FaRegCommentDots 
-                style={{
-                  cursor: 'pointer',
-                  width: '1.2em',
-                  height: '1.2em'
-                }}
-                onClick={() => toggleComment(p.id)}
-              />
+
+              <CardText style={{
+                marginBottom: 10,
+                whiteSpace: 'pre-wrap'  // 添加這個屬性來保留換行
+              }}>
+                {p.content}
+              </CardText>
+
+              {p.image && (
+                <CardImg
+                  bottom
+                  src={p.image}
+                  alt="貼文圖片"
+                  style={{ borderRadius: '10px', marginBottom: 10, userSelect: 'none' }}
+                />
+              )}
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginRight: 15
+                }}>
+                  {likedPosts.has(p.id) ? (
+                    <FaHeart
+                      style={{
+                        cursor: 'pointer',
+                        width: '1.2em',
+                        height: '1.2em',
+                        color: '#ffd5fc'
+                      }}
+                      onClick={() => likeSubmit(p.id)}
+                    />
+                  ) : (
+                    <FaRegHeart
+                      style={{
+                        cursor: 'pointer',
+                        width: '1.2em',
+                        height: '1.2em'
+                      }}
+                      onClick={() => likeSubmit(p.id)}
+                    />
+                  )}
+                  <p style={{
+                    margin: 0,
+                    marginRight: 5,
+                    marginLeft: 10,
+                    fontSize: '0.9rem',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {p.like_count}
+                  </p>
+                </div>
+                <FaRegCommentDots
+                  style={{
+                    cursor: 'pointer',
+                    width: '1.2em',
+                    height: '1.2em'
+                  }}
+                  onClick={() => toggleComment(p.id)}
+                />
                 <p style={{
                   margin: 0,
                   marginRight: 5,
@@ -371,18 +371,18 @@ export default function PostList({ mode = 'feed', profileDollId, onFollowSuccess
                 }}>
                   {p.comment_count}
                 </p>
-            </div>
-            {commentingPostId === p.id && (
-              <PostComment 
-                postId={p.id} 
-                onCommentAdded={() => handleCommentAdded(p.id)} 
-              />
-            )}
-          </CardBody>
-        </Card>
+              </div>
+              {commentingPostId === p.id && (
+                <PostComment
+                  postId={p.id}
+                  onCommentAdded={() => handleCommentAdded(p.id)}
+                />
+              )}
+            </CardBody>
+          </Card>
         </div>
       ))}
-      
+
       {loadingMore && (
         <div className="text-center my-4">
           <Spinner color="primary" size="sm" />
